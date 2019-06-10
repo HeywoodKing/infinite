@@ -1,0 +1,35 @@
+查看实例名称
+select convert(varchar(30),@@SERVICENAME) as shili
+
+
+
+
+测试一个数据连接对象
+using System;
+using System.Data.SqlClient;
+using System.Text;
+
+namespace Test
+{
+  class Program
+  {
+    static void Main(string[] args)
+    {
+      SqlConnection cn = new SqlConnection
+      ("server=\\SQLEXPRESS;database=master;uid=sa;pwd=jack");
+      try
+      {
+        cn.Open();
+        Console.WriteLine("连接成功！");
+      }
+      catch (SqlException sqle)
+      {
+        Console.WriteLine("连接出错：" + sqle.Message);
+      }
+      finally
+      {
+        cn.Close();
+      }
+    }
+  }
+}

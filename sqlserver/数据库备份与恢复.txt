@@ -1,0 +1,99 @@
+SQL语句里有.
+
+备份
+backup database [数据库名] to disk=[磁盘路径]
+
+例如
+backup database data to disk='D:\1.bak'
+
+恢复
+restore database [数据库名] from disk=[磁盘路径]
+
+例如
+restore database data from disk='D:\1.bak'
+
+
+
+create PROCEDURE GY_DBBak      
+          @bakequip int,                   --备份设备：磁盘&磁带      
+          @bakpath varchar(50),          --带全路径的备份文件名 
+          @baktype int,                  --完全备份&增量备份      
+          @baklog int,                 --‘0’备份日志 
+          @bakdb int,                --‘0’备份数据库      
+          @kind  varchar(7),                    --备份还是恢复
+	  @retmsg varchar(20)     output       --返回信息      
+  AS      
+
+        DECLARE     @DevName_data      varchar(50)      
+        DECLARE     @DevName_log       varchar(50)  
+        declare     @db_path           varchar(100)  
+        declare     @log_path          varchar(100)  
+                 
+        DECLARE     @RC INT        
+   
+  SELECT @db_path =  @bakpath  + '.dat'      
+  SELECT @log_path =  @bakpath  +  'log.dat'      
+  SELECT @RC=0
+   
+        DBCC     CHECKDB(Northwind)      
+  /***********************************************************  
+  **   CREATE   BACKUP   AND   RESTORE   DEVICES  
+  ************************************************************/  
+  IF   @RC=0  
+        BEGIN  
+   
+        EXEC   sp_addumpdevice   'disk',   @DevName_data,@db_path  
+   
+  exec   sp_addumpdevice   'disk',   @DevName_log,@log_path  
+        select   @rc=@@error  
+  IF   @RC<>0  
+  begin  
+  EXEC   SP_DropDevice   @Devname_data  
+  exec   sp_dropdevice   @devname_log  
+  SELECT   @RC=-1000  
+  return   @rc  
+  end  
+      END  
+   
+        IF     @kind='backup'      
+        BEGIN      
+                IF     @bakequip=0      
+                BEGIN      
+                        IF     @baktype=0      
+                        BEGIN      
+                                IF     @bakdb=0      
+                                BEGIN          
+                                        BACKUP     DATABASE     Northwind     TO     DISK=@Devname_data      
+                                        WITH     INIT      
+                                END      
+                                IF     @baklog=0      
+                                BEGIN                              
+                                        BACKUP     LOG     Northwind     WITH     NO_LOG                              
+                                        BACKUP     LOG     Northwind     TO     DISK=@DevName_log    
+                                        WITH     INIT,NO_TRUNCATE      
+                                END      
+                        END      
+                        ELSE     BEGIN      
+                                IF     @bakdb=0      
+                                BEGIN      
+                                        BACKUP     DATABASE     Northwind     TO     DISK=@DevName_data  
+                                        WITH     NOINIT      
+                                END      
+                                IF     @baklog=0      
+                                BEGIN      
+                                        BACKUP     LOG     Northwind     WITH     NO_LOG                              
+                                        BACKUP     LOG     Northwind     TO     DISK=@DevName_log    
+                                        WITH     NOINIT,NO_TRUNCATE      
+                                END      
+                        END                      
+                END      
+                SELECT     @retmsg='数据库备份成功！'      
+        END      
+     
+        IF     @kind='restore'              
+        BEGIN      
+                RESTORE     DATABASE     Northwind     FROM     DISK=     @DevName_data   WITH     REPLACE      
+                SELECT     @retmsg='恢复数据库成功！'      
+        END      
+     
+        RETURN     0

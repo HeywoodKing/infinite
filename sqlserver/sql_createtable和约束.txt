@@ -1,0 +1,26 @@
+create table A_studentinfo
+(
+  -- 学号
+  sno char(10) ,
+  -- 姓名
+  sname char(20) not null,
+  -- 性别
+  sex char(2) not null  ，check (sex in ('男','女')),这是列级约束
+  -- 身份证号
+  CardID char(18) not null unique,
+  -- 出生年份
+  yearofbirth int not null,
+  -- 所在班级
+  class char(10) not null,
+  -- 所属省份
+  province char(20) not null,
+  -- 入学时间
+  enrollment datetime not null,                                                                                               
+
+  -- 约束
+  constraint stu_PK primary key (sno),
+  constraint stu_sex check (sex in ('男','女')),
+  constraint stu_birth check (yearofbirth between 1900 and 2000)
+  这种叫表级约束
+)
+

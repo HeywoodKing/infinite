@@ -1,0 +1,87 @@
+动态生成select语句 
+
+让我们先看三条SQL语句： 
+
+
+select xh,value as th1 from t_table where th=1 
+select xh,value as th2 from t_table where th=2
+select xh,value as th3 from t_table where th=3
+ 
+
+
+
+这三条语句分别使用th字段按着所有th可能的值来查询t_table，这三条SQL语句所查询出来的记录如图3所示。 
+
+
+
+
+图 3
+然后再使用下面的语句按着xh分组： 
+
+
+select xh from t_table group by xh
+ 
+
+
+
+得到的结果如图4所示。 
+
+
+
+
+图4
+然后使用left join，以图4所示的表为最左边的表，进行连接，SQL语句如下： 
+
+
+select a.xh, b.th1, c.th2, d.th3 from
+(select xh from t_table group by xh) a 
+left join 
+(select xh,value as th1 from t_table where th=1) b on a.xh=b.xh 
+left join 
+(select xh,value as th2 from t_table where th=2) c on a.xh=c.xh 
+left join 
+(select xh,value as th3 from t_table where th=3) d on a.xh=d.xh
+ 
+
+
+
+之所以使用left join，是因为按着th查询后，有的表的某些xh值可以没有，如图3中的第三个表，就没有0003。如果使用内连接，0003就无法在记录集中体现。这面的SQL的查询结果如图5所示。 
+
+
+
+
+图5
+然后我们就可以使用如下的语句来连接th1、th2和th3了。 
+
+
+select xh, (th1+th2+th3) as th from myview
+ 
+
+
+
+myview表示将上面用left join的语句保存成的视图。 
+
+下面可以将这个过程写成一条SQL语句： 
+
+
+select xh, (th1+th2+th3) as th from 
+(
+select a.xh,  (case when b.th1 is null then '' else b.th1 end) as th1,
+ (case when c.th2 is null then '' else c.th2 end) as th2,
+ (case when d.th3 is null then '' else d.th3 end) as th3 
+from
+(select xh from t_table group by xh) a  
+left join 
+(select xh,value as th1 from t_table where th=1) b on a.xh=b.xh 
+left join 
+(select xh,value as th2 from t_table where th=2) c on a.xh=c.xh 
+left join
+(select xh,value as th3 from t_table where th=3) d on a.xh=d.xh
+) x
+ 
+
+
+
+由于null加上任何字符串都为null，因此，使用case语句来将null转换为空串。上面的SQL就会得到图2所示的查询结果。也许有的读者会问，如果th的可能取值可变呢！如xh为0001的th值四个：1至4。 那上面的SQL不是要再加一个left join吗？这样不是很不通用。 要解决这个问题也很容易。可以使用程序（如C#、Java等）自动生成上述的SQL，然后由程序提交给数据库，再执行。 当然，这需要程序事先知道th值对于当前程序最多有几个值，然后才可以自动生成上述的SQL语句。 
+
+这种方法几乎适合于所有的数据库，不过如果th的取值比较多的话，可能SQL语句会很长，但是如果用程序自动生成的话，就不会管这些了

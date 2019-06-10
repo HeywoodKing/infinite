@@ -1,0 +1,34 @@
+
+class ImageTest
+{
+
+    //Bitmap bmp = (Bitmap) pictureBox1.Image.Clone(); //这一行请无视……因为我测试的时候正好从pictureBox里面拿图而已
+    public static void CreateImage(Bitmap bmp)
+    {
+        int w = bmp.Width;
+        int h = bmp.Height;
+        BitmapData data = bmp.LockBits(Rectangle.FromLTRB(0, 0, w, h), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+         
+        int wb = data.Stride;
+         
+        unsafe
+        {
+            byte* pd = (byte*)data.Scan0.ToPointer();
+            for (int i = 0; i < h; ++i)
+            {
+                int* pStart = (int*)&pd[i * wb];
+                int* pEnd = (int*)&pd[(i+1) * wb];
+                pEnd -= 1;
+                while (pStart < pEnd)
+                {
+                    int tmp = *pStart;
+                    *pStart = *pEnd;
+                    *pEnd = tmp;
+                    ++pStart;
+                    --pEnd;
+                }
+            }
+        }
+        b.UnlockBits(data);
+    }
+}

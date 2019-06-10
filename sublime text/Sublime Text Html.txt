@@ -1,0 +1,69 @@
+Sublime Text Html插件
+
+View In Browser插件安装
+
+安装View In Browser插件
+快捷键 Ctrl+Shift+P 输入 Install Package并且回车，输入View In Browser 回车
+
+设置快捷键
+
+Preferences->Key Bindings-User 输入:[{ “keys”: [“ctrl+alt+f”], “command”: “open_in_browser” },]
+
+当为html的时候就可以 ctrl+alt+f 在浏览器中进行查看了 
+CTRL + ALT + F - Firefox 
+CTRL + ALT + C - Chrome 
+CTRL + ALT + I - Internet Explorer 
+CTRL + ALT + S - Safari
+
+如何快速的创建html文件
+
+安装插件Emmet
+
+快捷键 Ctrl+Shift+P 输入 Install Package并且回车，输入 Emmet 回车,一般情况下Tab键是有冲突的，Ctrl+E 触发生效
+
+Emmet常用操作方式
+
+html:5 或! ：用于HTML5文档类型
+html:xt    : 用于XHTML过渡文档类型
+html:4s    : 用于HTML4严格文档类型
+
+//轻松添加类、Id、文本和属性
+连续输入元素名称和ID,Emmet会自动为你补全,比如输入 p#foo ; p.bar#foo
+<p class="bar" id="foo"/></p>
+
+//如何定义HTML元素的内容和属性。你可以通过输入h1{foo}和a[href=#],就可以自动生成如下代码:
+<h1>foo</h1>
+<a href="#"></a>
+
+//嵌套
+>:子元素符号，表示嵌套的元素；+:同级标签符号;^:可以使该符号前的标签提示一行
+p>spn 
+<p><span></span></p>
+
+//分组
+(.foo>h1)+(.bar>h2) : 会自动生成如下代码
+<div class="foo">
+    <h1></h1>
+</div>
+<div class="bar">
+    <h2></h2>
+</div>
+
+//隐式标签
+在过去版本中，可以省略掉div，即输入.item即可生成<div class="item"></div>。现在如果只输入.item，则Emmet会根据父标签进行判定。比如在<ul>中输入.item，就会生成<li class="item"></li>。
+
+//定义多个元素
+要定义多个元素，可以使用*符号。比如,ul>li*3可以生成如下代码:
+<ul>
+    <li></li>
+    <li></li>
+    <li></li>
+</ul>
+
+//定义多个带属性的元素
+如果输入 ul>li.item$*3，将会生成如下代码:
+<ul>
+    <li class="item1"></li>
+    <li class="item2"></li>
+    <li class="item3"></li>
+</ul>

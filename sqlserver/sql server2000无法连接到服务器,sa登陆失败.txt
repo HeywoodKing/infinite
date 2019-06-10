@@ -1,0 +1,59 @@
+exec sp_password Null,'ok','sa'
+
+"sql server2000无法连接到服务器,sa登陆失败"解决方案
+
+一.控制面板-》服务-》MS SQL SERVER-》登陆--》本地系统帐户--》重新启动MS SQL SERVER
+用windows验证登陆查询分析器--》执行 sp_password null,sa新密码,'sa'
+
+二."无法连接到服务器,用户xxx登陆失败"
+该错误产生的原因是由于SQL Server使用了"仅 Windows"的身份验证方式,
+因此用户无法使用SQL Server的登录帐户（如 sa ）进行连接.解决方法如下所示:
+1.在服务器端使用企业管理器,并且选择"使用 Windows 身份验证"连接上 SQL Server
+操作步骤:
+在企业管理器中
+--右键你的服务器实例(就是那个有绿色图标的)
+--编辑SQL Server注册属性
+--选择"使用windows身份验证"
+--选择"使用SQL Server身份验证"
+--登录名输入:sa,密码输入sa的密码
+--确定
+2.设置允许SQL Server身份登录
+操作步骤:
+在企业管理器中
+--展开"SQL Server组",鼠标右键点击SQL Server服务器的名称
+--选择"属性"
+--再选择"安全性"选项卡
+--在"身份验证"下,选择"SQL Server和 Windows ".
+--确定,并重新启动SQL Server服务.
+在以上解决方法中,如果在第 1 步中使用"使用 Windows 身份验证"连接 SQL Server 失败,
+那就通过修改注册表来解决此问题:
+1.点击"开始"-"运行",输入regedit,回车进入注册表编辑器
+2.依次展开注册表项,浏览到以下注册表键:
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\MSSQLServer\MSSQLServer]
+3.在屏幕右方找到名称"LoginMode",双击编辑双字节值
+4.将原值从1改为2,点击"确定"
+5.关闭注册表编辑器
+6.重新启动SQL Server服务.
+此时,用户可以成功地使用sa在企业管理器中新建SQL Server注册,
+但是仍然无法使用Windows身份验证模式来连接SQL Server.
+这是因为在 SQL Server 中有两个缺省的登录帐户:
+BUILTIN\Administrators
+<机器名>\Administrator 被删除.
+要恢复这两个帐户,可以使用以下的方法:
+1.打开企业管理器,展开服务器组,然后展开服务器
+2.展开"安全性",右击"登录",然后单击"新建登录"
+3.在"名称"框中,输入 BUILTIN\Administrators
+4.在"服务器角色"选项卡中,选择"System Administrators"
+5.点击"确定"退出
+6.使用同样方法添加 <机器名>\Administrator 登录.
+说明:
+以下注册表键:
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\LoginMode
+的值决定了SQL Server将采取何种身份验证模式.
+1.表示使用"Windows 身份验证"模式
+2.表示使用混合模式（Windows 身份验证和 SQL Server 身份验证）.
+ 
+
+
+ 
+

@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>颜色格式相互转化</title>
+
+</head>
+
+<body>
+<div class="wrap">
+  <div>
+    <input id="v1"  />
+    <button id="b1" >转为RGB格式</button>
+    <div id="showRgb" ></div>
+  </div>
+  <!--[if IE]><br /><![endif]-->
+  <div>
+    <input id="v2"  >
+    <button id="b2" >转为十六进制</button>
+    <div id="showHex"> </div>
+  </div>
+</div>
+<!--[if IE]>
+	<style>
+		div.wrap{ border:1px #f0f0f0 solid;background:rgb(0,153,255);}
+ 		div.wrap #showRgb,div.wrap #showHex{ border:1px #ccc solid}
+    </style>
+<![endif]-->
+<style>
+ 	body{ background:#069;  }
+ 	div.wrap #showRgb,
+	div.wrap #showHex{ width:200px; height:35px;line-height:35px; font-size:16px; text-align:center;    box-shadow:0 0 5px #000 inset; background:#f0f0f0;  float:left;border-radius:3px;}
+ 	div.wrap{width:490px; height:90px;  background:rgba(0,153,255,.6);margin:10% auto; padding:50px; border-radius:10px;   box-shadow:0 0 5px #333}
+ 	div.wrap div{ width:489px; height:37px; margin:auto; display:block;}
+	div.wrap input{ width:130px; display:block; height:33px; line-height:33px;  float:left; margin-right:10px; margin-top:1px; border-radius:3px; border:none}
+	div.wrap input:focus{outline:none;}
+	div.wrap button{ float:left; width:135px; height:35px; margin-top:1px; margin-right:10px; outline:none; }
+ </style>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ <script type="text/javascript" >
+
+//十六进制颜色值的正则表达式
+var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+/*RGB颜色转换为16进制*/
+String.prototype.colorHex = function(){
+	var that = this;
+	if(/^(rgb|RGB)/.test(that)){
+		var aColor = that.replace(/(?:\(|\)|rgb|RGB)*/g,"").split(",");
+		var strHex = "#";
+		for(var i=0; i<aColor.length; i++){
+		var hex = Number(aColor[i]).toString(16);
+	if(hex === "0"){
+			hex += hex;	
+		}
+	strHex += hex;
+	}
+	if(strHex.length !== 7){
+	strHex = that;	
+	}
+	return strHex;
+	}else if(reg.test(that)){
+		var aNum = that.replace(/#/,"").split("");
+		if(aNum.length === 6){
+		return that;	
+	}else if(aNum.length === 3){
+		var numHex = "#";
+		for(var i=0; i<aNum.length; i+=1){
+			numHex += (aNum[i]+aNum[i]);
+	}
+	return numHex;
+	}
+}
+	else{
+	return that;	
+	}
+};
+
+
+/*16进制颜色转为RGB格式*/
+String.prototype.colorRgb = function(){
+	var sColor = this.toLowerCase();
+	if(sColor && reg.test(sColor)){
+		if(sColor.length === 4){
+				var sColorNew = "#";
+				for(var i=1; i<4; i+=1){
+						sColorNew += sColor.slice(i,i+1).concat(sColor.slice(i,i+1));	
+	}
+	sColor = sColorNew;
+	}
+//处理六位的颜色值
+var sColorChange = [];
+for(var i=1; i<7; i+=2){
+	sColorChange.push(parseInt("0x"+sColor.slice(i,i+2)));	
+}
+	return "RGB(" + sColorChange.join(",") + ")";
+}else{
+	return sColor;	
+	}
+};
+
+window.onload = function(){
+	var obj = {
+		v1: document.getElementById("v1"),	
+		b1: document.getElementById("b1"),	
+		s1: document.getElementById("showRgb"),
+		v2: document.getElementById("v2"),	
+		b2: document.getElementById("b2"),	
+		s2: document.getElementById("showHex")
+	};
+	obj.b1.onclick = function(){
+			var v = obj.v1.value;
+				obj.s1.innerHTML = v.colorRgb();
+	};
+	obj.b2.onclick = function(){
+			var v = obj.v2.value;
+				obj.s2.innerHTML = v.colorHex();
+	};
+};
+</script>
+</body>
+</html>

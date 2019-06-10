@@ -1,0 +1,2 @@
+C:\Windows\Microsoft.NET\Framework\v4.0.30319>aspnet_regsql.exe -ssadd -sstype p
+ -S 192.168.1.250\sql2008_dev -U sa -P hcSinri_2015

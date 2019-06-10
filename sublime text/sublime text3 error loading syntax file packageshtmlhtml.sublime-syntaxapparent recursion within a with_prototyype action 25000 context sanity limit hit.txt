@@ -1,0 +1,5 @@
+sublime text3 error loading syntax file “packageshtmlhtml.sublime-syntax” apparent recursion within a with_prototyype action 25000 context sanity limit hit
+
+Sublime text3加载语法文件包/html/html时出错
+
+解决方案：

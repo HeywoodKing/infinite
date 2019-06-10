@@ -1,0 +1,64 @@
+
+var query = from f in db.TField
+            join fw in db.TFieldWel
+            on f.emp_no equals fw.emp_no
+            where f.fy_no == fy_no && fw.fy_no == fy_no
+            && (string.IsNullOrEmpty(brd_no) ? true : f.brd_no.Equals(brd_no))
+            && (string.IsNullOrEmpty(area_no) ? true : f.area_no.Equals(area_no))
+            && (string.IsNullOrEmpty(city_no) ? true : f.city_no.Equals(city_no))
+            && (string.IsNullOrEmpty(outlet_no) ? true : f.city_no.Equals(outlet_no))
+            select new {
+                f.area_no,f.brd_no,f.city_no,f.emp_name,f.emp_no,f.f_ft,f.usr_no,
+                fw.we_no, fw.we_money
+            };
+
+
+var models = from m in BusinessDataContext.Cpms_CusSignInfo
+                             join n in BusinessDataContext.Cpms_CusSignInfoItem
+                             on m.ID equals n.CUSSIGNINFOID into mn
+                             from o in mn.DefaultIfEmpty()
+                             where m.STATE == 1 && m.ISDELETE == "0" && o.ISDELETE == "0"
+                             && (year <= 0 ? true : m.YEAR == year)
+                             && (string.IsNullOrEmpty(orgCode) ? true : m.ORGCODE == orgCode)
+                             group new { m, o } by m.CUSTOMERID into g
+                             select new
+                             {
+                                 CUSTOMERID = g.Key,
+                                 CUSNAME = g.Min(p => p.m.CUSNAME),
+                                 ORGCODE = g.Min(p => p.m.ORGCODE),
+                                 ORGNAME = g.Min(p => p.m.ORGNAME),
+                                 YEAR = g.Min(p => p.m.YEAR),
+                                 OFFERMETHOD = g.Min(p => p.m.OFFERMETHOD),
+                                 OFFERMETHODNAME = g.Min(p => p.m.OFFERMETHODNAME),
+                                 GASOLINE_OFFERAMOUNT = g.Where(p => p.o.OILCATEGORY == "01").Sum(p => p.o.OFFERAMOUNT),
+                                 GASOLINE_CONSUMPTION = g.Where(p => p.o.OILCATEGORY == "01").Sum(p => p.o.CONSUMPTION),
+                                 DIESEL_OFFERAMOUNT = g.Where(p => p.o.OILCATEGORY == "02").Sum(p => p.o.OFFERAMOUNT),
+                                 DIESEL_CONSUMPTION = g.Where(p => p.o.OILCATEGORY == "02").Sum(p => p.o.CONSUMPTION)
+                             };
+
+                decimal perfect25 = 2.5M;
+                decimal perfect20 = 2.0M;
+                decimal perfect15 = 1.5M;
+                decimal perfect12 = 1.2M;
+                decimal perfect10 = 1.0M;
+
+                var dataList = (from m in models
+                               group m by m.ORGCODE into g
+                               select new CusRenewAdjustIdeaView
+                               {
+                                   ORGCODE = g.Key,
+                                   ORGNAME = g.Min(p => p.ORGNAME),
+                                   CUSNUMS = g.Count(),
+                                   RENEWCUSNUMS = g.Count(),
+                                   GASOLINEPERFECTRATE25UPNUMS = g.Where(p => p.GASOLINE_OFFERAMOUNT > perfect25).Count(),
+                                   GASOLINEPERFECTRATE25NUMS = g.Where(p => p.GASOLINE_OFFERAMOUNT > perfect20 && p.GASOLINE_OFFERAMOUNT <= perfect25).Count(),
+                                   GASOLINEPERFECTRATE20NUMS = g.Where(p => p.GASOLINE_OFFERAMOUNT > perfect15 && p.GASOLINE_OFFERAMOUNT <= perfect20).Count(),
+                                   GASOLINEPERFECTRATE15DOWNNUMS = g.Where(p => p.GASOLINE_OFFERAMOUNT <= perfect15).Count(),
+                                   //DIESELCONSUMEREBATE = 0,
+                                   DIESELPERFECTRATE25UPNUMS = g.Where(p => p.DIESEL_OFFERAMOUNT > perfect25).Count(),
+                                   DIESELPERFECTRATE25NUMS = g.Where(p => p.DIESEL_OFFERAMOUNT > perfect20 && p.DIESEL_OFFERAMOUNT <= perfect25).Count(),
+                                   DIESELPERFECTRATE20NUMS = g.Where(p => p.DIESEL_OFFERAMOUNT > perfect15 && p.DIESEL_OFFERAMOUNT <= perfect20).Count(),
+                                   DIESELPERFECTRATE15NUMS = g.Where(p => p.DIESEL_OFFERAMOUNT > perfect12 && p.DIESEL_OFFERAMOUNT <= perfect15).Count(),
+                                   DIESELPERFECTRATE12NUMS = g.Where(p => p.DIESEL_OFFERAMOUNT > perfect10 && p.DIESEL_OFFERAMOUNT <= perfect12).Count(),
+                                   DIESELPERFECTRATE10DOWNNUMS = g.Where(p => p.DIESEL_OFFERAMOUNT <= perfect10).Count()
+                               }).AsEnumerable().ToList();

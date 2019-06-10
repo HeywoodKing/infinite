@@ -1,0 +1,60 @@
+图像处理(马赛克效果)
+/// <summary>
+        /// 马赛克效果
+        ///原理：确定图像的随机位置点和确定马赛克块的大小,然后马赛克块图像覆盖随机点即可.
+        /// </summary>
+        /// <param name="m_Iimage"></param>
+        /// <param name="val">分割成val*val像素的小区块</param>
+        public Image MaSaiKe(Image m_PreImage , int val)
+        {
+            Bitmap MyBitmap = new Bitmap(m_PreImage);
+            if (MyBitmap.Equals(null))
+            {
+                return null;
+            }
+            int iWidth = MyBitmap.Width;
+            int iHeight = MyBitmap.Height;
+            int stdR , stdG , stdB;
+            stdR = 0;
+            stdG = 0;
+            stdB = 0;
+            BitmapData srcData = MyBitmap.LockBits(new Rectangle(0 , 0 , iWidth , iHeight) ,
+            ImageLockMode.ReadWrite , PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                byte* point = (byte*)srcData.Scan0.ToPointer();
+                for (int i = 0; i < iHeight; i++)
+                {
+                    for (int j = 0; j < iWidth; j++)
+                    {
+                        if (i % val == 0)
+                        {
+                            if (j % val == 0)
+                            {
+                                stdR = point[2];
+                                stdG = point[1];
+                                stdB = point[0];
+                            }
+                            else
+                            {
+                                point[0] = (byte)stdB;
+                                point[1] = (byte)stdG;
+                                point[2] = (byte)stdR;
+                            }
+                        }
+                        else
+                        {
+                            //复制上一行  
+                            byte* pTemp = point - srcData.Stride;
+                            point[0] = (byte)pTemp[0];
+                            point[1] = (byte)pTemp[1];
+                            point[2] = (byte)pTemp[2];
+                        }
+                        point += 3;
+                    }
+                    point += srcData.Stride - iWidth * 3;
+                }
+                MyBitmap.UnlockBits(srcData);
+            }
+            return MyBitmap;
+        }

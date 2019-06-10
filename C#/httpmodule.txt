@@ -1,0 +1,29 @@
+﻿System.Web.Caching.OutputCacheModule
+System.Web.SessionState.SessionStateModule
+System.Web.Security.WindowsAuthenticationModule
+System.Web.Security.FormsAuthenticationModule
+System.Web.Security.PassportAuthenticationModule
+System.Web.Security.RoleManagerModule
+System.Web.Security.UrlAuthorizationModule
+System.Web.Security.FileAuthorizationModule
+System.Web.Security.AnonymousIdentificationModule
+System.Web.Profile.ProfileModule
+System.Web.Mobile.ErrorHandlerModule, System.Web.Mobile
+System.ServiceModel.Activation.HttpModule, System.ServiceModel.Activation
+System.Web.Routing.UrlRoutingModule
+System.Web.Handlers.ScriptModule, System.Web.Extensions
+
+
+
+名称    类型    功能
+OutputCache System.Web.Caching.OutputCacheModule      				页面级输出缓存
+Session     System.Web.SessionState.SessionStateModule      			Session状态管理
+WindowsAuthentication   System.Web.Security.WindowsAuthenticationModule 	用集成Windows身份验证进行客户端验证
+FormsAuthentication     System.Web.Security.FormsAuthenticationModule   	用基于Cookie的窗体身份验证进行客户端身份验证
+PassportAuthentication  System.Web.Security.PassportAuthenticationModule      	用MS护照进行客户身份验证
+RoleManager System.Web.Security.RoleManagerModule     				管理当前用户角色
+UrlAuthorization  System.Web.Security.UrlAuthorizationModule      		判断用户是否被授权访问某一URL
+FileAuthorization System.Web.Security.FileAuthorizationModule     		判断用户是否被授权访问某一资源
+AnonymousIdentification System.Web.Security.AnonymousIdentificationModule     	管理Asp.Net应用程序中的匿名访问
+Profile     System.Web.Profile.ProfileModule    				管理用户档案文件的创立 及相关事件
+ErrorHandlerModule      System.Web.Mobile.ErrorHandlerModule      		捕捉异常，格式化错误提示字符，传递给客户端程序

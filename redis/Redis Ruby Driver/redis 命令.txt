@@ -1,0 +1,7 @@
+连接redis集群某一个单独实例
+redis-cli.exe -c -p 6380
+
+查询redis集群运行情况
+redis-trib.rb check 127.0.0.1:6380  
+
+

@@ -1,0 +1,685 @@
+将Sublime Text 2配置为C#代码编辑器(附配置文件)
+
+有时候我们需要编写一些小的代码片段时，在Visual Studio中创建一个工程就显得有点杀鸡用牛刀的感觉了，所有说对于一个程序员来说一款轻巧的代码编辑器还是很有必要的。原来我用的主要的Notepad++，直到发现了Sublime Text 2之后，这是一款非常优秀的编辑器，用ST2写代码有种非常流畅的感觉，就像是原来刚使用Chrome浏览器的时候(不过现在已经越来越笨重了)，ST2是收费软件，但是可以无限试用的，现在已经出了ST3了，不过还是测试版。同时ST2具有很强的扩展性，有很多的插件可供使用。ST2支持多种编程语言，不过对C#的支持不是太好，想要作为一款C#代码编辑器还需要自己手动改造一番。
+
+1.格式化代码
+
+ST2其实自带了代码格式化的功能，不过没有提供相应的快捷键，选中需要格式化的区域之后，使用方式如下：
+
+      
+
+在这里我们可以自己定义快捷键，在菜单栏中打开 Perferences ——> Key Bindings-User ，输入:
+
+{"keys": ["ctrl+shift+r"], "command": "reindent" , "args": {"single_line": false}}
+2.配置C#编译器
+
+ST2支持对编译器的调用，但没有对C#编译器提供内置支持，需要我们自行进行配置。
+
+新建编译器选项
+
+选择菜单栏中的 Tools ——> Build System ——> New Build System ，输入：
+
+1 {
+2      "cmd": ["csc", "$file"],
+3      "file_regex": "^(...*?):([0-9]*):?([0-9]*)",
+4      "selector": "source.cs",
+5      "encoding": "cp936"
+6 }
+另存为ST2程序目录的 Packages/User 文件夹下面，文件名为： C#.sublime-build ，如下：
+
+      
+
+编辑好C#代码文件后，输入 Ctrl + B ，编译代码，如下：
+
+      
+
+编译后直接运行程序
+
+  如果我们需要不仅仅只是编译程序，还需要直接运行程序并且获取控制台的输出结果，我们还需要对上面的配置进行改造。
+
+1.创建RunCSharp.bat文件
+
+在C#编译器所在目录(32机器下在： C:\Windows\Microsoft.NET\Framework 目录下，有各版本的C#编译器)下创建一个 RunCSharp.bat 文件，内容如下：
+
+ 1 @ECHO OFF
+ 2 cd %~dp1
+ 3 ECHO Compiling %~nx1.......
+ 4 IF EXIST %~n1.exe (
+ 5 DEL %~n1.exe
+ 6 )
+ 7 csc %~nx1
+ 8 IF EXIST %~n1.exe (
+ 9 ECHO -----------OUTPUT-----------
+10 start %~n1
+11 )
+2.修改C#.sublime-build文件
+
+要实现编译器后运行的效果我们需要修改前面创建的build文件，修改后内容如下：
+
+1 {
+2      "cmd": ["RunCSharp.bat", "$file"],
+3      "file_regex": "^(...*?):([0-9]*):?([0-9]*)",
+4      "selector": "source.cs",
+5      "encoding": "cp936"
+6 }
+3.编译并运行程序
+
+和前面一样，编写好代码后，键入Ctrl + B编译运行，在输出栏中查看控制台输入结果：
+
+      
+
+3.为C#代码添加注释功能
+
+C#中的注释快捷键是无效的，这是因为 Packages文件夹 中缺少了定义注释行为的文件。打开Packages，在C#文件夹中添加一个名为： Comments.tmPreferences 文件，输入如下内容：
+
+ View Code
+ 1 <?xml version="1.0" encoding="UTF-8"?>
+ 2 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ 3 <plist version="1.0">
+ 4 <dict>
+ 5     <key>name</key>
+ 6     <string>Comments</string>
+ 7     <key>scope</key>
+ 8     <string>source.cs</string>
+ 9     <key>settings</key>
+10     <dict>
+11         <key>shellVariables</key>
+12         <array>
+13             <dict>
+14                 <key>name</key>
+15                 <string>TM_COMMENT_START</string>
+16                 <key>value</key>
+17                 <string>// </string>
+18             </dict>
+19             <dict>
+20                 <key>name</key>
+21                 <string>TM_COMMENT_START_2</string>
+22                 <key>value</key>
+23                 <string>/*</string>
+24             </dict>
+25             <dict>
+26                 <key>name</key>
+27                 <string>TM_COMMENT_END_2</string>
+28                 <key>value</key>
+29                 <string>*/</string>
+30             </dict>
+31         </array>
+32     </dict>
+33     <key>uuid</key>
+34     <string>FBA964F9-2013-44D1-A5FD-AE8AB3FF8954</string>
+35 </dict>
+36 </plist>
+添加注释文件后，就可以为C#代码添加注释了，可以使用菜单，也可以使用相应的快捷键，如下：
+
+      
+
+4.添加C#关键字
+
+编程语言的关键字在ST2中是高亮显示的，对于ST2我们需要自己定义一下关键字，例如：virtual,var等，这时我们需要修改Packages文件夹中的C#文件夹的C#.tmLanguage文件，修改后文件的内容如下：
+
+ View Code
+  1 <?xml version="1.0" encoding="UTF-8"?>
+  2 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  3 <plist version="1.0">
+  4 <dict>
+  5     <key>fileTypes</key>
+  6     <array>
+  7         <string>cs</string>
+  8     </array>
+  9     <key>foldingStartMarker</key>
+ 10     <string>^\s*/\*|^(?![^{]*?//|[^{]*?/\*(?!.*?\*/.*?\{)).*?\{\s*($|//|/\*(?!.*?\*/.*\S))</string>
+ 11     <key>foldingStopMarker</key>
+ 12     <string>^\s*\*/|^\s*\}</string>
+ 13     <key>keyEquivalent</key>
+ 14     <string>^~C</string>
+ 15     <key>name</key>
+ 16     <string>C#</string>
+ 17     <key>patterns</key>
+ 18     <array>
+ 19         <dict>
+ 20             <key>begin</key>
+ 21             <string>///</string>
+ 22             <key>captures</key>
+ 23             <dict>
+ 24                 <key>0</key>
+ 25                 <dict>
+ 26                     <key>name</key>
+ 27                     <string>punctuation.definition.comment.source.cs</string>
+ 28                 </dict>
+ 29             </dict>
+ 30             <key>end</key>
+ 31             <string>$\n?</string>
+ 32             <key>name</key>
+ 33             <string>comment.block.documentation.source.cs</string>
+ 34             <key>patterns</key>
+ 35             <array>
+ 36                 <dict>
+ 37                     <key>begin</key>
+ 38                     <string>(&lt;/?)(?:([-_a-zA-Z0-9]+)((:)))?([-_a-zA-Z0-9:]+)</string>
+ 39                     <key>captures</key>
+ 40                     <dict>
+ 41                         <key>1</key>
+ 42                         <dict>
+ 43                             <key>name</key>
+ 44                             <string>punctuation.definition.tag.source.cs</string>
+ 45                         </dict>
+ 46                         <key>2</key>
+ 47                         <dict>
+ 48                             <key>name</key>
+ 49                             <string>entity.name.tag.namespace.source.cs</string>
+ 50                         </dict>
+ 51                         <key>3</key>
+ 52                         <dict>
+ 53                             <key>name</key>
+ 54                             <string>entity.name.tag.source.cs</string>
+ 55                         </dict>
+ 56                         <key>4</key>
+ 57                         <dict>
+ 58                             <key>name</key>
+ 59                             <string>punctuation.separator.namespace.source.cs</string>
+ 60                         </dict>
+ 61                         <key>5</key>
+ 62                         <dict>
+ 63                             <key>name</key>
+ 64                             <string>entity.name.tag.localname.source.cs</string>
+ 65                         </dict>
+ 66                     </dict>
+ 67                     <key>end</key>
+ 68                     <string>(/?&gt;)</string>
+ 69                     <key>name</key>
+ 70                     <string>keyword.other.documentation.source.cs</string>
+ 71                     <key>patterns</key>
+ 72                     <array>
+ 73                         <dict>
+ 74                             <key>captures</key>
+ 75                             <dict>
+ 76                                 <key>1</key>
+ 77                                 <dict>
+ 78                                     <key>name</key>
+ 79                                     <string>entity.other.attribute-name.namespace.source.cs</string>
+ 80                                 </dict>
+ 81                                 <key>2</key>
+ 82                                 <dict>
+ 83                                     <key>name</key>
+ 84                                     <string>entity.other.attribute-name.source.cs</string>
+ 85                                 </dict>
+ 86                                 <key>3</key>
+ 87                                 <dict>
+ 88                                     <key>name</key>
+ 89                                     <string>punctuation.separator.namespace.source.cs</string>
+ 90                                 </dict>
+ 91                                 <key>4</key>
+ 92                                 <dict>
+ 93                                     <key>name</key>
+ 94                                     <string>entity.other.attribute-name.localname.source.cs</string>
+ 95                                 </dict>
+ 96                             </dict>
+ 97                             <key>match</key>
+ 98                             <string> (?:([-_a-zA-Z0-9]+)((:)))?([_a-zA-Z-]+)=</string>
+ 99                         </dict>
+100                         <dict>
+101                             <key>include</key>
+102                             <string>#doubleQuotedString</string>
+103                         </dict>
+104                         <dict>
+105                             <key>include</key>
+106                             <string>#singleQuotedString</string>
+107                         </dict>
+108                     </array>
+109                 </dict>
+110             </array>
+111         </dict>
+112         <dict>
+113             <key>include</key>
+114             <string>#comments</string>
+115         </dict>
+116         <dict>
+117             <key>begin</key>
+118             <string>(?x)^\s*
+119 ((?:\b(?:new|public|protected|internal|private|abstract|sealed|static)\b\s)*)
+120 (class)\s+
+121 ([A-Za-z_]\w+)\b</string>
+122             <key>captures</key>
+123             <dict>
+124                 <key>1</key>
+125                 <dict>
+126                     <key>name</key>
+127                     <string>storage.modifier.source.cs</string>
+128                 </dict>
+129                 <key>2</key>
+130                 <dict>
+131                     <key>name</key>
+132                     <string>storage.type.source.cs</string>
+133                 </dict>
+134                 <key>3</key>
+135                 <dict>
+136                     <key>name</key>
+137                     <string>entity.name.type.class.source.cs</string>
+138                 </dict>
+139             </dict>
+140             <key>end</key>
+141             <string>{</string>
+142             <key>name</key>
+143             <string>meta.definition.class.source.cs</string>
+144             <key>patterns</key>
+145             <array>
+146                 <dict>
+147                     <key>include</key>
+148                     <string>#classInheritance</string>
+149                 </dict>
+150             </array>
+151         </dict>
+152         <!--
+153         Disabled because it causes some lines to be interpreted incorrectly, for example:
+154             else if (c == ')')
+155         --->
+156         <!--
+157         <dict>
+158             <key>begin</key>
+159             <string>(?x)^\s*                                                                                # start of line
+160 ((?:\b(?:new|public|protected|internal|private|static|virtual|sealed|override|abstract|extern)\b\s*)*)         # method-modifiers
+161 \b((?:\w+\.)*[A-Za-z_]\w*)\b\s*                                                                                  # type
+162 (operator)\s+                                                                                                  # operator overload
+163 ((?:\+|-|!|~|\+\+|--|true|false|\*|/|%|\&amp;|\||\^|&lt;&lt;|&gt;&gt;|==|!=|&lt;|&gt;|&lt;=|&gt;=)\s*)                                      # operator name
+164 (?=\()</string>
+165             <key>captures</key>
+166             <dict>
+167                 <key>1</key>
+168                 <dict>
+169                     <key>name</key>
+170                     <string>storage.modifier.source.cs</string>
+171                 </dict>
+172                 <key>2</key>
+173                 <dict>
+174                     <key>name</key>
+175                     <string>storage.type.source.cs</string>
+176                 </dict>
+177                 <key>3</key>
+178                 <dict>
+179                     <key>name</key>
+180                     <string>storage.modifier.source.cs</string>
+181                 </dict>
+182                 <key>4</key>
+183                 <dict>
+184                     <key>name</key>
+185                     <string>entity.name.function.source.cs</string>
+186                 </dict>
+187             </dict>
+188             <key>end</key>
+189             <string>\)</string>
+190             <key>name</key>
+191             <string>meta.definition.operator.source.cs</string>
+192             <key>patterns</key>
+193             <array>
+194                 <dict>
+195                     <key>include</key>
+196                     <string>#statementRemainder</string>
+197                 </dict>
+198             </array>
+199         </dict>
+200         <dict>
+201             <key>begin</key>
+202             <string>(?x)^\s*                                                                            # start of line
+203 ((?:\b(?:new|public|protected|internal|private|static|virtual|sealed|override|abstract|extern)\b\s*)*)     # method-modifiers
+204 \b((?:\w+\.)*[A-Za-z_]\w*)\b\s*                                                                              # type
+205 ([A-Za-z_]\w*)\s*                                                                                             # name
+206 (?=\()</string>
+207             <key>captures</key>
+208             <dict>
+209                 <key>1</key>
+210                 <dict>
+211                     <key>name</key>
+212                     <string>storage.modifier.source.cs</string>
+213                 </dict>
+214                 <key>2</key>
+215                 <dict>
+216                     <key>name</key>
+217                     <string>storage.type.source.cs</string>
+218                 </dict>
+219                 <key>3</key>
+220                 <dict>
+221                     <key>name</key>
+222                     <string>entity.name.function.source.cs</string>
+223                 </dict>
+224             </dict>
+225             <key>end</key>
+226             <string>\)</string>
+227             <key>name</key>
+228             <string>meta.definition.method.source.cs</string>
+229             <key>patterns</key>
+230             <array>
+231                 <dict>
+232                     <key>include</key>
+233                     <string>#statementRemainder</string>
+234                 </dict>
+235             </array>
+236         </dict>
+237         -->
+238         <dict>
+239             <key>match</key>
+240             <string>\b(true|false|null|this|base)\b</string>
+241             <key>name</key>
+242             <string>constant.language.source.cs</string>
+243         </dict>
+244         <dict>
+245             <key>match</key>
+246             <string>\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\b</string>
+247             <key>name</key>
+248             <string>constant.numeric.source.cs</string>
+249         </dict>
+250         <dict>
+251             <key>match</key>
+252             <string>\b(if|else|while|for|foreach|do|return|continue|break|switch|case|default|goto|throw|try|catch|finally|lock|yield)\b</string>
+253             <key>name</key>
+254             <string>keyword.control.source.cs</string>
+255         </dict>
+256         <dict>
+257             <key>match</key>
+258             <string>\b(new|is|checked|unchecked|typeof|sizeof|override|in|out|ref|readonly|params|stackalloc|as)\b</string>
+259             <key>name</key>
+260             <string>keyword.operator.source.cs</string>
+261         </dict>
+262         <dict>
+263             <key>match</key>
+264             <string>\b(event|delegate|explicit|implicit|in|set|get)\b</string>
+265             <key>name</key>
+266             <string>keyword.other.source.cs</string>
+267         </dict>
+268         <dict>
+269             <key>match</key>
+270             <string>\b(internal|public|protected|private|static|const|new|sealed|abstract|virtual|override|extern|unsafe|readonly|volatile|operator)\b</string>
+271             <key>name</key>
+272             <string>storage.modifier.source.cs</string>
+273         </dict>
+274         <dict>
+275             <key>include</key>
+276             <string>#doubleQuotedStringLiteral</string>
+277         </dict>
+278         <dict>
+279             <key>include</key>
+280             <string>#doubleQuotedString</string>
+281         </dict>
+282         <dict>
+283             <key>include</key>
+284             <string>#singleQuotedString</string>
+285         </dict>
+286         <dict>
+287             <key>captures</key>
+288             <dict>
+289                 <key>1</key>
+290                 <dict>
+291                     <key>name</key>
+292                     <string>keyword.other.using.source.cs</string>
+293                 </dict>
+294                 <key>2</key>
+295                 <dict>
+296                     <key>name</key>
+297                     <string>entity.name.type.package.source.cs</string>
+298                 </dict>
+299             </dict>
+300             <key>match</key>
+301             <string>^\s*(using)\s+([^ ;]*);</string>
+302             <key>name</key>
+303             <string>meta.keyword.using.source.cs</string>
+304         </dict>
+305         <dict>
+306             <key>include</key>
+307             <string>#builtinTypes</string>
+308         </dict>
+309         <dict>
+310             <key>captures</key>
+311             <dict>
+312                 <key>1</key>
+313                 <dict>
+314                     <key>name</key>
+315                     <string>keyword.other.namespace.source.cs</string>
+316                 </dict>
+317                 <key>2</key>
+318                 <dict>
+319                     <key>name</key>
+320                     <string>entity.name.type.namespace.source.cs</string>
+321                 </dict>
+322             </dict>
+323             <key>match</key>
+324             <string>^\s*(namespace)\s+([^ ]+)(?:\s*{)?$</string>
+325             <key>name</key>
+326             <string>meta.keyword.namespace.source.cs</string>
+327         </dict>
+328         <dict>
+329             <key>captures</key>
+330             <dict>
+331                 <key>2</key>
+332                 <dict>
+333                     <key>name</key>
+334                     <string>keyword.control.import.source.cs</string>
+335                 </dict>
+336             </dict>
+337             <key>match</key>
+338             <string>^(#)\s*(if|else|elif|endif|define|undef|warning|error|line|region|endregion)\b</string>
+339             <key>name</key>
+340             <string>meta.preprocessor.source.cs</string>
+341         </dict>
+342     </array>
+343     <key>repository</key>
+344     <dict>
+345         <key>builtinTypes</key>
+346         <dict>
+347             <key>patterns</key>
+348             <array>
+349                 <dict>
+350                     <key>match</key>
+351                     <string>\b(bool|byte|sbyte|char|decimal|double|float|int|uint|long|ulong|object|short|ushort|string|void|class|struct|enum|interface|var|from|where|select|group|into|orderby|join|let|ascending|descending|on|by)\b</string>
+352                     <key>name</key>
+353                     <string>storage.type.source.cs</string>
+354                 </dict>
+355             </array>
+356         </dict>
+357         <key>classInheritance</key>
+358         <dict>
+359             <key>patterns</key>
+360             <array>
+361                 <dict>
+362                     <key>begin</key>
+363                     <string>:</string>
+364                     <key>end</key>
+365                     <string>(?={)</string>
+366                     <key>patterns</key>
+367                     <array>
+368                         <dict>
+369                             <key>captures</key>
+370                             <dict>
+371                                 <key>1</key>
+372                                 <dict>
+373                                     <key>name</key>
+374                                     <string>storage.type.source.cs</string>
+375                                 </dict>
+376                             </dict>
+377                             <key>match</key>
+378                             <string>\s*,?([A-Za-z_]\w*)\b</string>
+379                         </dict>
+380                     </array>
+381                 </dict>
+382             </array>
+383         </dict>
+384         <key>comments</key>
+385         <dict>
+386             <key>patterns</key>
+387             <array>
+388                 <dict>
+389                     <key>begin</key>
+390                     <string>/\*</string>
+391                     <key>captures</key>
+392                     <dict>
+393                         <key>0</key>
+394                         <dict>
+395                             <key>name</key>
+396                             <string>punctuation.definition.comment.source.cs</string>
+397                         </dict>
+398                     </dict>
+399                     <key>end</key>
+400                     <string>\*/\n?</string>
+401                     <key>name</key>
+402                     <string>comment.block.source.cs</string>
+403                 </dict>
+404                 <dict>
+405                     <key>captures</key>
+406                     <dict>
+407                         <key>1</key>
+408                         <dict>
+409                             <key>name</key>
+410                             <string>punctuation.definition.comment.source.cs</string>
+411                         </dict>
+412                     </dict>
+413                     <key>match</key>
+414                     <string>(//).*$\n?</string>
+415                     <key>name</key>
+416                     <string>comment.line.double-slash.source.cs</string>
+417                 </dict>
+418             </array>
+419         </dict>
+420         <key>doubleQuotedString</key>
+421         <dict>
+422             <key>begin</key>
+423             <string>"</string>
+424             <key>beginCaptures</key>
+425             <dict>
+426                 <key>0</key>
+427                 <dict>
+428                     <key>name</key>
+429                     <string>punctuation.definition.string.begin.source.cs</string>
+430                 </dict>
+431             </dict>
+432             <key>end</key>
+433             <string>"</string>
+434             <key>endCaptures</key>
+435             <dict>
+436                 <key>0</key>
+437                 <dict>
+438                     <key>name</key>
+439                     <string>punctuation.definition.string.end.source.cs</string>
+440                 </dict>
+441             </dict>
+442             <key>name</key>
+443             <string>string.quoted.double.source.cs</string>
+444             <key>patterns</key>
+445             <array>
+446                 <dict>
+447                     <key>match</key>
+448                     <string>\\.</string>
+449                     <key>name</key>
+450                     <string>constant.character.escape.source.cs</string>
+451                 </dict>
+452             </array>
+453         </dict>
+454         <key>doubleQuotedStringLiteral</key>
+455         <dict>
+456             <key>captures</key>
+457             <dict>
+458                 <key>0</key>
+459                 <dict>
+460                     <key>name</key>
+461                     <string>punctuation.definition.string.begin.source.cs</string>
+462                 </dict>
+463             </dict>
+464             <key>match</key>
+465             <string>@"([^"]|"")*"</string>
+466             <key>name</key>
+467             <string>string.quoted.double.literal.source.cs</string>
+468         </dict>
+469         <key>singleQuotedString</key>
+470         <dict>
+471             <key>begin</key>
+472             <string>'</string>
+473             <key>beginCaptures</key>
+474             <dict>
+475                 <key>0</key>
+476                 <dict>
+477                     <key>name</key>
+478                     <string>punctuation.definition.string.begin.source.cs</string>
+479                 </dict>
+480             </dict>
+481             <key>end</key>
+482             <string>'</string>
+483             <key>endCaptures</key>
+484             <dict>
+485                 <key>0</key>
+486                 <dict>
+487                     <key>name</key>
+488                     <string>punctuation.definition.string.end.source.cs</string>
+489                 </dict>
+490             </dict>
+491             <key>name</key>
+492             <string>string.quoted.single.xml</string>
+493             <key>patterns</key>
+494             <array>
+495                 <dict>
+496                     <key>match</key>
+497                     <string>\\.</string>
+498                     <key>name</key>
+499                     <string>constant.character.escape.source.cs</string>
+500                 </dict>
+501             </array>
+502         </dict>
+503         <key>statementRemainder</key>
+504         <dict>
+505             <key>patterns</key>
+506             <array>
+507                 <dict>
+508                     <key>begin</key>
+509                     <string>\(</string>
+510                     <key>end</key>
+511                     <string>(?=\))</string>
+512                     <key>name</key>
+513                     <string>meta.definition.param-list.source.cs</string>
+514                     <key>patterns</key>
+515                     <array>
+516                         <dict>
+517                             <key>include</key>
+518                             <string>#builtinTypes</string>
+519                         </dict>
+520                     </array>
+521                 </dict>
+522             </array>
+523         </dict>
+524     </dict>
+525     <key>scopeName</key>
+526     <string>source.cs</string>
+527     <key>uuid</key>
+528     <string>1BA75B32-707C-11D9-A928-000D93589AF6</string>
+529 </dict>
+530 </plist>
+5.添加新的代码片段
+
+对于一些常用的代码片段，我们不需要每次都手动输入一遍，可以将它们配置问代码片段，减少手动代码输入量，效果类似于Visual Studio的智能提示，如下：
+
+例如输入fore时，会出现foreach的提示：
+
+      
+
+选择后，输入回车键，出现foreach语句的结构：
+
+      
+
+添加新的代码片段只需要在Packages中的C#文件夹中增加以 .sublime-snippet 为后缀的文件，内容如下：
+
+<snippet>
+    <content><![CDATA[System.Collections.Generic]]></content>--插入的内容
+    <tabTrigger>S.C.G</tabTrigger>--快捷键
+    <scope>source.cs</scope>--源码匹配
+    <description>System.Collections.Generic</description>--说明
+</snippet>
+6.修改字体大小
+
+  
+
+配置文件下载 ： C#.zip ( 将所有文件复制Packages文件夹下的C#文件夹即可，配置文件包括常用的代码片段，注释配置，和关键字的定义。)
+
+参考资料&进一步阅读
+
+http://www.oschina.net/translate/compile-and-run-java-programs-in-sublime-text-2?cmp
+
+http://www.ueder.net/2012/03/08/%E4%BB%8Enotepad-%E5%88%B0-sublime-text2/
+
+http://www.cnblogs.com/leecanz/archive/2012/03/04/2379446.html
+
+http://www.cnblogs.com/xiaowu/archive/2012/08/27/2658534.html

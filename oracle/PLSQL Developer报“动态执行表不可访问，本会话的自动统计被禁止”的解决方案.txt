@@ -1,0 +1,38 @@
+PLSQL Developer报“动态执行表不可访问，本会话的自动统计被禁止”的解决方案
+
+
+现象：
+
+第一次用PLSQL Developer连接数据库，若用sys用户登录并操作则正常，若用普通用户比如haishu登录并创建一个表则报错“动态执行表不可访问，本会话的自动统计被禁止。在执行菜单里你可以禁止统计，或在v$session,v$sesstat和v$statname表里获得选择权限。”
+
+ 
+
+原因分析：
+
+从报错提示就可以看出，原因在于动态性能表相关的权限没有被授权给当前用户
+
+ 
+
+解决方法一（推荐）：
+
+根据提示，在执行菜单里禁止统计，具体操作方法：在顶部的菜单中选择“工具”-->“首选项”-->“选项”-->“自动统计”。把“自动统计”前面默认的√去掉。
+
+
+ 
+
+解决方法二：
+
+根据提示，用sys身份给haishu用户授权
+
+grant select on V_$session to hccpms;
+grant select on V_$sesstat to hccpms;
+grant select on V_$statname to hccpms;
+ 
+
+或给所有用户授权
+
+grant select on V_$session to public;
+
+grant select on V_$sesstat to public;
+
+grant select on V_$statname to public;

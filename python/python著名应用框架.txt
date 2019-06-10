@@ -1,0 +1,42 @@
+著名应用编辑
+Pylons-Web应用框架
+Zope- 应用服务器
+Plone- 内容管理系统
+Django- 鼓励快速开发的Web应用框架
+Uliweb- 国人开发的轻量级Web框架
+TurboGears- 另一个Web应用快速开发框架
+Twisted--Python的网络应用程序框架
+Python Wikipedia Robot Framework- MediaWiki的机器人程序
+MoinMoinWiki- Python写成的Wiki程序
+flask- Python 微Web框架
+tornado- 非阻塞式服务器
+Webpy- Python 微Web框架
+Bottle- Python 微Web框架
+EVE- 网络游戏EVE大量使用Python进行开发
+Reddit - 社交分享网站
+Dropbox - 文件分享服务
+Pylons - Web应用框架
+TurboGears - 另一个Web应用快速开发框架
+Fabric - 用于管理成百上千台Linux主机的程序库
+Trac - 使用Python编写的BUG管理系统
+Mailman - 使用Python编写的邮件列表软件
+Mezzanine - 基于Django编写的内容管理系统
+Blender - 以C与Python开发的开源3D绘图软件
+16学习网站编辑
+Python官方文档[8] 
+Python学习资源
+PythonTab中文网[9] 
+Python爱好者论坛[10] 
+Pythoner在线互动交流平台[11] 
+Python在线资源大全[4] 
+Python免费教学视频[12] 
+Python在线运行及高手进阶资料[13] 
+简明Python教程[14] 
+一人一python[13] 
+Python 学习资源
+
+
+python爬虫之采集搜素引擎联想词
+http://www.tudou.com/programs/view/SXgshk-sYbw
+
+

@@ -1,0 +1,215 @@
+中位数（Median）统计学名词
+ 1、定义：一组数据按从小到大（或从大到小）的顺序依次排列，处在中间位置的一个数（或最中间两个数据的平均数，注意：和众数不同，中位数不一定在这组数据中）。　 　　
+ 2、中位数的优缺点：中位数是样本数据所占频率的等分线，它不受少数几个极端值得影响，有时用它代表全体数据的一般水平更合适。 　
+ 3、在频率分布直方图中，中位数左边和右边的直方图的面积应该相等，由此可以估计中位数的值。 　　
+ 4、中位数也可表述为第50百分位数，二者等价。 　　
+ 5、直观印象描述：一半比“我”小，一半比“我”大。
+ 
+中位数的算法
+　  求中位数时，首先要先进行数据的排序（从小到大），然后计算中位数的序号，分数据为奇数个与偶数个两种来求. 　　
+ 中位数算出来可避免极端数据，代表着数据总体的中等情况。 　　
+ 如果总数个数是奇数的话,按从小到大的顺序,取中间的那个数 　　
+ 如果总数个数是偶数个的话,按从小到大的顺序,取中间那两个数的平均数
+
+-- 测试表
+CREATE TABLE test_median (
+  Name  varchar(10),
+  val   INT
+);
+GO
+-- 测试数据.
+INSERT INTO test_median
+  SELECT 'A',  1000  UNION ALL
+  SELECT 'A',  2000  UNION ALL
+  SELECT 'A',  3000  UNION ALL
+  SELECT 'A',  4000  UNION ALL
+  SELECT 'A',  5000  UNION ALL
+  SELECT 'B',  100   UNION ALL
+  SELECT 'B',  200   UNION ALL
+  SELECT 'B',  300   UNION ALL
+  SELECT 'B',  400   UNION ALL
+  SELECT 'B',  7000  UNION ALL
+  SELECT 'B',  10000
+GO
+Name 为 A 的数据，有5条
+Name 为 B 的数据，有6条
+
+直接使用 SQL 语句来进行计算的处理
+使用2个子查询来计算
+1个子查询用来排序
+1个子查询用于计算总数
+然后根据总数的 奇/偶，来决定哪些行需要进行计算。
+
+SELECT
+  data_with_rownumber.Name,
+  AVG(data_with_rownumber.val) AS median
+FROM
+  (
+  SELECT
+ ROW_NUMBER() OVER(PARTITION BY Name ORDER BY val) AS seq,
+ Name,
+ val
+  FROM
+ test_median
+  ) data_with_rownumber JOIN
+  (
+  SELECT
+ Name, COUNT(1) AS NumOfVal
+  FROM
+ test_median
+  GROUP BY
+ Name
+  ) data_count
+  ON (
+ data_count.Name = data_with_rownumber.Name
+ AND (
+  (data_count.NumOfVal % 2 = 0 AND data_with_rownumber.seq IN (data_count.NumOfVal / 2, (data_count.NumOfVal / 2) + 1))
+  OR
+  (data_count.NumOfVal % 2 = 1 AND data_with_rownumber.seq = 1 + data_count.NumOfVal / 2)
+  )
+  )
+GROUP BY
+  data_with_rownumber.Name
+Name       median
+---------- -----------
+A                 3000
+B                  350
+(2 行受影响)
+ 
+使用  Visual C# SQL CLR  创建的聚合函数来处理
+ 
+使用 VS2010，创建一个
+Visual C# SQL CLR 数据库项目 命名为 MyMidNumber
+在项目中添加一个 [聚合] 的类
+代码如下：
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Data.SqlTypes;
+using Microsoft.SqlServer.Server;
+
+[Serializable]
+[SqlUserDefinedAggregate(
+ Format.UserDefined,               // 使用 UserDefined 序列化格式
+  IsInvariantToNulls = true,        // 指示聚合是否与空值无关。
+  IsInvariantToDuplicates = false,  // 指示聚合是否与重复值无关。
+  IsInvariantToOrder = false,       // 指示聚合是否与顺序无关。
+  MaxByteSize = 8000)               //  聚合实例的最大大小（以字节为单位）。
+  ]
+public struct Median : Microsoft.SqlServer.Server.IBinarySerialize
+{
+ public void Init()
+ {
+  // 初始化.
+  dataList = new List<Decimal>();
+ }
+ public void Accumulate(SqlDecimal Value)
+ {
+  // 新增一个数据
+  dataList.Add(Value.Value);
+ }
+ public void Merge(Median Group)
+ {
+  // 新增一组数据.
+  dataList.AddRange(Group.dataList);
+ }
+ public SqlDecimal Terminate()
+ {
+  // 首先排序.
+  dataList.Sort();
+  decimal middleVal = 0;
+  if (dataList.Count > 0)
+  {
+   if (dataList.Count % 2 == 1)
+   {
+    // 当数量为奇数的时候.
+    // 中位数为中间的那个数字.
+    // 例如
+    // 1个数字， 中位为第1个
+    // 3个数字， 中位为第2个
+    // 5个数字， 中位为第3个
+    // 7个数字， 中位为第4个
+    middleVal = dataList[dataList.Count / 2];
+   }
+   else
+   {
+    // 当数量为偶数的时候.
+    // 中位数为 中间2个数的 算数平均
+    // 例如
+    // 2个数字， 中位为 (第1个 + 第2个) / 2
+    // 4个数字， 中位为 (第2个 + 第3个) / 2
+    // 6个数字， 中位为 (第3个 + 第4个) / 2
+    // 8个数字， 中位为 (第4个 + 第5个) / 2
+    middleVal =
+     (dataList[dataList.Count / 2 - 1]
+     + dataList[dataList.Count / 2]) / 2;
+   }
+  }
+  return new SqlDecimal(middleVal);
+ }
+ // 这是分组的所有数据.
+ private List<Decimal> dataList;
+
+ /// <summary>
+ /// 使用 UserDefined 序列化格式
+ /// 通过 IBinarySerialize.Read 方法完全控制二进制格式。
+ /// 从用户定义类型 (UDT) 或用户定义聚合的二进制格式生成用户定义的类型或用户定义的聚合。
+ /// </summary>
+ /// <param name="r"></param>
+ public void Read(System.IO.BinaryReader r)
+ {
+  // 初始化数据.
+  dataList = new List<decimal>();
+  // 先读取总数量.
+  int size = r.ReadInt32();
+  // 依次读取数据，加入列表.
+  for (int i = 0; i < size; i++)
+  {
+   dataList.Add(r.ReadDecimal());
+  }
+ }
+ /// <summary>
+ /// 使用 UserDefined 序列化格式
+ /// 通过 IBinarySerialize.Read 方法完全控制二进制格式。
+ /// 将用户定义的类型 (UDT) 或用户定义的聚合转换为其二进制格式，以便保留。
+ /// </summary>
+ /// <param name="w"></param>
+ public void Write(System.IO.BinaryWriter w)
+ {
+  // 先写入一个 总数量
+  w.Write(dataList.Count);
+  // 依次写入每一个数据.
+  foreach (Decimal data in dataList)
+  {
+   w.Write(data);
+  }
+ }
+}
+ 
+C# 项目需要记得设置 目标框架为 .NET Framework 3.5
+如果使用默认的 .NET Framework 4，可能无法成功的把编译好的 DLL 文件发布到 SQL Server 2008 上面去。
+在把编辑好的 DLL 文件，加入到数据库的程序集之后。
+再执行下面的 SQL 语句。
+CREATE AGGREGATE [dbo].[Median](@Value NUMERIC (18))
+ RETURNS NUMERIC (18)
+ EXTERNAL NAME [MyMidNumber].[Median];
+ 
+最后直接在 SQL 语句里面，使用新编写的聚合函数：
+SELECT
+  ISNULL(Name, '全部') AS 名称,
+  SUM(val)  AS  合计,
+  AVG(val)  AS  平均数,
+  dbo.Median(val) AS 中位数
+FROM
+  test_median
+GROUP BY
+  Name
+WITH ROLLUP
+
+名称         合计          平均数         中位数
+---------- ----------- ----------- --------------------
+A                15000        3000                 3000
+B                18000        3000                  350
+全部             33000        3000                 2000
+(3 行受影响)

@@ -1,0 +1,25 @@
+关于希尔伯特、图灵、哥德尔的故事和相关研究可以阅读《哥德尔、艾舍尔、巴赫：集异璧之大成》一书。关于冯?诺依曼，可以阅读他的传记：《天才的拓荒者：冯?诺依曼传》。关于维纳，可以参考他的著作《控制论》。若要全面了解人工智能，给大家推荐两本书：Artificial Intelligence: A Modern Approach和Artificial Intelligence: Structures and Strategies for Complex Problem Solving。了解机器学习以及人工神经网络可以参考Pattern Recognition和Neural Networks and Learning Machines。关于行为学派和人工生命，可以参考《数字创世纪：人工生命的新科学》以及人工生命的论文集。若要深入了解贝叶斯网络，可以参考Causality: Models, Reasoning, and Inference。深入了解胡特的通用人工智能理论可以阅读Universal Artificial Intelligence: Sequential Decisions Based on Algorithmic Probability。关于深度学习方面的知识可参考网站：http://deeplearning.net/reading-list/，其中有不少综述性的文章。人类计算方面可以参考冯?安的网站：http://www.cs.cmu.edu/~biglou/。
+
+
+
+广义智能家居包括围绕家庭的一切智能，智能电视、智能电器、智能灯光、智能开关、智能插座、智能厨卫、智能温控、智能安防、智能音响、智能空气监测以及智能路由器等等。“家”正在成为科技要接管的下一个重镇。
+
+一方面， 智能手机已过增长高峰；另一方面，互联网正在“下沉”，向本地生活服务、传统行业和硬件渗透是必然趋势。
+
+还有相关条件业已成熟。物联网已有多年历史，此前更多是工业应用，如交通、物流、能源等。物联网的发展让更小、更低耗和更廉价的传感器更易获取，同时还培养了物联网人才，这些将被应用到民用市场。同时，App开发技术十分成熟，用户手机习惯已养成，这些条件让家庭智能化成为可能。
+
+智能家居单品（门锁、灯光、摄像头、温控器、插座、开关）支持HomeKit后，iOS用户则可以通过HomeKit平台结合Siri去操控家庭的设备，未来HomeKit还可能开放给第三方App。
+
+Google：最舍得投入，软件+硬件、单品+平台，一起上
+
+智能手机时代Google软而不硬，凭借着Android构建OHA联盟反超Apple，打造一个繁荣的Android生态。
+
+但Google并不满足只软不硬，Android帮其带来了大量的移动用户，并将搜索、Chrome、地图、GMAIL等服务一股脑整合进去，但相比Apple凭借软硬及内容一体化赚得钵满盆满而言，Android并未给Google带来匹配的回报。三星心怀异心研发Tizen系统这类做法让Google对其盟友并无安全感。
+
+在后期它开始推行自有Nexus设备，拿下Moto并将其置换为联想股权，尝试更硬一些。研发GoogleGlass、无人驾驶汽车等更是让自己成为彻头彻尾的设备+互联网公司。
+
+在智能家居上它一开始便不再满足于只做一个系统的软件生态。32亿美金收购了Nest这一杀手锏产品，同时家庭摄像头Dropcam被Google收购的传言业已出现。毫无疑问的是，苹果不会只硬不软，它的野心绝不是做单品，而是做一个与Android阵营类似的生态，甚至可能是以Android或者ChromeOS为基础。可以预料，接下来Google为智能电视打造的操作系统、为智能家居设备打造的标准平台将会问世，还会有一些SDK、云服务给到厂商。
+
+Google在智能家居上是十分认真。软硬结合、单品+平台一起上是其思路，开放仍将是其特色以及核心优势，Android及OHA构建的用户基础将帮助它再造一个新的Google Home联盟。
+
+智能硬件最被各方看好的有三个领域：可穿戴、家居和汽车。2014年正在成为智能家居的新纪元，Apple、Google、微软和三星一起为我们打开新大门。Apple象征性尝试，Google大手笔动作，微软已日暮西山，三星优势明显。胜算排名三星最大，Google第二，Apple第三，微软最弱。如果Apple依然毫无作为，未来的智能家居之争将是Google与三星的双雄对决。

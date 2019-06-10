@@ -1,0 +1,16 @@
+﻿我们运行.net的发布工具installutil.exe来添加到windows服务里面(该工具默认在C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727目录下)
+ 
+把下面代码 保存到txt文件,并且另存为bat文件,并且和你的exe文件放在一起,那么双击就可以直接安装服务了.
+ 
+@echo 安装WindowService
+@Set Path=C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;
+@Set svn_dir=%cd%
+installutil %svn_dir%\WindowsService1.exe
+ 
+@echo 成功！
+ 
+然后你需要去系统服务里面 将其开启,至此,你的服务也就发布成功了
+如果要卸载服务 只需要将 installutil %svn_dir%\WindowsService1.exe 改为installutil %svn_dir%\WindowsService1.exe /u就可以了
+
+删除服务
+sc delete 服务名

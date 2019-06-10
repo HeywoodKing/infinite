@@ -1,0 +1,116 @@
+
+SQLServer中为表新增一列！
+IF EXISTS(SELECT 1 FROM 表1 A,表2 B WHERE A.id=B.id AND A.[name]='sys_Module' AND B.[name]='M_ShowType')
+
+ALTER TABLE 表名 DROP COLUMN M_ShowType
+alter table 表名 add 列名 int
+
+
+
+sql中的alter(增加或删除表中的字段或列)
+
+alter table chargesheet --新增字段
+add yb_sch varchar(20)
+alter table chargesheet --将条码号长度改为30
+alter column invoice_id varchar(30)
+create index i_chargesheet_psdate --建立索引
+on chargesheet(sheet_psdate)
+
+alter table chargesheet
+add sex_id char(1),--性别
+ xz_type varchar(4),--险种类型
+ yl_type varchar(2)--医疗类别
+alter table parameter --医疗机构代码
+add hos_ylid varchar(12)
+例子：
+/*drop table admin*/
+create table admin(
+id int not null,
+username varchar(20) not null,
+password varchar(30) not null,
+primary key(id)
+)
+go
+alter table admin add sex varchar(4)
+alter table admin add tel varchar(11)
+go
+alter table admin 
+alter column tel varchar(12)
+go
+alter table admin add address varchar(100)
+alter table admin
+alter column address varchar(200)
+go
+alter table admin
+drop column address
+go
+select * from admin
+参考:(下面的来是网上的例子)
+
+用SQL语句删除一行或一列
+一行： 
+DELETE FROM 表名 WHERE 条件 
+一列： 
+属于修改表结构了，一般在编程中比较忌讳这个，具体方法如下： 
+ALTER TABLE 表名 DROP 新列名
+
+如何删除一个表的某一个属性(某一列）
+create database login
+use login
+create table userInfo
+(userName varchar(20),
+password varchar(20),
+description varchar(25),)
+insert into userInfo values('Jerrry','Jerry','mouse')
+现在我不想要description一列
+alter table userInfo drop column description
+后来我又后悔了，想要这一列
+alter talbe userInfo add description varchar(25)
+
+
+
+
+
+
+
+
+
+
+
+
+
+我现在有两张表，basuser（userid（自动编号，已有100000条数据），username），qusmain（memo，userid（对应basuser的userid，已有300000条数据，有大半数据的userid＝0））
+我想把basuser中的userid打乱更新到qusmain的userid＝0中.
+刚才用游标，慢死了，希望高手帮忙！
+检举 | 2009-1-15 10:07 最佳答案
+"我想把basuser中的userid打乱更新到qusmain的userid＝0中"
+--打乱是什么意思
+那是不是basuser.userid可以在qusmain.userid出现N次呢
+
+那就用随机数比较好 --随机到表basuser.userid就更新到qusmain.userid=0的第一条
+
+也可以这样
+create proc proc_UpdateQusmainData
+as
+   declare @randNum int --随机数
+   declare @randNumVal int --取得随机数
+   declare @NumAll int --记录执行次数
+   declare @Num int --执行记录
+   set @Num=1
+   select top 1 userid  from qusmain where userid=0
+   while (@Num <= @NumAll) begin 
+   set @randNum=ceiling(rand()*100000)--1-100000的数字
+   if not exists(select 1 from basuser where userid=@randNum) begin
+     set @randNumVal=ceiling(rand()*10000)
+   end else begin
+     set @randNumVal=@randNum   
+   end
+   update qusmain set userid=@randNumVal where userid in 
+   (select top 1 userid  from qusmain where userid=0)
+
+   set @Num=@Num+1
+   end
+Go
+
+
+--游标方式 你已经OK了....

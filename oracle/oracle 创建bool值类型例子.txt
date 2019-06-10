@@ -1,0 +1,28 @@
+-- Create table
+create table MY_TEST
+(
+  id                  NUMBER(32) not null,
+  userid           NUMBER(32) not null,
+  isenable        boolean
+--  isenable        char check (isenable in (0,1))
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    minextents 1
+    maxextents unlimited
+  );
+-- Add comments to the table 
+comment on table MY_TEST
+  is '我的测试表';
+-- Add comments to the columns 
+comment on column MY_TEST.id
+  is '主键';
+comment on column MY_TEST.userid
+  is '用户ID';
+comment on column MY_TEST.isenable
+  is '是否启用';

@@ -1,0 +1,23 @@
+insert into a_studentinfo(sno,sname,sex,cardid,yearofbirth,class,province,enrollment) values
+ ('999','雷锋','男','111111',1965,'3','湖南','1986-1-1')
+
+
+Create Trigger truStudent 
+      On a_studentinfo                          --在Student表中创建触发器 
+      for Update                          	--为什么事件触发 
+      As                                        --事件触发后所要做的事情 
+       if Update(sno)            
+       begin 
+         Update BorrowRecord 
+           Set sno=i.sno
+           From BorrowRecord br , Deleted   d ,Inserted i      
+                                               --DeletedInserted临时表 
+            Where br.sno=d.sno 
+      end
+
+
+Create trigger trdStudent 
+	On a_studentinfo
+        for Delete As 
+	Delete BorrowRecord 
+From BorrowRecord br , deleted d Where br.sno=d.sno 

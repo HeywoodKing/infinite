@@ -1,0 +1,4 @@
+1. 以管理员方式启动一个命令行窗口（Win+R 输入cmd按Ctrl+Shift+Enter）
+2. 在命令行窗口中输入：netsh interface tcp set global autotuninglevel=disabled
+后面那条命令可以改为下面的，速度更快：
+netsh interface tcp set global autotuninglevel=highlyrestricted

@@ -1,0 +1,414 @@
+select * from OrderDetails order by ProductID compute sum(Quantity) by ProductID
+
+create trigger ins_bookorder on book_order
+after insert
+as
+declare @x int,@y int,@z smallint
+select @x=book_id,@y=quantity,@z=order_id from book_order
+begin
+ if(select stock_quantity from supplies where book_id=@x)<@y
+    update orders
+    set order_type=3 where order_id=@z
+ else 
+  if(select order_type from orders where order_id=@z)!=3
+    update orders
+    set order_type=2 where order_id=@z
+end
+
+
+
+create trigger ins_bookorder1 on book_order
+after insert
+as
+declare @x int,@y int,@z smallint
+select @x=book_id,@y=quantity,@z=order_id from book_order
+begin
+ if(select stock_quantity from supplies where book_id=@x)<@y
+    update orders
+    set ship_date=null where order_id=@z
+    else
+    update orders
+    set ship_date=getdate() where order_id=@z
+end
+
+
+create trigger ins_bookorder2 on book_order
+after insert
+as
+declare @x int,@y int,@z smallint
+select @x=book_id,@y=quantity,@z=order_id from book_order
+begin
+ if(select stock_quantity from supplies where book_id=@x)<@y
+    update book_order
+    set lacksign=1 where order_id=@z and book_id=@x
+end
+
+
+
+create trigger ins_bookorder3 on book_order
+after insert
+as
+declare @x int,@y int,@z smallint
+select @x=book_id,@y=quantity,@z=order_id from book_order
+begin
+ if(select stock_quantity from supplies where book_id=@x)<@y
+    update supplies
+    set lacksign=1, needed_quantity=needed_quantity-@y where book_id=@x
+else
+   update supplies
+    set  stock_quantity=stock_quantity-@y,needed_quantity=needed_quantity where book_id=@x
+end
+
+
+
+
+create trigger up_supplies on supplies
+after update
+as
+if update(stock_quantity)
+declare @x int,@y int,@z smallint
+select @x=book_id,@y=stock_quantity from updated
+begin
+    update supplies
+    set stock_date=getdate() where book_id=@x
+end
+
+
+
+create trigger up_supplies2 on supplies
+after update
+as
+if update(stock_quantity)
+declare @x int,@y int
+select @x=book_id,@y=stock_quantity from inserted
+begin
+    if(select needed_quantity from supplies where book_id=@x)>(-@y)
+    update supplies
+    set lacksign=0 where book_id=@x
+end
+
+
+
+
+drop trigger ins_bookorder2
+
+insert book_order(order_id,book_id,quantity) values (1,1001,10)
+
+
+declare orders_cursor cursor for select order_id,quantity from book_order where book_id=1003 and lacksign=1
+open orders_cursor
+declare @sg int,@sdf int
+fetch next from orders_cursor into @sg,@sdf
+while @@fetch_status=0
+begin
+begin
+update book_order
+set lacksign=0
+where order_id=@sg
+end
+begin
+update supplies
+set stock_quantity=stock_quantity-@sdf,needed_quantity=needed_quantity+@sdf where book_id=1003
+end
+fetch next from orders_cursor into @sg,@sdf
+end
+close orders_cursor
+deallocate orders_cursor
+
+
+create trigger up_order on orders
+for update
+as
+if update(isok)
+declare @x int,@y int
+select @x=order_id from inserted
+begin
+update orders
+set order_type=1 where order_id=@x
+end
+begin 
+select @y=ordersum  from order_sum   where  order_id=@x
+end
+begin
+update credits
+set credits=credits+@y where order_id=@x
+end
+
+
+
+create trigger up_order1 on orders
+for update
+as
+if update(credits)
+declare @x int,@y int,@z int
+select @x=order_id, @y=credits from inserted
+begin
+if(@y<200)
+set @z=1;
+else if(@y<500)
+set @z=2;
+else
+set @z=3;
+end
+begin
+update orders
+set scale=@z where order_id=@x
+end
+
+
+
+
+
+
+
+declare orders_cursor1 cursor for select book_id from book_order where order_id=1
+open orders_cursor1
+declare @sg int,@result int
+fetch next from orders_cursor1 into @sg
+set @result=0
+while @@fetch_status=0
+begin
+if(select lacksign from book_order where book_id=@sg and order_id=1)=1
+set @result=1
+fetch next from orders_cursor1 into @sg
+end
+if(@result=0)
+begin
+update orders
+set ship_date=getdate(),order_type=2 where order_id=1
+end
+close orders_cursor1
+deallocate orders_cursor1
+
+
+
+
+
+
+
+ALTER TABLE table 
+{ [ ALTER COLUMN column_name 
+    { new_data_type [ ( precision [ , scale ] ) ]
+        [ COLLATE < collation_name > ]
+        [ NULL | NOT NULL ]
+        | {ADD | DROP } ROWGUIDCOL }
+    ] 
+    | ADD
+        { [ < column_definition > ]
+        | column_name AS computed_column_expression
+        } [ ,...n ]
+    | [ WITH CHECK | WITH NOCHECK ] ADD
+        { < table_constraint > } [ ,...n ] 
+    | DROP
+        { [ CONSTRAINT ] constraint_name 
+            | COLUMN column } [ ,...n ] 
+    | { CHECK | NOCHECK } CONSTRAINT
+        { ALL | constraint_name [ ,...n ] }
+    | { ENABLE | DISABLE } TRIGGER
+        { ALL | trigger_name [ ,...n ] } 
+}
+
+< column_definition > ::=
+    { column_name data_type }
+    [ [ DEFAULT constant_expression ] [ WITH VALUES ]
+    | [ IDENTITY [ ( seed , increment ) [ NOT FOR REPLICATION ] ] ]
+        ] 
+    [ ROWGUIDCOL ]
+    [ COLLATE < collation_name > ]
+    [ < column_constraint > ] [ ...n ]
+
+< column_constraint > ::=
+    [ CONSTRAINT constraint_name ]
+    { [ NULL | NOT NULL ]
+        | [ { PRIMARY KEY | UNIQUE }
+            [ CLUSTERED | NONCLUSTERED ]
+            [ WITH FILLFACTOR = fillfactor ]
+            [ ON { filegroup | DEFAULT } ]
+            ] 
+        | [ [ FOREIGN KEY ]
+            REFERENCES ref_table [ ( ref_column ) ]
+            [ ON DELETE { CASCADE | NO ACTION } ]
+            [ ON UPDATE { CASCADE | NO ACTION } ]
+            [ NOT FOR REPLICATION ]
+            ] 
+        | CHECK [ NOT FOR REPLICATION ]
+            ( logical_expression ) 
+    }
+
+< table_constraint > ::=
+    [ CONSTRAINT constraint_name ]
+    { [ { PRIMARY KEY | UNIQUE }
+        [ CLUSTERED | NONCLUSTERED ]
+        { ( column [ ,...n ] ) } 
+        [ WITH FILLFACTOR = fillfactor ]
+        [ ON { filegroup | DEFAULT } ]
+        ] 
+        |    FOREIGN KEY
+            [ ( column [ ,...n ] ) ]
+            REFERENCES ref_table [ ( ref_column [ ,...n ] ) ]
+            [ ON DELETE { CASCADE | NO ACTION } ]
+            [ ON UPDATE { CASCADE | NO ACTION } ]
+            [ NOT FOR REPLICATION ]
+        | DEFAULT constant_expression
+            [ FOR column ] [ WITH VALUES ]
+        |    CHECK [ NOT FOR REPLICATION ]
+            ( search_conditions ) 
+    }
+
+
+
+示例
+A. 更改表以添加新列
+下例添加一个允许空值的列，而且没有通过 DEFAULT 定义提供值。各行的新列中的值将为 NULL。
+
+CREATE TABLE doc_exa ( column_a INT) 
+GO
+ALTER TABLE doc_exa ADD column_b VARCHAR(20) NULL
+GO
+EXEC sp_help doc_exa
+GO
+DROP TABLE doc_exa
+GO
+
+B. 更改表以除去列
+下例修改表以删除一列。
+
+CREATE TABLE doc_exb ( column_a INT, column_b VARCHAR(20) NULL) 
+GO
+ALTER TABLE doc_exb DROP COLUMN column_b
+GO
+EXEC sp_help doc_exb
+GO
+DROP TABLE doc_exb
+GO
+
+C. 更改表以添加具有约束的列
+下例向表中添加具有 UNIQUE 约束的新列。 
+
+CREATE TABLE doc_exc ( column_a INT) 
+GO
+ALTER TABLE doc_exc ADD column_b VARCHAR(20) NULL 
+   CONSTRAINT exb_unique UNIQUE
+GO
+EXEC sp_help doc_exc
+GO
+DROP TABLE doc_exc
+GO
+
+D. 更改表以添加未验证的约束
+下例向表中的现有列上添加约束。该列中存在一个违反约束的值；因此，利用 WITH NOCHECK 来防止对现有行验证约束，从而允许该约束的添加。
+
+CREATE TABLE doc_exd ( column_a INT) 
+GO
+INSERT INTO doc_exd VALUES (-1)
+GO
+ALTER TABLE doc_exd WITH NOCHECK 
+ADD CONSTRAINT exd_check CHECK (column_a > 1)
+GO
+EXEC sp_help doc_exd
+GO
+DROP TABLE doc_exd
+GO
+
+E. 更改表以添加多个带有约束的列
+下例向表中添加多个带有约束的新列。第一个新列具有 IDENTITY 属性；表中每一行的标识列都将具有递增的新值。
+
+CREATE TABLE doc_exe ( column_a INT CONSTRAINT column_a_un UNIQUE) 
+GO
+ALTER TABLE doc_exe ADD 
+
+/* Add a PRIMARY KEY identity column. */ 
+column_b INT IDENTITY
+CONSTRAINT column_b_pk PRIMARY KEY, 
+
+/* Add a column referencing another column in the same table. */ 
+column_c INT NULL  
+CONSTRAINT column_c_fk 
+REFERENCES doc_exe(column_a),
+
+/* Add a column with a constraint to enforce that   */ 
+/* nonnull data is in a valid phone number format.  */
+column_d VARCHAR(16) NULL 
+CONSTRAINT column_d_chk
+CHECK 
+(column_d IS NULL OR 
+column_d LIKE "[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]" OR
+column_d LIKE
+"([0-9][0-9][0-9]) [0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]"),
+
+/* Add a nonnull column with a default.  */ 
+column_e DECIMAL(3,3)
+CONSTRAINT column_e_default
+DEFAULT .081
+GO
+EXEC sp_help doc_exe
+GO
+DROP TABLE doc_exe
+GO
+
+F. 添加具有默认值的可为空的列
+下例添加可为空的、具有 DEFAULT 定义的列，并使用 WITH VALUES 为表中的各现有行提供值。如果没有使用 WITH VALUES，那么每一行的新列中都将具有 NULL 值。
+
+ALTER TABLE MyTable 
+ADD AddDate smalldatetime NULL
+CONSTRAINT AddDateDflt
+DEFAULT getdate() WITH VALUES
+
+G. 禁用并重新启用一个约束
+下例禁用用于限制可接受的薪水数据的约束。WITH NOCHECK CONSTRAINT 与 ALTER TABLE 一起使用，以禁用该约束并使正常情况下会引起约束违规的插入操作得以执行。WITH CHECK CONSTRAINT 重新启用该约束。
+
+CREATE TABLE cnst_example 
+(id INT NOT NULL,
+ name VARCHAR(10) NOT NULL,
+ salary MONEY NOT NULL
+    CONSTRAINT salary_cap CHECK (salary < 100000)
+)
+
+-- Valid inserts
+INSERT INTO cnst_example VALUES (1,"Joe Brown",65000)
+INSERT INTO cnst_example VALUES (2,"Mary Smith",75000)
+
+-- This insert violates the constraint.
+INSERT INTO cnst_example VALUES (3,"Pat Jones",105000)
+
+-- Disable the constraint and try again.
+ALTER TABLE cnst_example NOCHECK CONSTRAINT salary_cap
+INSERT INTO cnst_example VALUES (3,"Pat Jones",105000)
+
+-- Reenable the constraint and try another insert, will fail.
+ALTER TABLE cnst_example CHECK CONSTRAINT salary_cap
+INSERT INTO cnst_example VALUES (4,"Eric James",110000)
+
+H. 禁用并重新启用触发器
+下例使用 ALTER TABLE 的 DISABLE TRIGGER 选项来禁用触发器，以使正常情况下会违反触发器条件的插入操作得以执行。然后下例使用 ENABLE TRIGGER 重新启用触发器。
+
+CREATE TABLE trig_example 
+(id INT, 
+name VARCHAR(10),
+salary MONEY)
+go
+-- Create the trigger.
+CREATE TRIGGER trig1 ON trig_example FOR INSERT
+as 
+IF (SELECT COUNT(*) FROM INSERTED
+WHERE salary > 100000) > 0
+BEGIN
+print "TRIG1 Error: you attempted to insert a salary > $100,000"
+ROLLBACK TRANSACTION
+END
+GO
+-- Attempt an insert that violates the trigger.
+INSERT INTO trig_example VALUES (1,"Pat Smith",100001)
+GO
+-- Disable the trigger.
+ALTER TABLE trig_example DISABLE TRIGGER trig1
+GO
+-- Attempt an insert that would normally violate the trigger
+INSERT INTO trig_example VALUES (2,"Chuck Jones",100001)
+GO
+-- Re-enable the trigger.
+ALTER TABLE trig_example ENABLE TRIGGER trig1
+GO
+-- Attempt an insert that violates the trigger.
+INSERT INTO trig_example VALUES (3,"Mary Booth",100001)
+GO

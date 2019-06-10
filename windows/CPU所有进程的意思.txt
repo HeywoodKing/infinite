@@ -1,0 +1,154 @@
+PPAP.exe 
+是PLIVE的加速器进程 PPSAP.exe 进程是PPS加速器
+安装ppstream后出现的ppsap.exe进程
+
+svchost.exe
+Service Host Process是一个标准的动态连接库主机处理服务。Svchost.exe对那些从动态连接库（DLL）中运行的服务来说是一个普通的主机进程名。Svhost.exe文件定位在系统的Windows\system32文件夹下。在启动的时候，Svchost.exe检查注册表中的位置来构建需要加载的服务列表。这就会使多个Svchost.exe在同一时间运行。Windows 2000一般有2个Svchost进程，一个是RPCSS（Remote Procedure Call）服务进程，另外一个则是由很多服务共享的一个Svchost.exe；而在 windows XP中，则一般有4个以上的Svchost.exe服务进程；Windows 2003 server中则更多。Svchost.exe 是一个系统的核心进程，并不是病毒进程。但由于Svchost.exe进程的特殊性，所以病毒也会千方百计的入侵Svchost.exe。通过察看 Svchost.exe进程的执行路径可以确认是否中毒。如果你怀疑计算机有可能被病毒感染，Svchost.exe的服务出现异常的话通过搜索 Svchost.exe文件就可以发现异常情况。一般只会在C:\Windows\System32目录下找到一个Svchost.exe程序。如果你在其他目录下发现Svchost.exe程序的话，那很可能就是中毒了。
+
+notepad.exe
+是记事本进程
+
+360se.exe
+360se 这个是360浏览器的进程
+
+TXPlatform.exe
+  TXPlatform - TXPlatform.exe - QQ相关进程信息
+  进程文件： TXPlatform 或者 TXPlatform.exe
+  进程名称： TXPlatform 或者 TXPlatform.exe
+  描述：腾讯即时通讯客户端相关程序,用于阻止同一个QQ号在同一台电脑上登陆2次和支持外部添加功能（如添加到用户自定义面板）。
+TXPlatform.exe的作用是释放QQ使用过程中资源。 TXPlatform虽然占了一定的内存，但是如果不启动TXPlatform你的QQ会占用更大的资源。经测试不开TXPlatform的QQ2小时后内存占用会达30+MB，虚拟内存70+MB，而开着TXPlatform的QQ内存占用始终是10MB以内，虚拟内存40MB以内（如果视频或语音内存会临时增加，结束后内存会立即释放) 。
+
+360rp.exe为奇虎360公司旗下产品360杀毒的一项子进程，也是启动360杀毒软件的必须进程。该进程无法结束,一旦结束，1分钟之后又会自动重新启动,让此进程无法启动的方式就是卸载360杀毒和关闭360杀毒软件自启动。
+
+sqlservr.exe
+是数据库的进程
+
+explorer.exe
+在窗口中选择Explorer.exe进程，单击“结束进程”按钮，如图1所示，接下来桌面上除了壁纸（活动桌面Active Desktop的壁纸除外），所有图标和任务栏都消失了。此时你仍可以像平常一样操作一切软件。当你需要离开电脑一会儿，又不想别人操作你的电脑，但设置密码觉得又太尴尬，用以上的方法可以起到一定程度的保密效果。当然，此时仍可以用任务管理器的“新任务”来重新运行Explorer.exe，但对于一般用户而言，这种保密措施已经足够了——毕竟现在还有许多菜鸟呀！
+
+
+cajshost.exe
+caj阅读器的相关程序
+
+
+mDNSResponder.exe 
+进程文件：mDNSResponder 或者 mDNSResponder.exe 
+进程名称： Bonjour for Windows Component 
+
+描述： 
+mDNSResponder.exe是一款名为Bonjour的音乐分享软件相关程序。
+出品者： Apple 
+属于： Bonjour for Windows 
+
+applemobiledeviceservice.exe是用于苹果Iphone手机的相关程序。
+这个进程正是iTunes软件对iPhone提供支持的服务。
+
+AliceService.exe
+是支付宝的插件 一般都在系统盘C:\Program Files\Common Files\alipay
+
+AlipaySecSvc.exe
+支付宝的后台服务进程，为支付宝安全产品提供服务，一旦停止该服务，有可能影响你的支付安全。
+你电脑上安装的有支付宝数字证书控件时一般开机时默认是启动这个服务的。
+如果你不常用支付宝该服务可以停用
+。
+
+
+spoolsv.exe 是Print Spooler的进程，管理所有本地和网络打印队列及控制所有打印工作。如果此服务被停用，本地计算机上的打印将不可用。该进程属 Windows 系统服务。
+木马spoolsv进程信息:
+  描述:   这个垃圾软件利用将msicn\msibm.dll插入多个进程的方法对系统进行监控，在system32下创建如下的东西：   wmpdrm.dll   1116\   msicn\msibm.dll   msicn\ube.exe   msicn\plugins\   spoolsv\spoolsv.exe(这个还长得像微软打印服务，shit！！）   注册表加入如下垃圾：   [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run]   "spoolsv"="%System%\spoolsv\spoolsv.exe -printer"   [HKEY_CLASSES_ROOT\CLSID\\InprocServer32]   @="%System%\wmpdrm.dll"   [HKEY_CLASSES_ROOT\wmpdrm.cfsbho]   [HKEY_CLASSES_ROOT\wmpdrm.cfsbho.1]   [HKEY_CLASSES_ROOT\TypeLib\]   [HKEY_CLASSES_ROOT\Interface\]   然后每隔4秒左右对以上东西进行监控，前后互相照应，让你无从下手   启动项 c:/windows/system32/spoolsv/spoolsv.exe -printer   cfs2…… 相关文件、目录：   %System%\wmpdrm.dll   %System%\1116\   %System%\msicn\msibm.dll   %System%\msicn\ube.exe   %System%\msicn\plugins\   %System%\spoolsv\spoolsv.exe   %System%\spoolsv\spoolsv.exe，有一个启动项：   [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run]   "spoolsv"="%System%\spoolsv\spoolsv.exe -printer"   运行后会调用%System%\msicn\msibm.dll，创建%System%\1116\目录，备份用。   %System%\1116\目录是备份目录，里面是%System%\wmpdrm.dll、%System%\msicn\和%System%\spoolsv\spoolsv.exe的备份。   %System%\msicn\msibm.dll，会插入多个指定进程，大约每4秒钟监视恢复文件（从%System%\1116\目录）和注册表信息（启动项、BHO）：   [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run]   "spoolsv"   [HKEY_CLASSES_ROOT\CLSID\\InprocServer32]   @="%System%\wmpdrm.dll"   注："spoolsv"的数据不会被监视，所以修改它的数据也不会被恢复，只有删除"spoolsv"才会被恢复。   还可能会从远程服务器下载文件：   http://liveupdate.ourxin.com/secp.exe   secp.exe是个安装程序，安装以下文件：   %System%\wmpdrm.dll   %System%\msicn\ube.exe   %System%\msicn\plugins\（目录里4个dll文件）   %System%\wmpdrm.dll是一个BHO，%System%\msicn\ube.exe像是卸载程序。   另外，在%System%\和%System%\msicn\目录里还有有一些从远程下载来的cpz、vxd文件，比如：   ava.vxd   guid.vxd   plgset.vxd   safep.vxd   %System%\wmpdrm.dll作为BHO被调用后，会尝试调用%System%\spoolsv\spoolsv.exe和%System%\msicn\msibm.dll。   注：如果%System%\spoolsv\spoolsv.exe没有被运行或被调用，也就不会备份还原，好像它就是用来备份的。   另外……   在“开始菜单”>>“程序”里 可能 会有一项“NavAngel”，里面有个快捷方式NavAngel.lnk，指向：%System%\spoolsv\spoolsv.exe -ctrlfun:4,3   “添加/删除程序”里有一项“NavAngel”，对应命令是：%System%\spoolsv\spoolsv.exe -ctrlfun:4,2   还有一项“WinDirected 2.0”，对应命令是：%System%\spoolsv\spoolsv.exe -uninst   还可能会有mscache\目录，从名字看像是存放临时缓存文件的。   BHO相关注册表信息：   [HKEY_CLASSES_ROOT\CLSID\]   [HKEY_CLASSES_ROOT\wmpdrm.cfsbho]   [HKEY_CLASSES_ROOT\wmpdrm.cfsbho.1]   [HKEY_CLASSES_ROOT\TypeLib\]   [HKEY_CLASSES_ROOT\Interface\]
+判别自己是否中毒
+  1、点开始－运行，输入msconfig，回车，打开实用配置程序，选择“启动”， 感染以后会在启动项里面发现运行Spoolsv.exe的启动项， 每次进入windows会有NTservice的对话框。   2、打开系统盘，假设C盘，看是否存在C:\WINDOWS\system32\spoolsv文件夹，里面有个spoolsv.exe文件，有“傲讯浏览器辅助工具”的字样说明，正常的spoolsv.exe打印机缓冲池文件应该在C:\WINDOWS\system32目录下。   3，打开任务管理器，会发现spoolsv.exe进程，而且CPU占用率很高。
+清除方法
+  1、重新启动，开机按F8进入安全模式。   2、点开始－运行，输入cmd，进入dos。   利用rd命令删除以下目录（如果存在）（ 在dos窗口下输入：rd(空格）C:\WINDOWS\system32\spoolsv/s，回车，出现提示，输入y回车，即可删除整个目录。）：   C:\WINDOWS\system32\msibm   C:\WINDOWS\system32\spoolsv   C:\WINDOWS\system32\bakcfs   C:\WINDOWS\system32\msicn   利用del命令删除下面的文件（如果存在）（比如在dos窗口下输入：del(空格）C:\windows\system32\spoolsv.exe，回车，即可删除被感染的spoolsv.exe，这个文件可以在杀毒结束后在别的正常的机器上复制正常的spoolsv.exe粘贴到   C:\windows\system32文件夹。）：   C:\windows\system32\spoolsv.exe   C:\WINDOWS\system32\wmpdrm.dll   3、重启按F8再次进入安全模式。   （1）桌面右键点击我的电脑，选择“管理”，点击“服务和应用程序”-“服务”，右键点击   NTservice，选择“属性”，修改启动类型为“禁用”。   、   （2）点开始，运行，输入regedit，回车打开注册表，点菜单上的编辑，选择查找，查找含有spoolsv.exe的注册表项目，删除。可以利用F3继续查找，将含有spoolsv.exe的注册表项目全部删除。   4、若以上操作完成后,仍然有该进程。请桌面右键点击我的电脑，选择“管理”，点击“服务和应用程序”-“服务”，右键点击print spooler，选择“属性”，先点“停止”然后修改启动类型为手动或“禁用”。随后重复以上步骤。   另外解决方案 直接删除C:\WINDOWS\system32\spool\PRINTERS 下的文件即可   我还遇到一种情况：经检查，不是以上所描述的病毒，但经常占CPU 100％，但是连续关进程几次，便不再出现，奇怪。   如上所述，在system32里有 spool文件夹。直接把 \PRINTERS 下的文件删除，便解决了这个问题。   这可能不是“病毒”问题，而是系统的故障，但出现了还是很麻烦的。
+杀毒后处理
+  病毒清了后你的SPOOLSV.EXE文件就没有了，且在服务里你的后台打印print spooler也不能启动了，当然打印机也不能运行了，在运行里输入“services.msc”后，在“print spooler”服务中的“常规”项里的“可执行文件路径”也变得不可用，如启动会显示“错误3:找不到系统路径”的错误，这是因为你的注册表的相关项也删了，（在上面清病毒的时候）   解决方法：   1:在安装光盘里I386目录下把SPOOLSV.EX_文件复制到SYSTEM32目录下改名为spoolsv.exe,当然也可以在别人的系统时把这个文件拷过来，还可以用NT/XP的文件保护功能，即在CMD里键入SFC/SCANNOW全面修复，反正你把这个文件恢复就可以了。   2:修改注册表即可：进入“HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Spooler”目录下，新建一个可扩充字符串值，取名：“ImagePath”，其值为：“C:\WINDOWS\system32\spoolsv.exe”（不要引号）再进入控制面板中启动打印服务即可。
+
+alg.exe - alg - 进程管理信息 
+进程文件： alg or alg.exe 
+进程名称： Application Layer Gateway Service 
+进程类别：其他进程 
+英文描述： 
+alg.exe is a part of the Microsoft Windows operating system. It is a core process for Microsoft Windows Internet Connection sharing and Internet connection firewall. This program is important for the stable and secure running of your computer and should 
+中文参考： 
+alg.exe是微软Windows操作系统自带的程序。它用于处理微软Windows网络连接共享和网络连接防火墙。这个程序对你系统的正常运行是非常重要的。 
+出品者：Microsoft Corp. 
+属于：Microsoft Windows Operating System 
+
+
+是360安全卫士的主动防御文件。
+
+这个主动防御项为360用户提供实时保护、文件审计、主动防御、智能加速等功能，使360云查杀引擎的扫描速度提高了10倍，内存占用节省了80%，木马查杀效率也大幅提高，建议您不要关闭。
+
+Alipaybsm.exe
+支付宝的浏览器监视程序
+
+urlproc.exe
+360安全浏览器红绿灯程序，用于拦截显示恶意网站的状态 
+
+alipaySafetran.exe
+这个程序是支付宝安全服务的后台进程，安装了支付宝安全证书就会自动运行，只是多了一个进程而已，为了保安全，其实也没什么
+
+ctfmon - ctfmon.exe - 进程信息 
+进程文件: ctfmon or ctfmon.exe 
+进程名称: Alternative User Input Services 
+描述: 控制Alternative User Input Text Processor (TIP)和Microsoft Office语言条。Ctfmon.exe提供语音识别、手写识别、键盘、翻译和其它用户输入技术的支持。
+
+lsass.exe---------------lsass.exe管理IP安全策略以及启动ISAKMP/Oakley (IKE)和IP安全驱动程序
+
+
+taskmgr.exe-------------任务管理器
+notepad.exe-------------就是“notepad.exe 记事本应用程序” 
+rundll32.exe------------“执行32位的DLL文件
+realsched.exe-----------可以从RealPlayer的服务器上获取一些版本更新等消息
+wscntfy.exe-------------这是“安全中心”警告提示信息的进程
+alg.exe-----------------为 Internet 连接共享和 Internet 连接防火墙提供第三方协议插件的支持spoolsv.exe-------------Windows打印任务控制程序，用以打印机就绪
+explorer.exe------------资源管理器
+svchost.exe-------------是nt核心系统的非常重要的进程,很多病毒、木马也会调用它
+lsass.exe---------------lsass.exe管理IP安全策略以及启动ISAKMP/Oakley (IKE)和IP安全驱动程序
+services.exe------------管理Windows服务(系统进程)
+winlogon.exe------------Windows用户登录程序，系统进程。Windows运行时至少应该有一个此进程
+csrss.exe---------------客户端服务子系统，用以控制Windows图形相关子系统(系统进程)
+smss.exe----------------会话管理子系统用以初始化系统变量
+system.exe--------------进程信息(系统进程)
+system idle process-----系统闲置进程。它是系统的默认进程
+
+360sd.exe
+360杀毒的进程
+
+进程文件: sqlwriter.exe 　　进程名称: n/a 　　英文描述: sqlwriter.exe is a process associated with Microsoft SQL Server from Microsoft Corporation. Allows backup and restore applications to operate in the Volume Shadow Copy Service (VSS) framework. Disabling or enabling it is down to user preference. 　　进程分析: 　　MicrosoftSQLServer的SQL编写器服务，允许备份和还原应用程序以便在VolumeShadowCopyService(VSS)框架中进行操作。服务器上的所有SQL实例只有一个SQL编写器服务实例。 在任务管理器中结束这个进程一般没什么影响。 
+
+1、360Tray.exe  360tray.exe是360安全卫士实时监控程序 可以将此程序添加到杀毒软件的“可信任区域”
+2、正常的文件应该在360安全卫士的目录中的 safemon文件夹里。
+3、该进程应该是一个360安全卫士盾牌的样子，在系统的时间栏里，如果没有，就是伪装木马。
+
+TNSLSNR.exe
+TNSLSNR.exe 或 HSPM 或 Oracle Database 10g Express Edition 由 Oracle Corporation 发行。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

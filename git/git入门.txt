@@ -1,0 +1,20 @@
+克隆项目
+git clone "项目地址"
+
+查看项目状态
+git status
+
+拉取项目
+git pull
+
+推送项到远程
+1.查看项目状态
+git status
+2.拉取项目
+git pull
+3.增加本地文件
+git add .
+4.提交本地新增文件到本地仓库
+git commit -m "消息"
+5.推送到远程仓库
+git push origin master

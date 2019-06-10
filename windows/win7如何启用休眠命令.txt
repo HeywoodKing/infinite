@@ -1,0 +1,2 @@
+´ò¿ªcmd
+ÊäÈë£ºpowercfg -hibernate on

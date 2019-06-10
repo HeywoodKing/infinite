@@ -1,0 +1,9 @@
+彻底卸载sql server 2000数据库过程：(删除一下项目的时候最好是先备份)
+1.	在C盘下删掉C:\Program Files\Microsoft SQL Server\80\Tools
+C:\Program Files\Microsoft SQL Server\MSSQL
+2.	删掉注册表的信息：
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\MSSQL Server
+HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\MSDTC
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\control\session manager中找到PendingFileRenameOperations项目，删除，这样就可以清楚安装暂挂项目了
+3.	HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\setup删除
+ExceptionComponents

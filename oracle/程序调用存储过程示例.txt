@@ -1,0 +1,8 @@
+begin
+  -- Call the procedure
+  pro_cardconsumptionday_t(in_start_date => :in_start_date,
+                           in_end_date => :in_end_date,
+                           in_pre_2_card => :in_pre_2_card,
+                           out_code => :out_code,
+                           out_msg => :out_msg);
+end;

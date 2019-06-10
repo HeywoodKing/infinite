@@ -1,0 +1,3 @@
+echo ¸´ÖÆÖÐ...
+echo n|copy /-y c:\bk\*.*
+pause

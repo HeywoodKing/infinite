@@ -1,0 +1,32 @@
+将win7电脑无线网变身WiFi热点，让手机、笔记本共享上网
+
+用win7建立无线局域网，可以共享上网可以局域网游戏。
+
+开启windows 7的隐藏功能：虚拟WiFi和SoftAP（即虚拟无线AP），就可以让电脑变成无线路由器，实现共享上网，节省网费和路由器购买费。
+以操作系统为win7的笔记本或装有无线网卡的台式机作为主机。
+主机设置如下：
+
+1、以管理员身份运行命令提示符：
+快捷键win+R→输入cmd→回车
+
+2、启用并设定虚拟WiFi网卡：
+运行命令：netsh wlan set hostednetwork mode=allow ssid=wuminPC key=wuminWiFi
+此命令有三个参数，mode：是否启用虚拟WiFi网卡，改为disallow则为禁用。
+ssid：无线网名称，最好用英文(以wuminPC为例)。
+key：无线网密码，八个以上字符(以wuminWiFi为例)。
+以上三个参数可以单独使用，例如只使用mode=disallow可以直接禁用虚拟Wifi网卡。
+
+
+开启成功后，网络连接中会多出一个网卡为“Microsoft Virtual WiFi Miniport Adapter”的无线连接2，为方便起见，将其重命名为虚拟WiFi。若没有，只需更新无线网卡驱动就OK了。
+
+3、设置Internet连接共享：
+在“网络连接”窗口中，右键单击已连接到Internet的网络连接，选择“属性”→“共享”，勾上“允许其他??????连接(N)”并选择“虚拟WiFi”。
+确定之后，提供共享的网卡图标旁会出现“共享的”字样，表示“宽带连接”已共享至“虚拟WiFi”。
+
+4、开启无线网络：
+继续在命令提示符中运行：netsh wlan start hostednetwork   netsh wlan stop hostednetwork
+
+（将start改为stop即可关闭该无线网，以后开机后要启用该无线网只需再次运行此命令即可）
+
+
+至此，虚拟WiFi的红叉叉消失，WiFi基站已组建好，主机设置完毕。笔记本、带WiFi模块的手机等子机搜索到无线网络wuminPC，输入密码wuminWiFi，就能共享上网了。

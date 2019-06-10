@@ -1,0 +1,17 @@
+net start wlansvc
+
+net stop wlansvc
+
+
+netsh wlan set hostednetwork
+
+标记             值
+mode            指定允许还是禁止托管网络。
+ssid            托管网络的 SSID。
+key             托管网络使用的用户安全密钥。
+keyUsage        指定用户密钥密钥是永久性的还是临时的。
+
+netsh wlan set hostednetwork mode=allow
+	   set hostednetwork mode=allow
+	   set hostednetwork ssid=ssid1
+	   set hostednetwork key=passphrase keyUsage=persistent

@@ -1,0 +1,6 @@
+WIN7修改锁屏图片
+已有 1138 次阅读2012-8-18 16:59 |个人分类:杂七杂八
+1  修改好你要设为登陆背景的图片保存为JPG格式，大小最好和电脑的分辨率一样，控制在250KB以内，命名为BackgroundDefault.jpg
+2  在开始菜单中输入regedit，打开注册表定位到HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\Background，更改OEMBackground的值，若为0则表示不使用OEM背景仅使用Windows默认背景；若为1则表示使用OEM背景，此时C:\Windows\System32\oobe\info\Backgrounds下的BackgroundDefault.jpg图片就是Windows登录背景。
+3  在“运行”中输入gpedit.msc，打开组策略编辑器，在目录“计算机配置-管理模块-系统-登录”中找到“始终使用自定义登录背景”项，哈哈，终于找到这个隐藏的家伙了，双击，在编辑页面选择“已启用”，最后保存设置
+第2步的路径info\Backgrounds机器没有的话就自己创建文件夹，命名按info和Backgrounds

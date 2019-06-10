@@ -1,0 +1,4 @@
+redis-trib.rb create --replicas 0 127.0.0.1:6380 127.0.0.1:6381 127.0.0.1:6382 
+
+
+redis-trib.rb check 127.0.0.1:6380
