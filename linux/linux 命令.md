@@ -1,0 +1,118 @@
+#linux 常用命令
+```
+ls
+ll
+ls -a
+pwd
+cd ~
+whereis python
+touch a.txt
+sudo vim a.conf
+su root
+sudo apt-get update
+sudo apt-get upgrade
+mkdir aaa
+tree
+cat a.txt
+
+
+```
+
+查看系统内核版本
+`cat /proc/version`
+
+显示linux的内核版本和系统是多少位的：X86_64代表系统是64位的。
+`uname -a`
+
+```
+sb_release -a
+显示如下
+Distributor ID: Ubuntu                           //类别是ubuntu
+Description:  Ubuntu 16.04.3 LTS          //16年3月发布的稳定版本，LTS是Long Term Support：长时间支持版本，支持周期长达三至五年
+Release:    16.04                                    //发行日期或者是发行版本号
+Codename:   xenial                               //ubuntu的代号名称
+```
+
+```
+Task: Start Apache 2 Server /启动apache服务
+# /etc/init.d/apache2 start
+or
+$ sudo /etc/init.d/apache2 start
+Task: Restart Apache 2 Server /重启apache服务
+# /etc/init.d/apache2 restart
+or
+$ sudo /etc/init.d/apache2 restart
+Task: Stop Apache 2 Server /停止apache服务
+# /etc/init.d/apache2 stop
+or
+$ sudo /etc/init.d/apache2 stop
+```
+
+当前目录是/local，而我经常要访问/usr/local/linux/work
+那么我就可以使用在local下建立一个文件linkwork，
+然后sudo ln -s /usr/local/linux/work  /local/linkwork
+即建立两者之间的链接。
+
+删除链接
+`rm -rf   symbolic_name   注意不是rm -rf   symbolic_name/ `
+那么上面我就是rm -rf /local/linkwork
+
+链接有两种，一种被称为硬链接（Hard Link），另一种被称为符号链接（Symbolic Link）。
+建立硬链接时，链接文件和被链接文件必须位于同一个文件系统中，并且不能建立指向目录的硬链接。而对符号链接，则不存在这个问题。默认情况下，ln产生硬链接。
+　　在硬链接的情况下，参数中的“目标”被链接至[链接名]。如果[链接名]是一个目录名，系统将在该目录之下建立一个或多个与“目标”同名的链接文件，链接文件和被链接文件的内容完全相同。如果[链接名]为一个文件，用户将被告知该文件已存在且不进行链接。如果指定了多个“目标”参数，那么最后一个参数必须为目录。
+　　如果给ln命令加上- s选项，则建立符号链接。如果[链接名]已经存在但不是目录，将不做链接。[链接名]可以是任何一个文件名（可包含路径），也可以是一个目录，并且允许它与“目标”不在同一个文件系统中。如果[链接名]是一个已经存在的目录，系统将在该目录下建立一个或多个与“目标”同名的文件，此新建的文件实际上是指向原“目标”的符号链接文件。
+
+```
+
+which python
+which python3
+
+python --version
+python3 --version
+pip --version
+
+FreeBSD
+sudo pkg install python3
+
+Debian/Ubuntu
+sudo apt-get install python3
+
+openSUSE
+sudo zypper in python3
+
+Arch linux
+sudo pacman -S python
+```
+
+下载安装脚本（使用 wget 或者 curl）
+`wget https://bootstrap.pypa.io/get-pip.py`
+
+运行安装脚本（注意不同系统启动 Python 3 的命令，用哪个版本的 Python 运行安装脚本，pip 就被关联到哪个版本。）
+`sudo python3 get-pip.py`
+
+部分 Linux 发行版可直接用包管理器安装 pip，如 Debian 和 Ubuntu
+`sudo apt-get install python-pip`
+
+>macOS（Mac OS X）可用 Homebrew 安装 Python 3，再用通过 get-pip.py 安装 pip
+安装 Python 3
+`brew install python3`
+下载安装脚本
+`curl https://bootstrap.pypa.io/get-pip.py`
+安装 pip
+`python3 get-pip.py`
+
+>CentOS 7 编译安装 Python 3 方法如下（默认安装 pip）：
+# 为了命令更直观且避免新人不停的敲 sudo 直接用 root 敢死队模式进行
+su
+# 安装编译环境
+yum groupinstall 'Development Tools'
+yum install zlib-devel bzip2-devel openssl-devel ncurese-devel
+# 下载源码包（替换成自己需要的版本）
+wget https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz
+# 解压并切换到源码目录
+tar -jxvf Python-3.5.1.tar.xz
+cd Python-3.5.1
+# 编译（配置自定义安装路径 ./configure --prefix=/your/pach/）
+./configure --prefix=/usr/local/python3
+make 
+make install
