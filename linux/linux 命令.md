@@ -12,7 +12,7 @@ Shift+Ctrl+Alt+R 记录一小段屏幕录像
 
 ```
 
-## linux 常用命令
+### linux 常用命令
 ```
 ls
 ll
@@ -36,12 +36,12 @@ cat a.txt
 
 ```
 
-## 查看系统内核版本
+### 查看系统内核版本
 ```
 cat /proc/version
 ```
 
-## 显示linux的内核版本和系统是多少位的：X86_64代表系统是64位的。
+### 显示linux的内核版本和系统是多少位的：X86_64代表系统是64位的。
 ```
 uname -a
 ```
@@ -75,7 +75,7 @@ $ sudo /etc/init.d/apache2 stop
 然后sudo ln -s /usr/local/linux/work  /local/linkwork
 即建立两者之间的链接。
 
-## 删除链接
+### 删除链接
 `rm -rf   symbolic_name   注意不是rm -rf   symbolic_name/ `
 那么上面我就是rm -rf /local/linkwork
 
@@ -106,13 +106,13 @@ Arch linux
 sudo pacman -S python
 ```
 
-## 下载安装脚本（使用 wget 或者 curl）
+### 下载安装脚本（使用 wget 或者 curl）
 `wget https://bootstrap.pypa.io/get-pip.py`
 
-## 运行安装脚本（注意不同系统启动 Python 3 的命令，用哪个版本的 Python 运行安装脚本，pip 就被关联到哪个版本。）
+### 运行安装脚本（注意不同系统启动 Python 3 的命令，用哪个版本的 Python 运行安装脚本，pip 就被关联到哪个版本。）
 `sudo python3 get-pip.py`
 
-## 部分 Linux 发行版可直接用包管理器安装 pip，如 Debian 和 Ubuntu
+### 部分 Linux 发行版可直接用包管理器安装 pip，如 Debian 和 Ubuntu
 `sudo apt-get install python-pip`
 
 >macOS（Mac OS X）可用 Homebrew 安装 Python 3，再用通过 get-pip.py 安装 pip
@@ -124,28 +124,35 @@ sudo pacman -S python
 `python3 get-pip.py`
 
 >CentOS 7 编译安装 Python 3 方法如下（默认安装 pip）：
-## 为了命令更直观且避免新人不停的敲 sudo 直接用 root 敢死队模式进行
+### 为了命令更直观且避免新人不停的敲 sudo 直接用 root 敢死队模式进行
 su
-## 安装编译环境
+### 安装编译环境
 yum groupinstall 'Development Tools'
 yum install zlib-devel bzip2-devel openssl-devel ncurese-devel
-## 下载源码包（替换成自己需要的版本）
+### 下载源码包（替换成自己需要的版本）
 wget https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz
-## 解压并切换到源码目录
+### 解压并切换到源码目录
 tar -jxvf Python-3.5.1.tar.xz
 cd Python-3.5.1
-## 编译（配置自定义安装路径 ./configure --prefix=/your/pach/）
+### 编译（配置自定义安装路径 ./configure --prefix=/your/pach/）
 ./configure --prefix=/usr/local/python3
 make 
 make install
 
-## 查看本机ip
+### 查看本机ip
 ```
 ifconfig -a
 ```
 
-## 修复上次安装异常
+### 修复上次安装异常
 ```
 sudo apt-get --fix-broken install
 ```
 
+### 修改权限
+```
+1. 修改chfweb文件夹权限为777
+sudo chmod 777 chfweb
+2. 修改文件夹chfweb以及子文件夹和子文件的权限为777
+sudo chmod -R 777 chfweb
+```

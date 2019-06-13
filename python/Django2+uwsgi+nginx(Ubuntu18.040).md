@@ -11,7 +11,11 @@ uwsgi 2.0.18
 ## 服务器：
 >Ubuntu 18.04
 
-我的项目是在本机的home/flack/myproject/下,而且我的项目本身用的就是pipenv虚拟环境，会在根目录下存在pipfile 和 pipfile.lock两个文件
+## 安装pipenv
+`pip install pipenv`
+
+我的项目是在本机的home/flack/myproject/
+下,而且我的项目本身用的就是pipenv虚拟环境，会在根目录下存在pipfile 和 pipfile.lock两个文件
 这两个文件的生成是这样的
 首先进入到你的django项目根目录，然后输入以下命令（确保已经安装了pipenv虚拟环境）
 ```
@@ -138,6 +142,7 @@ sudo apt-get install libmysqlclient-dev
 cd /opt/project/chf-project/chfweb/
 python manage.py makemigrations
 python manage.py migrate
+python manage.py createsuperuser
 
 python manage.py runserver 9000
 浏览器访问127.0.0.1:9000查看成功与否
@@ -285,6 +290,20 @@ sudo chmod 777 /opt/project/chf-project/chfweb/uwsgi.log
 ```
 
 这时就完美成功
+
+每次有更新时都要重载uwsgi与nginx才能生效，为了方便uwsgi的重载，在项目目录下新建一个uwsgi文件夹
+然后在里面新建两个文件:uwsgi.pid（用于重载停止等操作）和uwsgi.status（用于查看状态）
+
+修改chfweb_uwsgi.ini，把原先的stats那行删掉，下面加上这两行：
+```
+stats=%(chdir)/uwsgi/uwsgi.status
+pidfile=%(chdir)/uwsgi/uwsgi.pid
+
+这样如果项目有更新，就可以使用这两个命令来分别重载uwsgi和nginx了
+
+uwsgi --reload uwsgi/uwsgi.pid
+systemctl reload nginx.service
+```
 
 ```
 vim的使用方法:

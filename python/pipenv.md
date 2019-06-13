@@ -5,6 +5,72 @@ pipenv 是 Pipfile 主要倡导者、requests 作者 Kenneth Reitz 写的一个�
 
 Python开发者应该听过pip、easy_install和virtualenv，应该还知道 virtualenvwrapper、virtualenv-burrito和autoenv，再加上pyvenv、venv（Python 3标准库）、pyenv…额，是不是有种发懵的感觉？那么现在有个好消息，你可以只使用终极方案: pipenv + autoenv（可选）。
 
+```
+Usage: pipenv [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --where             Output project home information.
+  --venv              Output virtualenv information.
+  --py                Output Python interpreter information.
+  --envs              Output Environment Variable options.
+  --rm                Remove the virtualenv.
+  --bare              Minimal output.
+  --completion        Output completion (to be eval'd).
+  --man               Display manpage.
+  --support           Output diagnostic information for use in GitHub issues.
+  --site-packages     Enable site-packages for the virtualenv.  [env var:
+                      PIPENV_SITE_PACKAGES]
+  --python TEXT       Specify which version of Python virtualenv should use.
+  --three / --two     Use Python 3/2 when creating virtualenv.
+  --clear             Clears caches (pipenv, pip, and pip-tools).  [env var:
+                      PIPENV_CLEAR]
+  -v, --verbose       Verbose mode.
+  --pypi-mirror TEXT  Specify a PyPI mirror.
+  --version           Show the version and exit.
+  -h, --help          Show this message and exit.
+
+
+Usage Examples:
+   Create a new project using Python 3.7, specifically:
+   $ pipenv --python 3.7
+
+   Remove project virtualenv (inferred from current directory):
+   $ pipenv --rm
+
+   Install all dependencies for a project (including dev):
+   $ pipenv install --dev
+
+   Create a lockfile containing pre-releases:
+   $ pipenv lock --pre
+
+   Show a graph of your installed dependencies:
+   $ pipenv graph
+
+   Check your installed dependencies for security vulnerabilities:
+   $ pipenv check
+
+   Install a local setup.py into your virtual environment/Pipfile:
+   $ pipenv install -e .
+
+   Use a lower-level pip command:
+   $ pipenv run pip freeze
+
+Commands:
+  check      Checks for security vulnerabilities and against PEP 508 markers
+             provided in Pipfile.
+  clean      Uninstalls all packages not specified in Pipfile.lock.
+  graph      Displays currently-installed dependency graph information.
+  install    Installs provided packages and adds them to Pipfile, or (if no
+             packages are given), installs all packages from Pipfile.
+  lock       Generates Pipfile.lock.
+  open       View a given module in your editor.
+  run        Spawns a command installed into the virtualenv.
+  shell      Spawns a shell within the virtualenv.
+  sync       Installs all packages specified in Pipfile.lock.
+  uninstall  Un-installs a provided package and removes it from Pipfile.
+  update     Runs lock, then sync.
+```
+
 ## Pipfile的基本理念是：
 Pipfile 文件是 TOML 格式而不是 requirements.txt 这样的纯文本。
 一个项目对应一个 Pipfile，支持开发环境与正式环境区分。默认提供 default 和 development 区分。
