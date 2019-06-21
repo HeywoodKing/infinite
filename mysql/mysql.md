@@ -8,6 +8,16 @@
 7、输入命令：update mysql.user set authentication_string=password('root') where user='root' ;
 刷新一下：flush privileges;
 
+### Incorrect string value: '\\xE5\\x93\\x81\\xE7\\x89\\x8C...' for column 'name'
+这个问题一般都是字符集的问题
+创建数据库的时候指定字符集：
+create database if not exists chf default character set = 'utf8';
+
+在mysql配置文件中指定数据库的字符集
+
+查看创建的DB的字符集
+select schema_name,default_character_set_name from information_schema.schemata where schema_name = 'test03';
+
 
 修改密码方式：
 方法1： 用SET PASSWORD命令
@@ -310,3 +320,16 @@ mysqldump -u root -p -d dbName > sqlFilePath
 
 导出命令执行情况如下图所示： 
 ![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
+
+命令行复制sql插入数据太长，导致命令行死机，直接结束掉重新进入mysql,提示如下：
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+解决方法：
+```
+首先进入mysql
+查看那个数据库占用了进程
+show processlist;
+kill 180;
+然后既可以了
+```

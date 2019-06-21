@@ -7,7 +7,10 @@ django-admin startapp appname
 python manage.py startapp appname
 
 启动开发应用服务器
-python manage.py runserver 192.168.1.100:9090
+`python manage.py runserver 192.168.1.100:9090`
+
+nohup指明服务后台运行，0.0.0.0指明项目跑在本地的127.0.0.1上，8000指明端口
+`nohup python manage.py runserver 0.0.0.0:8000`
 
 生成数据库迁移脚本
 python manage.py makemigrations [appname]

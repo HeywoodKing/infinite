@@ -64,6 +64,11 @@ sudo /etc/init.d/nginx restart
 service nginx restart
 ```
 
+### 查看错误日志
+```
+grep /var/log/nginx/error.log
+```
+
 ### 打开nginx.conf配置文件编辑
 ```
 vim /etc/nginx/nginx.conf

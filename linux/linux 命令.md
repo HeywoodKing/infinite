@@ -155,4 +155,65 @@ sudo apt-get --fix-broken install
 sudo chmod 777 chfweb
 2. 修改文件夹chfweb以及子文件夹和子文件的权限为777
 sudo chmod -R 777 chfweb
+3. 增加组
+`sudo groupadd --system webapps`
+
+4. 增加用户
+用户名为user_test
+`sudo useradd --system --gid webapps --shell /bin/bash --home /webapps/test user_test`
+
+设置密码为：test
+`passwd test`
+
+5. 给用户赋值权限
+创建用户目录
+`mkdir -p /webapps/test`
+修改目录权限，下面的命令意思是：使/webapps/test/这个目录属于user_test这个用户
+`chown user_test /webapps/test/`
+
+添加用户user_test sudo权限 
+在/etc/sudoers添加 
+使用命令vim /etc/sudoers打开/etc/sudoers 
+在里面添加下面这一句：
+`user_test ALL=(ALL:ALL) ALL`
+使用:wq!强制保存
+
+切换用户为：user_test
+`su - user_test`
+
+6. 修改python默认版本
+```
+调整优先级
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
+sudo update-alternatives --config python3
+```
+7. 
+
+
+```
+
+### 查找被占用的端口
+```
+netstat -tul /* 查看端口，-t：tcp，-u：udp，-l：listening */
+netstat -tln
+
+netstat -tln | grep 80
+ps -aux | grep 8000 /* 查看8000端口占用情况，-a：all，-u：user，-x：ttys以外的 */
+查看进程
+netstat -ntpl
+查看nginx进程
+ps -ef | grep nginx
+```
+netstat -tln 查看所有端口的使用情况，netstat -tln | grep 80 只查看80端口的使用情况
+
+### 查看端口被哪个进程占用
+```
+lsof -i :80
+```
+
+### 杀掉占用80端口的进程
+```
+kill -9 /* 进程id */
+kill pid /* 杀死pid */
 ```

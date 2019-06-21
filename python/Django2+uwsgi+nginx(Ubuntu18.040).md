@@ -33,6 +33,16 @@ pipenv install pillow
 pipenv install pytz
 pipenv install sqlparse
 pipenv install mysqlclient
+安装mysqlclients时可能会报错，
+>
+1. 首先在虚拟环境pipenv下卸载刚才报错的mysqlclient,命令：
+pipenv uninstall mysqlclient
+2. 推出虚拟环境再次安装以下依赖
+apt-get install setuptools libmysql-dev libmysqlclient-dev python3.7-dev
+3. 进入虚拟环境
+pipenv shell
+4. 再次安装mysqlclient
+pipenv install mysqlclient
 ```
 
 #### 注：确保以上组件或者您的项目所需要的第三方包都已安装
