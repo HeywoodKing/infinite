@@ -62,11 +62,34 @@ sudo service uwsgi restart
 
 ### 安装
 ```
+1. 第一种
 sudo apt-get install uwsgi
+或
+pip install uwsgi
+
+2. 通过网络安装
+curl http://uwsgi.it/install | bash -s default /tmp/uwsgi
+这种方式会在/tmp/uwsgi路径下安装二进制版本，并且可以随意改变它。
+
+3. 通过下载源并编译它
+wget https://projects.unbit.it/downloads/uwsgi-latest.tar.gz 
+tar zxvf uwsgi-latest.tar.gz 
+cd uwsgi-latest
+make
+这种方式构建完成后，uwsgi二进制文件会存在于当前路径下
+
+注：在使用发行版提供的软件包时，你可能需要考虑的一件事，你的发行版很可能以模块化方式构建了uWSGI（每个功能都是必须加载的不同插件）。所以，你必须先安装好--plugin python,http插件，用来保证文章中的例子能正常运行。
 ```
 
 
 ### 卸载
+
+
+### uwsgi 有多种配置可用：
+1. ini 
+2. xml 
+3. json
+4. yaml
 
 
 ### 命令参数方式启动单独文件的测试
@@ -85,12 +108,20 @@ sudo apt-get install uwsgi
 
 ### 启动
 `/etc/init.d/uwsgi start`
+`uwsgi --ini chfweb_uwsgi.ini`
 
 ### 停止
 `/etc/init.d/uwsgi stop`
+`uwsgi --stop uwsgi/uwsgi.pid`
+停止uwsgi服务后，用ps命令查看uwsgi的进程，已经不存在了
 
 ### 将命令打包成配置文件修改后的重载
 `uwsgi --reload chfweb_uwsgi.ini`
+
+`uwsgi --connect-and-read uwsgi/uwsgi.status`
+这个命令返回一个json串，显示进程和worker的状态很详细
+
+
 
 ### 查看安装后的路径
 
@@ -99,6 +130,217 @@ sudo apt-get install uwsgi
 
 
 ### 检查版本
+
+### 部署一个简单的uwsgi应用实例
+```
+def application(env, start_response):
+    start_response('200 OK', [('Content-Type', 'text/html')])
+    return [b'Hello World']
+uWSGI Python loader会默认查找并加载此函数
+
+部署到http的9090端口
+开启uWSGI，运行HTTP server转发请求到你的WSGI应用
+uwsgi --http :9090 --wsgi-file helloworld.py
+注：如果当前目录不再foobar.py路径中，则需要将命令中文件的路径也加上
+注：当你有一个前端Webserver，或者你正在做某种形式的基准测试时，不要使用--http，使用--http-socket
+
+为你的WSGI应用添加并发（concurrency）与监控（monitoring）
+默认情况下uWSGI只会开启一个进程和一个线程
+你可以用--processes选项和--threads选项添加更多的进程和线程
+uwsgi --http :9090 --wsgi-file foobar.py --master --processes 4 --threads 2
+以上命令将会产生一个主进程，4个工作进程，和http路由。主进程会控制4个工作进程结束时再重新生成新的进程。每个工作进程下有2个线程。
+
+监测。stats子系统允许你导出uWSGI的内部统计信息，格式为json。
+uwsgi --http :9090 --wsgi-file foobar.py --master --processes 4 --threads 2 --stats 127.0.0.1:9191
+我运行--stats选项成功后，用浏览器访问9191端口，返回的是拒绝访问。查看了原文档写的是：telnet to the port 9191，猜的可能是浏览器是http访问，而不是telnet
+你也可以使用uwsgitop工具，来监控实例。uwsgitop可用pip安装。
+注：应该绑定stats socket到私有地址，否则每个人都能获取到uwsgi的状态信息。
+```
+
+### 与web服务器，如nginx，协同使用（putting behind a full webserver）
+虽然uWSGI的http router具有耐用，高性能的特点。但是你可能还是想要和功能齐全的webserver搭配使用。
+
+uWSGI本身支持http，FastCGI，SCGI和uwsgi协议。性能最佳的是uwsgi协议，它已经可以支持nginx和Cherokee（Apache的各种模块的都可以用）
+
+uwsgi --socket 127.0.0.1:3031 --wsgi-file foobar.py --master --processes 4 --threads 2 --stats 127.0.0.1:9191
+uwsgi --http-socket 127.0.0.1:3031 --wsgi-file foobar.py --master --processes 4 --threads 2 --stats 127.0.0.1:9191
+注：--http-socket和—http不同，--http是自己生成代理。
+
+### 自动开启uWSGI
+
+### 部署到django上
+Django基本上是使用最多的web框架了。部署它相当简单。
+### 假设我们的django项目在/home/foobar/myproject，执行
+uwsgi --socket 127.0.0.1:3031 --chdir /home/foobar/myproject/ --wsgi-file myproject/wsgi.py --master --processes 4 --threads 2 --stats 127.0.0.1:9191
+成功后，我们用浏览器访问http://公网IP /，则可以看到django页面的小火箭了。
+
+### 从命令行选项到ini配置文件
+上面这个命令是用--chdir选项来改变文件路径。在django中此选项为必填项，这样才能加载正确的模块。
+但是上面的命令太长了，所以uWSGI支持各种风格的配置文件。这里使用.ini文件
+```
+[uwsgi]
+socket = 127.0.0.1:3031
+chdir = /home/foobar/myproject/
+wsgi-file = myproject/wsgi.py
+processes = 4
+threads = 2
+stats = 127.0.0.1:9191
+```
+
+然后，运行这个配置文件
+`uwsgi yourfile.ini`
+
+如果你的django版本<1.4，那么你的django项目目录下（/home/foobar/myproject/myproject/wsgi.py）是没有wsgi.py文件的。那么你需要执行如下命令
+`uwsgi --socket 127.0.0.1:3031 --chdir /home/foobar/myproject/ --pythonpath .. --env DJANGO_SETTINGS_MODULE=myproject.settings --module "django.core.handlers.wsgi:WSGIHandler()" --processes 4 --threads 2 --stats 127.0.0.1:9191`
+
+转变成ini文件为：
+```
+[uwsgi]
+socket = 127.0.0.1:3031
+chdir = /home/foobar/myproject/
+pythonpath = ..
+env = DJANGO_SETTINGS_MODULE=myproject.settings
+module = django.core.handlers.wsgi:WSGIHandler()
+processes = 4
+threads = 2
+stats = 127.0.0.1:9191
+```
+### 部署Flask
+Flask是比较流行的python轻量级Web框架。
+保存如下示例内容，myflaskapp.py
+```
+from flask import Flask
+ 
+app = Flask(__name__)
+ 
+@app.route('/')
+def index():
+    return "<span style='color:red'>I am app 1</span>"
+```
+Flask会导入它的WSGI函数（即，以application为函数名的函数）作为app。执行如下命令：
+```
+uwsgi --socket 127.0.0.1:3031 --wsgi-file myflaskapp.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191
+```
+
+### 部署web2py
+也是一个很流行的选择。解压web2py源文件，新建uWSGI配置文件，内容如下：
+```
+[uwsgi]
+http = :9090
+chdir = path_to_web2py
+module = wsgihandler
+master = true
+processes = 8
+```
+注：当前最近的web2py版本，你可能需要复制wsgihandler.py脚本到handlers文件夹外。
+
+该配置仍然使用的是http router。用浏览器访问9090端口，可以看到web2py的欢迎页面。
+
+### 关于https请求
+点击管理界面，你会发现不起作用，因为它需要https。因此，你需要安装OpenSSL开发头文件，然后再重新构建uWSGI，构建系统则将会自动探测到https请求了。
+
+#### 步骤如下：:
+首先，生成自己的密钥和证书
+```
+openssl genrsa -out foobar.key 2048
+openssl req -new -key foobar.key -out foobar.csr
+openssl x509 -req -days 365 -in foobar.csr -signkey foobar.key -out foobar.crt
+```
+然后，会有三个文件，foobar.csr, foobar.key and foobar.crt。修改uWSGI配置文件如下：
+```
+[uwsgi]
+https = :9090,foobar.crt,foobar.key
+chdir = path_to_web2py
+module = wsgihandler
+master = true
+processes = 8
+```
+重新运行uWSGI，并使用https协议连接9090端口。
+
+### 关于python线程的说明
+如果你启动uWSI服务器时不使用线程，那么python GIL也不会启动，所以你的应用线程也不会运行。你可能不太喜欢这个设置，但是uWSGI是语言独立的服务器，所以它大多数的选择都会保持”不可知”。
+
+但是对于开发人员来说，基本上所有的uWSGI配置都可以通过选项来设置。
+
+如果你想要在不启动应用程序的多个线程的情况下维护Python线程支持，只需添加--enable-threads选项（或ini样式的enable-threads = true）。
+
+### Virtualenvs
+可以通过添加virtualenv = <path>选线来配置指定的运行环境
+
+### 安全性和可用性（Security and availability）
+为了避免用root用户身份运行uWSGI实例，你可以使用uid和gid选项来删除权限。配置如下：
+```
+[uwsgi]
+https = :9090,foobar.crt,foobar.key
+uid = foo
+gid = bar
+chdir = path_to_web2py
+module = wsgihandler
+master = true
+processes = 8
+```
+
+如果需要绑定到特权端口（例如HTTPS用的443端口号），那么使用共享套接字shared-socket。它们是在删除权限之前创建的，可以使用= N语法引用，其中N是套接字号（从0开始）：
+```
+[uwsgi]
+shared-socket = :443
+https = =0,foobar.crt,foobar.key
+uid = foo
+gid = bar
+chdir = path_to_web2py
+module = wsgihandler
+master = true
+processes = 8
+```
+
+### 常见问题之“卡住请求”
+Web应用程序部署的一个常见问题是“卡住请求”。 这时所有线程/工作线程都会被卡住（请求被阻止），应用不能接受更多请求。 为了避免这个问题，你可以设置harakiri计时器。 它是一个监视器（由主进程管理），它将摧毁超过指定秒数的进程。 示例如下，关闭超过30秒的进程：
+```
+[uwsgi]
+shared-socket = :443
+https = =0,foobar.crt,foobar.key
+uid = foo
+gid = bar
+chdir = path_to_web2py
+module = wsgihandler
+master = true
+processes = 8
+harakiri = 30
+```
+
+除此之外，自uWSGI1.9版本之后，stats服务器会导出整个请求变量，所以你可以及时查看你的uWSGI实例在做什么。
+
+### 卸载
+uWSGI卸载子系统允许在某些特定模式匹配时尽快释放工作线程，并且可以委派给pure-c线程。 例如，从文件系统发送静态文件，将数据从网络传输到客户端等等。
+
+卸载非常复杂，但它的使用对最终用户是透明的。 如果你想尝试卸载，可以添加--offload-threads <n>选项，其中<n>是要生成的线程数（每个CPU 1个是一个很好的值）。
+
+当卸载线程被允许执行时，所有可以被优化的部分都会被自动检测到。
+
+### 多个python版本共用相同的uWSGI服务器
+正如我们所见，uWSGI由一个小内核和各种插件组成。插件能够在二进制中嵌入，或者动态的加载。当你为python构建uWSGI时，一系列的插件和python嵌入到二进制文件中。
+
+那么，这会带来一个问题，如果你想很多版本python，但是又不想为每一个版本构建一个二进制文件，怎么办？
+
+最好的方式是将语言独立（languang-independent）的各项配置构建成二进制文件，然后对每个版本的python制作成插件，当需要时再加载。
+
+### 这里不太明白怎么才能构建python插件，不知道一下代码是在哪里配置还是执行
+我们从同一个目录下开始构建python插件
+```
+PYTHON=python3.4 ./uwsgi --build-plugin "plugins/python python34"
+PYTHON=python2.7 ./uwsgi --build-plugin "plugins/python python27"
+PYTHON=python2.6 ./uwsgi --build-plugin "plugins/python python26"
+```
+
+你将会以python34_plugin.so, python27_plugin.so, python26_plugin.so，这三个文件结束。复制这三个文件到你的目标路径。（默认情况下，uWSGI会再当前工作目录下搜索插件）
+
+现在，在你的配置文件中你可以在最顶上添加插件路径和插件指令了。
+```
+[uwsgi]
+plugins-dir = <path_to_your_plugin_directory>
+plugin = python26
+```
+然后它会从目录中加载python26_plugin.so插件库到你复制的插件中。
 
 
 ### 参数配置说明

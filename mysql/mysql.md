@@ -333,3 +333,11 @@ show processlist;
 kill 180;
 然后既可以了
 ```
+
+### mysql 执行脚本sql文件
+1. 进入mysql
+`mysql>source /var/www/chinslickingweb/chin.sql;`
+
+2. 不进入mysql
+`mysql -uroot -p123456 -Dchin</var/www/chinslickingweb/chin.sql`
+

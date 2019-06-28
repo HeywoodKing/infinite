@@ -116,3 +116,150 @@ sudo ufw status
 在您选择的浏览器中打开localhost
 https://www.linuxidc.com/upload/2018_05/18050708325033.png
 ```
+
+## 假定一个场景：某个网站它可能不希望被网络爬虫抓取，例如测试环境不希望被抓取，以免对用户造成误导，那么需要在该网站中申明，本站不希望被抓取。有如下方法：
+
+### 方法一：修改nginx.conf，禁止网络爬虫的ua，返回403。
+```
+server { 
+  listen 80; 
+  server_name 127.0.0.1; 
+  # 添加如下内容即可防止爬虫
+  if ($http_user_agent ~* "qihoobot|Baiduspider|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot") 
+  { 
+    return 403; 
+  } 
+  
+  ...
+}
+``` 
+
+### 方法2：网站更目录下增加Robots.txt，放在站点根目录下。
+限制浏览器访问：
+```
+if ($http_user_agent ~* "Firefox|MSIE")
+{
+     return 403;
+}
+```
+
+### Nginx防盗链的3种方法 文件防盗链 图片防盗链 视频防盗链 linux防盗链
+能够支持高达 50,000 个并发连接数的响应, 感谢Nginx为我们选择了 epoll and kqueue作为开发模型. 目前中国大陆使用nginx网站用户有：新浪、网易、 腾讯,另外知名的微网志Plurk也使用nginx。
+
+一般常用的方法是在server或者location段中加入!
+`valid_referers   none  blocked  www.hihi123.com  hihi123.com;`
+
+none 表示空的来路，也就是直接访问，比如直接在浏览器打开一个图片
+blocked 表示被防火墙标记过的来路
+server_names 也就是域名了。0.5.33以后的版本中，可以用*.hihi123.com来表示所有的二级域名
+
+```
+location ~ .*\.(wma|wmv|asf|mp3|mmf|zip|rar|jpg|gif|png|swf|flv)$ {
+     valid_referers none blocked *.765h.com 765h.com;
+     if ($invalid_referer) {
+     #rewrite ^/ http://www.765h.com/error.html;
+     return 403;
+      }
+}
+
+第一行：wma|gif|jpg|png|swf|flv
+表示对wma、gif、jpg、png、swf、flv后缀的文件实行防盗链
+
+第二行：*.765h.com 765h.com
+表示对*.765h.com 765h.com这2个来路进行判断(*代表任何，任何的二级域名)，你可以添加更多
+if{}里面内容的意思是，如果来路不是指定来路就跳转到403错误页面，当然直接返回404也是可以的，也可以是图片。
+```
+
+```
+location /img/ {
+    root /data/img/;
+    valid_referers none blocked *.765h.com 765h.com;
+    if ($invalid_referer) {
+                   rewrite  ^/  http://www.765h.com/images/error.gif;
+                   #return   403;
+    }
+}
+以上是nginx自带的防盗链功能。
+```
+
+### nginx 的第三方模块ngx_http_accesskey_module 来实现下载文件的防盗链
+安装Nginx和nginx-http-access模块
+```
+#tar zxvf nginx-0.7.61.tar.gz
+#cd nginx-0.7.61/
+#tar xvfz nginx-accesskey-2.0.3.tar.gz
+#cd nginx-accesskey-2.0.3 
+#vi config
+#把HTTP_MODULES="$HTTP_MODULES $HTTP_ACCESSKEY_MODULE" 修改成HTTP_MODULES="$HTTP_MODULES ngx_http_accesskey_module" (这是此模块的一个bug)
+#./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --add-module=/root/nginx-accesskey-2.0.3
+
+编译成功后，在主配置文件加入类似下面的代码：
+server{ 
+..... 
+    location /download { 
+        accesskey             on;
+        accesskey_hashmethod  md5;
+        accesskey_arg         "key";
+        accesskey_signature   "mypass$remote_addr";
+    } 
+}
+/download 为你下载的目录。
+```
+
+前台php产生的下载路径格式是：
+
+1.http://*****.com/download/1.zip?key=<?php echo md5('mypass'.$_SERVER["REMOTE_ADDR"]);?>
+这样，当访问没有跟参数一样时，其他用户打开时，就出现：403
+
+ 
+
+NginxHttpAccessKeyModule第三方模块，实现方法如下：
+
+1. 下载Nginx HttpAccessKeyModule模块文件：Nginx-accesskey-2.0.3.tar.gz；
+
+ 
+
+2. 解压此文件后，找到nginx-accesskey-2.0.3下的config文件。编辑此文件：替换其中的"$HTTP_ACCESSKEY_MODULE"为"ngx_http_accesskey_module"；
+
+ 
+
+3. 用一下参数重新编译nginx：
+
+./configure --add-module=path/to/nginx-accesskey
+
+4. 修改nginx的conf文件，添加以下几行：
+
+复制代码
+location /download {
+  accesskey             on;
+  accesskey_hashmethod  md5;
+  accesskey_arg         "key";
+  accesskey_signature   "mypass$remote_addr";
+}
+复制代码
+
+其中：
+accesskey为模块开关；
+accesskey_hashmethod为加密方式MD5或者SHA-1；
+accesskey_arg为url中的关键字参数；
+accesskey_signature为加密值，此处为mypass和访问IP构成的字符串。
+
+访问测试脚本download.php：
+```
+<?
+$ipkey= md5("mypass".$_SERVER['REMOTE_ADDR']);
+$output_add_key="<a href=http://www.example.cn/download/G3200507120520LM.rar?key=".$ipkey.">download_add_key</a><br />";
+$output_org_url="<a href=http://www.example.cn/download/G3200507120520LM.rar>download_org_path</a><br />";
+echo $output_add_key;
+echo $output_org_url;
+?>
+```
+
+访问第一个download_add_key链接可以正常下载，第二个链接download_org_path会返回403 Forbidden错误。
+
+如果不怕麻烦，有条件实现的话，推荐使用Nginx HttpAccessKeyModule这个东西。
+
+他的运行方式是：如我的download 目录下有一个 file.zip 的文件。对应的URI 是http://www.765h.com/download/file.zip
+使用ngx_http_accesskey_module 模块后http://www.765h.com/download/file.zip?key=09093abeac094. 只有给定的key值正确了，才能够下载download目录下的file.zip。而且 key 值是根据用户的IP有关的，这样就可以避免被盗链了。
+
+据说Nginx HttpAccessKeyModule现在连迅雷都可以防了，可以尝试一下。

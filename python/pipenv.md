@@ -497,3 +497,77 @@ autoenv
 $ git clone git://github.com/kennethreitz/autoenv.git ~/.autoenv
 $ echo 'source ~/.autoenv/activate.sh' >> ~/.bashrc
 ```
+
+
+先贴出命令
+
+pip install --user --upgrade pipenv   # 用户安装pipenv
+
+pipenv --three  # 会使用当前系统的Python3创建环境
+pipenv --two  # 使用python2创建
+pipenv --python 3.6 指定某一Python版本创建环境
+
+pipenv run python 文件名
+pipenv run pip ...  # 运行pip
+
+pipenv shell 激活虚拟环境
+
+pipenv --where 显示目录信息
+
+pipenv --venv 显示虚拟环境信息
+
+pipenv --py 显示Python解释器信息
+
+pipenv install requests 安装相关模块并加入到Pipfile
+
+pipenv install django==1.11 安装固定版本模块并加入到Pipfile
+
+pipenv graph    # 显示依赖图
+
+pipenv check    #检查安全漏洞
+
+pipenv uninstall requests   # 卸载包并从Pipfile中移除
+
+pipenv uninstall --all   # 卸载全部包
+
+
+以前一直使用pip+virtualenv+virtualwrapper管理模块和环境， 但是virtualwrapper在windows上使用不太方便，而且包和环境分开管理确实经常不记得哪个是哪个了。 后来又出现一堆其他名字很像的虚拟环境管理，已经摸不清头脑了。
+
+最后google了一下，总的来说发现，使用pipenv比较好， 它整合了 pip+virtualenv+Pipfile，能够自动处理好包的依赖问题和虚拟环境问题，是最推荐使用的虚拟环境管理。
+
+安装pipenv:
+
+$ pip install --user pipenv
+1
+2
+升级pipenv
+
+$ pip install --user --upgrade pipenv
+1
+使用pipenv
+
+切换到项目文件夹，然后输入：
+
+pipenv install requests
+1
+Pipenv是基于项目来管理依赖的，在安装requests依赖的时候，他会在项目文件夹中创建 Pipfile，用来track依赖，并且也是会分别创建一个virtualenv来运行这个项目。
+
+写一个python文件：
+
+import requests
+
+response = requests.get('https://httpbin.org/ip')
+
+print('Your IP is {0}'.format(response.json()['origin']))
+1
+2
+3
+4
+5
+使用pipenv管理的环境来运行：
+
+pipenv run python main.py
+1
+这应该会输出类似的：
+
+Your IP is 8.8.8.8

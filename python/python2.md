@@ -129,6 +129,8 @@ UserWarning 用户代码生成的警告
 ```
 
 #103.python中copy和deepcopy区别
+copy是浅拷贝，只拷贝可变对象的父级元素。 deepcopy是深拷贝，递归拷贝可变对象的所有元素。
+
 复制不可变数据类型，不管copy还是deepcopy,都是同一个地址当浅复制的值是不可变对象（数值，字符串，元组）时和=“赋值”的情况一样，对象的id值与浅复制原来的值相同。
 ![演示](https://images2018.cnblogs.com/blog/1247221/201806/1247221-20180630134429748-1171745107.png "演示")
 
@@ -1794,10 +1796,284 @@ PhantomJS 是一个基于Webkit的“无界面”(headless)浏览器， 它会�
 能够直接模拟 ajax 请求获取数据固然是极好的，但是有些网站把 ajax 请求的所有参数全部加密了。我们根本没办法构造自己所需要 的数据的请求。这种情况下就用 selenium+phantomJS，调用浏览器 内核，并利用 phantomJS 执行 js 来模拟人为操作以及触发页面中的 js 脚本。从填写表单到点击按钮再到滚动页面，全部都可以模拟， 不考虑具体的请求和响应过程，只是完完整整的把人浏览页面获取数 据的过程模拟一遍。
 用这套框架几乎能绕过大多数的反爬虫，因为它不是在伪装成浏览 器来获取数据(上述的通过添加 Headers 一定程度上就是为了伪装 成浏览器)，它本身就是浏览器，phantomJS 就是一个没有界面的浏览器，只是操控这个浏览器的不是人。利selenium+phantomJS 能干很多事情，例如识别点触
 
+189. 简述函数式编程
+在函数式编程中，函数是基本单位，变量只是一个名称，而不是一个存储单元。除了匿名函数外，Python还使用fliter(),map(),reduce(),apply()函数来支持函数式编程。
+
+190. 什么是匿名函数，匿名函数有什么局限性
+匿名函数，也就是lambda函数，通常用在函数体比较简单的函数上。匿名函数顾名思义就是函数没有名字，因此不用担心函数名冲突。不过Python对匿名函数的支持有限，只有一些简单的情况下可以使用匿名函数。
+
+191. 如何捕获异常，常用的异常机制有哪些？
+try…except…finally语句:当try语句执行时发生异常，回到try语句层，寻找后面是否有except语句。找到except语句后，会调用这个自定义的异常处理器。except将异常处理完毕后，程序继续往下执行。finally语句表示，无论异常发生与否，finally中的语句都要执行。
+assert语句：判断assert后面紧跟的语句是True还是False，如果是True则继续执行print，如果是False则中断程序，调用默认的异常处理器，同时输出assert语句逗号后面的提示信息。
+
+with语句：如果with语句或语句块中发生异常，会调用默认的异常处理器处理，但文件还是会正常关闭。
+
+192. 简述Python的作用域以及Python搜索变量的顺序
+Python作用域简单说就是一个变量的命名空间。代码中变量被赋值的位置，就决定了哪些范围的对象可以访问这个变量，这个范围就是变量的作用域。在Python中，只有模块（module），类（class）以及函数（def、lambda）才会引入新的作用域。Python的变量名解析机制也称为 LEGB 法则：本地作用域（Local）→当前作用域被嵌入的本地作用域（Enclosing locals）→全局/模块作用域（Global）→内置作用域（Built-in）
+
+193. 新式类和旧式类的区别,如何确保使用的类是新式类
+为了统一类(class)和类型(type)，python在2.2版本引进来新式类。在2.1版本中，类和类型是不同的。
+
+为了确保使用的是新式类，有以下方法：
+
+放在类模块代码的最前面 __metaclass__ = type
+从内建类object直接或者间接地继承
+在python3版本中，默认所有的类都是新式类。
+
+194. Python垃圾回收机制
+Python GC主要使用引用计数（reference counting）来跟踪和回收垃圾。在引用计数的基础上，通过“标记-清除”（mark and sweep）解决容器对象可能产生的循环引用问题，通过“分代回收”（generation collection）以空间换时间的方法提高垃圾回收效率。
+
+>1. 引用计数
+PyObject是每个对象必有的内容，其中ob_refcnt就是做为引用计数。当一个对象有新的引用时，它的ob_refcnt就会增加，当引用它的对象被删除，它的ob_refcnt就会减少.引用计数为0时，该对象生命就结束了。
+
+优点:
+简单 实时性 
+
+缺点:
+维护引用计数消耗资源 循环引用
+
+>2. 标记-清除机制
+基本思路是先按需分配，等到没有空闲内存的时候从寄存器和程序栈上的引用出发，遍历以对象为节点、以引用为边构成的图，把所有可以访问到的对象打上标记，然后清扫一遍内存空间，把所有没标记的对象释放。
+
+>3. 分代技术
+分代回收的整体思想是：将系统中的所有内存块根据其存活时间划分为不同的集合，每个集合就成为一个“代”，垃圾收集频率随着“代”的存活时间的增大而减小，存活时间通常利用经过几次垃圾回收来度量。
+
+Python默认定义了三代对象集合，索引数越大，对象存活时间越长。
+
+195. Python中的@property有什么作用?如何实现成员变量的只读属性？
+@property装饰器就是负责把一个方法变成属性调用，通常用在属性的get方法和set方法，通过设置@property可以实现实例成员变量的直接访问，又保留了参数的检查。另外通过设置get方法而不定义set方法可以实现成员变量的只读属性。
+
+196. *args and **kwargs
+
+>*args代表位置参数，它会接收任意多个参数并把这些参数作为元组传递给函数。
+**kwargs代表的关键字参数，允许你使用没有事先定义的参数名，另外，位置参数一定要放在关键字参数的前面。
+
+197. 有用过with statement吗？它的好处是什么？具体如何实现？
+with语句适用于对资源进行访问的场合，确保不管使用过程中是否发生异常都会执行必要的“清理”操作，释放资源，比如文件使用后自动关闭、线程中锁的自动获取和释放等
+
+198. what will be the output of the code below? explain your answer
+```
+def extend_list(val, list=[]):
+    list.append(val)    
+    return list
+
+list1 = extend_list(10)
+list2 = extend_list(123, [])
+list3 = extend_list('a')
+
+print(list1) # list1 = [10, 'a']
+print(list2) # list2 = [123, []]
+print(list3) # list3 = [10, 'a']
+
+class Parent(object):
+    x = 1
+
+class Child1(Parent):
+    pass
+
+class Child2(Parent):
+    pass
+
+print(Parent.x, Child1.x, Child2.x)  # [1,1,1]
+Child1.x = 2
+print(Parent.x, Child1.x, Child2.x)  # [1,2,1]
+Partent.x = 3
+print(Parent.x, Child1.x, Child2.x)  # [3,2,3]
+```
+
+199. 在一个二维数组中，每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
+```
+arr = [
+    [1,4,7,10,15], 
+    [2,5,8,12,19], 
+    [3,6,9,16,22], 
+    [10,13,14,17,24],
+    [18,21,23,26,30]
+]
+
+def getNum(num, data=None):
+    while data:        
+        if num > data[0][-1]:
+            del data[0]
+            print(data)
+            getNum(num, data=None)        
+        elif num < data[0][-1]:
+            data = list(zip(*data))            
+            del data[-1]
+            data = list(zip(*data))
+            print(data)
+            getNum(num, data=None)        
+        else:
+            return True
+            data.clear()    
+    
+    return False
+
+if __name__ == '__main__':
+    print(getNum(18, arr))
+```
+
+200. 获取最大公约数、最小公倍数
+```
+a = 36
+b = 21
+def maxCommon(a, b):
+    while b: 
+        a,b = b, a%b    
+        return a
+
+def minCommon(a, b):
+    c = a*b    
+    while b: 
+        a,b = b, a%b    
+        return c//a
+
+if __name__ == '__main__':
+    print(maxCommon(a,b))
+    print(minCommon(a,b))
+```
+
+201. 获取中位数
+```
+def median(data):
+    data.sort()
+    half = len(data) // 2
+    return (data[half] + data[~half])/2
+
+l = [1,3,4,53,2,46,8,42,82]
+if __name__ == '__main__':
+    print(median(l))
+```
+
+202. 输入一个整数，输出该数二进制表示中1的个数。其中负数用补码表示。
+```
+def getOneCount(num):
+    if num > 0:
+        count = b_num.count('1')
+        print(b_num)
+        return count
+    elif num < 0:
+        b_num = bin(~num)
+        count = 8 - b_num.count('1')
+        return count
+    else:
+        return 8
+
+if __name__ == '__main__':
+    print(getOneCount(5))
+    print(getOneCount(-5))
+    print(getOneCount(0))
+```
+
+203. B+树结构
 
 
+204. 索引原理、数据库索引优化问题
 
-189. 
+
+205. redis如何解决高并发问题
+
+>1. 如果redis宕机了，或者链接不上，怎么办？
+解决方法：
+
+①配置主从复制，配置哨兵模式（相当于古代门派的长老级别可以选择掌门人的权利），一旦发现主机宕机，让下一个从机当做主机。
+
+②如果最坏的情况，只能关闭Redis连接，去往数据库连接。但由于数据量大，这样SQL数据库也会宕掉的。
+
+>2. 如果redis缓存在高峰期到期失效，在这个时刻请求会向雪崩一样，直接访问数据库如何处理？
+设置条件查询判断，判断redis缓存里是否有数据，如果没有，则去往数据库连接。当然要加分布式锁，利用redis的单线程+多路IO复用技术，原子性原理，让其它的线程请求等待，假若第一个线程进去获取到分布式锁在查询数据的途中宕掉了，不能让其它线程一直等待，设置等待一定时间判断是否取回数据，如果没有，递归调用自己的方法让第二个线程继续拿分布式锁查询数据库。当第二个锁从数据库拿到数据时，把数据值设置到redis数据库缓存中，设置失效时间，避免占内存，方便使用提高效率。
+
+>3. 如果用户不停地查询一条不存在的数据，缓存没有，数据库也没有，那么会出现什么
+如果数据不存在，缓存中没有，数据库也没有，当然如果不设置判断，会一直调用数据库，使数据库效率降低，访问量大时甚至会宕机。
+ 解决方案：从数据库查询，如果数据库没有，则返回值为Null，判断数据库返回的值，如果为Null，则自定义把标识的字段存到Redis中，用key,value的方法，jedis.setex(key,"empty")，设置失效时间跟具体情况而定，然后调用String json=jedis.get(key),判断是否获取的值"empty".equal(json),如果相等，则抛出自定义异常，给用户提示，或者直接return null。这样用户再次查询的时候由于先从reids缓存中查询，redis会有对应的Key获取之前设置的value值，这样就不会再次调用数据库，影响效率等问题。
+
+redis的缺点有哪些?
+
+>是数据库容量受到物理内存的限制,不能用作海量数据的高性能读写,因此Redis适合的场景主要局限在较小数据量的高性能操作和运算上。
+
+>Redis较难支持在线扩容，在集群容量达到上限时在线扩容会变得很复杂。为避免这一问题，运维人员在系统上线时必须确保有足够的空间，这对资源造成了很大的浪费。
+
+### 32核 128G内存的机器，使用3台搭建redis集群，完成千万用户级别的项目redis分布式集群搭建
+
+1、redis实现高性能
+redis是基于内存进行操作的，性能较高；
+前端发送请求、后端进行和mysql数据库进行交互，进行sql 查询操作，读写比较慢，这时候引入redis ,把从mysql 的数据放入redis 中，下次读取时候性能就会提高；
+当然，前提是mysql数据未变动情况下，否则，从redis读取的内容和mysql不一致，造成缓存和数据库数据不同步问题，发生错误、这个问题可以使用rabbitMQ，在redis中对数据库变化监听来解决同步不一致问题；
+
+2、redis实现高并发
+mysql数据库并发2000、你千万级别用户的项目，并发高于2000时候mysql 不是GG了么，这时候，使用redis 缓存在一定程度上可以解决高并发的问题。
+在redis 数据库中存放些数据，倘若总数据量50G，mysql存20G，redis存30G，并发量4000的话，redis就能处理2400的并发量，mysql仅仅处理1600的并发量即可；
+这样高并发4000的并发量并非什么难题
+
+206. 浏览器的一个请求从发送到返回都经历了什么，讲的越详细越好
+我大概讲下我的答案：
+
+1、先从网络模型层面：
+
+client （浏览器）与 server 通过 http 协议通讯，http 协议属于应用层协议，http 基于 tcp 协议，所以 client 与 server 主要通过 socket 进行通讯；
+
+而 tcp 属于传输层协议、如果走 https 还需要会话层 TLS、SSL 等协议； 传输层之下网络层，这里主要是路由协议 OSPF 等进行路由转发之类的。再向下数据链路层主要是 ARP、RARP 协议完成 IP 和 Mac 地址互解析，再向下到最底层物理层基本就是 IEEE 802.X 等协议进行数据比特流转成高低电平的的一些定义等等；
+
+当浏览器发出请求，首先进行数据封包，然后数据链路层解析 IP 与 mac 地址的映射，然后上层网路层进行路由查表路由，通过应用层 DNS 协议得到目标地址对应的 IP ，在这里进行 n 跳的路由寻路；而传输层 tcp 协议可以说下比较经典的三次握手、四次分手的过程和状态机，这里放个图可以作为参考：
+
+2、应用层方面：
+
+数据交换主要通过 http 协议， http 协议是无状态协议，这里可以谈一谈 post、get 的区别以及 RESTFul 接口设计，然后可以讲服务器 server 模型 epoll、select 等，接着可以根据实际经验讲下 server 处理流程，比如我： server 这边 Nginx 拿到请求，进行一些验证，比如黑名单拦截之类的，然后 Nginx 直接处理静态资源请求，其他请求 Nginx 转发给后端服务器，这里我用 uWSGI, 他们之间通过 uwsgi 协议通讯，uWSGI 拿到请求，可以进行一些逻辑， 验证黑名单、判断爬虫等，根据 wsgi 标准，把拿到的 environs 参数扔给 Django ，Django 根据 wsgi 标准接收请求和 env， 然后开始 startresponse ，先跑 Django 相关后台逻辑，Django 拿到请求执行 request middleware 内的相关逻辑，然后路由到相应 view 执行逻辑，出错执行 exception middleware 相关逻辑，接着 response 前执行 response middleware 逻辑，最后通过 wsgi 标准构造 response， 拿到需要返回的东西，设置一些 headers，或者 cookies 之类的，最后 finishresponse 返回，再通过 uWSGI 给 Nginx ，Nginx 返回给浏览器。
+
+
+207. MySQL 数据引擎
+
+208. 排序算法问题，排序算法的最小时间复杂度及原因，
+
+
+费那波数列常数空间复杂度内计算任意 fib(n)
+动态规划
+```
+def fib(n):
+    a, b = 0, 1
+    for x in xrange(n):
+        a, b = b, a + b
+    return b
+```
+
+
+209. 搜索查找算法
+
+
+210. tcp 相关知识
+
+
+211. epoll 服务模型
+
+
+212. tornado 的一些原理
+
+
+213. 微信红包构架设计
+
+
+214. 分布式 redis 使用 hash 的潜在问题
+主要是分布式机器 hash 后可能存在储存分配不均匀问题
+然后 hash 表又问了冲突解决方案，主要是拉链法和进位法
+
+215. 在极端情况下，系统缓存全部失效，该如何防止流量全部打到数据库上
+缓存重建
+
+216. 单链表逆置
+```
+def revese(node):
+    p = node
+    cur = node.next
+    p.next = None
+    while cur:
+        tmp = cur.next
+        cur.next = p
+        p = cur
+        cur = tmp
+    return p
+```
+
+217. 
 
 #200.结束语
 https://blog.csdn.net/weixin_41666747/article/details/79942847

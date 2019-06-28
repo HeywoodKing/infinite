@@ -276,6 +276,38 @@ server{
 
 ```
 
+除了上述要修改nginx.conf文件之外，我们有更要的方式，不需要修改nginx.conf文件，而是在/etc/nginx/sites-available/下创建一个chinslickingweb_nginx.conf
+
+`sudo vim /etc/nginx/sites-available/chinslickingweb_nginx.conf # 打开此文件`
+增加如下内容：
+```
+server{
+        listen 8001;
+        server_name ip地址; # 添加您服务器外网地址
+        charset utf-8;
+        client_max_body_size 75M;
+
+        location /static {
+                alias /var/www/chinslickingweb/static;
+        }
+
+        location /media {
+                alias /var/www/chinslickingweb/uploads;
+        }
+
+        location / {
+                uwsgi_pass 127.0.0.1:8023;
+                include /etc/nginx/uwsgi_params;
+        }
+}
+```
+然后简历软连接到/etc/nginx/sites-enabled/
+```
+sudo ln -s ~/path/to/your/mysite/mysite_nginx.conf /etc/nginx/sites-enabled/
+或者
+ln -s /etc/nginx/sites-available/chinslickingweb_nginx.conf /etc/nginx/sites-enabled/
+```
+
 ```
 /etc/init.d/nginx start #启动
 /etc/init.d/nginx stop #停止
@@ -313,6 +345,16 @@ pidfile=%(chdir)/uwsgi/uwsgi.pid
 
 uwsgi --reload uwsgi/uwsgi.pid
 systemctl reload nginx.service
+```
+
+```
+killall -QUIT uwsgi ，这样会杀死所有的站点uwsgi进程，可能有需要杀各自的进程
+@N t s同学给出了linux shell方法，在此感谢。
+line=`ps aux|grep uwsgi |grep 'uwsgi ./site1/.'|awk '{print $2}' `
+for pid in line;
+do
+    kill -9 $pid;
+done
 ```
 
 ```

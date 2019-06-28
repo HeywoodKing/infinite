@@ -139,8 +139,16 @@ linkage url编码
 更新pip
 python -m pip install --upgrade pip
 
+国际化( Make sure you have GNU gettext tools 0.15 or newer installed.)
+Windows下的gettext(linux下可能不用安装)
+从http://sourceforge.net/projects/gettext下载以下zip文件
+gettext-runtime-0.17.zip: http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime-0.17.zip
+gettext-tools-0.17.zip: http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-tools-0.17.zip
+解压文件
+在同一文件夹下（如: C:\Downloads\gettext）展开这2个压缩文件中的bin\。(注意目录合并了)
+更新系统路径：控制面板>系统>高级>环境变量，在系统变量列表中，把;D:\Downloads\Programming\gettext\bin加到变量值字段的末尾。
+在CMD中验证下我们的配置是否正确xgettext --version或者gettext --version。
 
-国际化
 python manage.py makemessages -l en
 python manage.py makemessages -l zh-Hans
 python manage.py makemessages -l zh-Hant
