@@ -8,6 +8,7 @@ pip --help
 ## 升级 pip
 ```
 pip install -U pip
+pip install --upgrade pip
 ```
 
 ## 安装包

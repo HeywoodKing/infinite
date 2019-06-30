@@ -217,3 +217,6 @@ lsof -i :80
 kill -9 /* 进程id */
 kill pid /* 杀死pid */
 ```
+
+### ubuntu更新操作系统
+`do-release-upgrade`
