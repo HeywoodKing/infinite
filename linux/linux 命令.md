@@ -220,3 +220,10 @@ kill pid /* 杀死pid */
 
 ### ubuntu更新操作系统
 `do-release-upgrade`
+
+
+Ubuntu卸载自带Python后无法进入桌面
+1、启动Ubuntu系统，Alt+Ctrl+F4进入命令行；
+2、按提示输入用户名和密码；
+3、输入sudo apt-get install ubuntu-minimal ubuntu-standard ubuntu-desktop；
+4、等待安装结束输入：sudo reboot重新启动或输入命令：startx  即可进入桌面。
