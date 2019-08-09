@@ -18,6 +18,14 @@ D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB
 --serviceDisplayName	　　指定服务名称，有多个mongodb服务时执行。
 --install	　　　　　　　　   指定作为一个Windows服务安装。
 
+连接MongoDB
+mongo 192.168.99.100/admin -u root -p
+
+
+
+
+
+
 查看所有数据库列表
 show dbs
 

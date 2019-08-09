@@ -341,3 +341,276 @@ kill 180;
 2. 不进入mysql
 `mysql -uroot -p123456 -Dchin</var/www/chinslickingweb/chin.sql`
 
+### 设置mysql事务隔离级别
+```
+set session transaction isolation level [read uncommitted|read committed|repeatable read|serializable]
+start transaction
+
+select id, name, balance from account;
+update account set balance = balance + 50 where id = 1;
+```
+
+### mysql 命令总结：
+```
+mysql -h 192.168.99.100 -u root -p
+
+show databases;
+show engines;
+
+create database test charset=utf8;
+create database test DEFAULT CHARACTER SET gbk COLLATE gbk_chinese_ci;
+create database test DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+use test;
+
+show tables;
+
+create table students(
+    id int not null auto_increment primary key,
+    name varchar(100) not null comment '学生姓名',
+    gender bit default 0 comment '性别',,
+    birthday datetime comment '生日',
+    remark varchar(300) comment '备注',
+    --primary key (id),
+    --unique key id(id),
+    --foreign key(subid) references subjects(id)
+) engine=InnoDB default charset=utf8;
+
+show create database test;
+
+drop database test;
+
+show create table students;
+
+select database();
+
+desc students;
+
+alter table students rename to|as student;
+
+rename table students to|as student;
+
+alter table students add is_delete bit default;
+alter table students add column aa bool default true;
+
+alter table students modify id int auto_increment unique;
+alter table students modify column id int auto_increment unique;
+
+alter table students drop aa;
+alter table students drop column aa;
+
+alter table students engine=innodb|bdb;
+
+<!-- 查看外键 -->
+show create table my_foreign1;
+
+alter table students add constraint my_foreign1 foreign key(subid) references subjects(id);
+
+select * from students\G;
+
+insert into students(name, gender, birthday) values('zhangsan', 1, '1990-7-8');
+
+update students set name='lili' where id=1;
+
+delete from students where id=1;
+
+select * from subjects where id between 3 and 5;
+
+select * from students where id is null;
+select * from students where id is not null;
+
+select count(*),sum(id),max(id),min(id),floor(avg(id)),ceil(avg(id)) from subjects;
+
+select * from subjects where id=(select min(id) from subjects);
+
+select gender,count(*) from students group by gender;
+
+select gender,count(\*) from students group by gender having count(\*) > 2;
+
+select * from (
+select gender,count(\*) from students group by gender having count(\*) > 2);
+
+select id,name,gender,birthday from students where gender in 
+(select gender from (select gender,count(\*) from students group by gender having count(\*) > 2) as b);
+
+select * from students order by birthday asc,gender desc;
+
+<!-- 取5条记录 -->
+select * from students limit 5;
++----+-----------+--------+---------------------+--------+-----------+
+| id | name      | gender | birthday            | remark | is_delete |
++----+-----------+--------+---------------------+--------+-----------+
+|  1 | 小王      | 女     | 1994-10-11 00:00:00 | NULL   |           |
+|  2 | 小小王    | 女     | 1993-10-11 00:00:00 | NULL   |           |
+|  3 | 王大锤    | 女     | 1993-10-11 00:00:00 | NULL   |           |
+|  4 | 王铁锤    | 男     | 1993-10-11 00:00:00 | NULL   |           |
+|  5 | 王铁蛋    | 女     | 1993-10-11 00:00:00 | NULL   |           |
++----+-----------+--------+---------------------+--------+-----------+
+5 rows in set (0.00 sec)
+
+<!-- 从第二开始取5条 -->
+<!-- n页码，m条数--》limit (n-1)*m, m; -->
+select * from students limit 2,5;
++----+--------------+--------+---------------------+--------+-----------+
+| id | name         | gender | birthday            | remark | is_delete |
++----+--------------+--------+---------------------+--------+-----------+
+|  3 | 王大锤       | 女     | 1993-10-11 00:00:00 | NULL   |           |
+|  4 | 王铁锤       | 男     | 1993-10-11 00:00:00 | NULL   |           |
+|  5 | 王铁蛋       | 女     | 1993-10-11 00:00:00 | NULL   |           |
+|  6 | 隔壁老王     | 保密   | 1993-10-11 00:00:00 | NULL   |           |
+|  7 | 隔壁小王     | 其他   | 1993-10-11 00:00:00 | NULL   |           |
++----+--------------+--------+---------------------+--------+-----------+
+5 rows in set (0.00 sec)
+
+CREATE TABLE `scores` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `score` smallint(6) DEFAULT '0',
+  `stuid` int(11) NOT NULL,
+  `subid` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `stuid` (`stuid`),
+  KEY `subid` (`subid`),
+  CONSTRAINT `scores_ibfk_1` FOREIGN KEY (`stuid`) REFERENCES `students` (`id`),
+  CONSTRAINT `scores_ibfk_2` FOREIGN KEY (`subid`) REFERENCES `subjects` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8
+
+mysql> select a.id,name,gender,b.score from students as a inner join scores as b on a.id=b.stuid;
++----+-----------+--------+-------+
+| id | name      | gender | score |
++----+-----------+--------+-------+
+|  1 | 小王      | 女     |    10 |
+|  1 | 小王      | 女     |     9 |
+|  1 | 小王      | 女     |     9 |
+|  1 | 小王      | 女     |     5 |
+|  2 | 小小王    | 女     |     5 |
+|  2 | 小小王    | 女     |     6 |
+|  2 | 小小王    | 女     |    10 |
+|  2 | 小小王    | 女     |    10 |
++----+-----------+--------+-------+
+8 rows in set (0.00 sec)
+
+mysql> select a.id,name,gender,b.score,c.title from students as a inner join scores as b on a.id=b.stuid inner join subjects as c on c.id=b.subid;
++----+-----------+--------+-------+---------+
+| id | name      | gender | score | title   |
++----+-----------+--------+-------+---------+
+|  1 | 小王      | 女     |    10 | mysql   |
+|  2 | 小小王    | 女     |     5 | mysql   |
+|  1 | 小王      | 女     |     9 | redis   |
+|  2 | 小小王    | 女     |     6 | redis   |
+|  1 | 小王      | 女     |     9 | mongodb |
+|  2 | 小小王    | 女     |    10 | mongodb |
+|  1 | 小王      | 女     |     5 | oracle  |
+|  2 | 小小王    | 女     |    10 | oracle  |
++----+-----------+--------+-------+---------+
+8 rows in set (0.00 sec)
+
+mysql> select a.id,name,gender,b.score,c.title from students as a inner join scores as b on a.id=b.stuid inner join subjects as c on c.id=b.subid
+    -> order by a.name desc,c.title desc;
++----+-----------+--------+-------+---------+
+| id | name      | gender | score | title   |
++----+-----------+--------+-------+---------+
+|  1 | 小王      | 女     |     9 | redis   |
+|  1 | 小王      | 女     |     5 | oracle  |
+|  1 | 小王      | 女     |    10 | mysql   |
+|  1 | 小王      | 女     |     9 | mongodb |
+|  2 | 小小王    | 女     |     6 | redis   |
+|  2 | 小小王    | 女     |    10 | oracle  |
+|  2 | 小小王    | 女     |     5 | mysql   |
+|  2 | 小小王    | 女     |    10 | mongodb |
++----+-----------+--------+-------+---------+
+8 rows in set (0.00 sec)
+
+mysql> select a.id,a.name as province,b.id as cid,b.name as city,c.id as aid,c.name as county from region as a 
+inner join region as b on a.id=b.pid 
+inner join region c on b.id=c.pid and a.id=2;
++----+-----------+-----+-----------+-----+--------------+
+| id | province  | cid | city      | aid | county       |
++----+-----------+-----+-----------+-----+--------------+
+|  2 | 甘肃省    |   3 | 天水市    |  12 | 秦州区       |
+|  2 | 甘肃省    |   3 | 天水市    |  13 | 麦积区       |
+|  2 | 甘肃省    |   3 | 天水市    |  14 | 武山县       |
+|  2 | 甘肃省    |   3 | 天水市    |  15 | 甘谷县       |
+|  2 | 甘肃省    |   3 | 天水市    |  16 | 张家川县     |
+|  2 | 甘肃省    |   3 | 天水市    |  17 | 清水县       |
+|  2 | 甘肃省    |   3 | 天水市    |  18 | 秦安县       |
++----+-----------+-----+-----------+-----+--------------+
+7 rows in set (0.00 sec)
+
+
+mysql> create view v_region as select a.id,a.name as province,b.id as cid,b.name as city,c.id as aid,c.name as county from region as a inner join region as b on a.id=b.pid inner join region c on b.id=c.pid;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> select * from v_region;
++----+-----------+-----+-----------+-----+--------------+
+| id | province  | cid | city      | aid | county       |
++----+-----------+-----+-----------+-----+--------------+
+|  1 | 北京市    |   5 | 北京市    |   6 | 海淀区       |
+|  1 | 北京市    |   5 | 北京市    |   7 | 西城区       |
+|  1 | 北京市    |   5 | 北京市    |   8 | 东城区       |
+|  1 | 北京市    |   5 | 北京市    |   9 | 朝阳区       |
+|  1 | 北京市    |   5 | 北京市    |  10 | 密云县       |
+|  1 | 北京市    |   5 | 北京市    |  11 | 大兴区       |
+|  2 | 甘肃省    |   3 | 天水市    |  12 | 秦州区       |
+|  2 | 甘肃省    |   3 | 天水市    |  13 | 麦积区       |
+|  2 | 甘肃省    |   3 | 天水市    |  14 | 武山县       |
+|  2 | 甘肃省    |   3 | 天水市    |  15 | 甘谷县       |
+|  2 | 甘肃省    |   3 | 天水市    |  16 | 张家川县     |
+|  2 | 甘肃省    |   3 | 天水市    |  17 | 清水县       |
+|  2 | 甘肃省    |   3 | 天水市    |  18 | 秦安县       |
++----+-----------+-----+-----------+-----+--------------+
+13 rows in set (0.00 sec)
+
+begin;
+update region set name='北京' where id=1;
+commit;
+--rollbck;
+
+<!-- 查看表的索引 -->
+show index from students;
+show view from students;
+
+create index idx_students_id on students(id, name(11), gender);
+drop index idx_students_id on students;
+
+<!-- 开启运行时间检测 -->
+set profiling=1;
+<!-- 查看执行时间 -->
+show profiles;
+
+<!-- 数学函数 -->
+select abs(-32);
+select mod(10/3);
+select 10%3;
+select floor(2/3);
+select ceiling(2/3);
+
+<!-- 外键级联 -->
+restrict
+cascade
+set null
+no action
+
+
+
+mysqldump -uroot -p test > E:/mysql/bak/2019_08_04.sql
+
+mysqldump -uroot -p test > ~/mysql/bak/2019_08_04.sql
+
+mysqldump -h 192.168.99.100 -uroot -p test > ~/mysql/bak/2019_08_04.sql
+
+mysqldump -h 192.168.99.100 -uroot -p test > E:/mysql/2019_08_04_bak.sql
+
+mysql -h 192.168.99.100 -uroot -p test2 < E:/mysql/2019_08_04_bak.sql
+
+create view v_clouse_lg as 
+select * from students
+inner join
+select * from subjects
+
+set session transaction isolation level read uncommitted|read committed|repeatable read|serializable
+start transaction
+commit;
+rollbck;
+
+```
+

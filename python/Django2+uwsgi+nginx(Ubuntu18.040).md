@@ -538,6 +538,19 @@ vim的使用方法:
     q! --放弃打开文件后的所有修改退出
 ```
 
+### django项目国际化
+```
+建立语言文件是通过django-admin makemessages命令完成的。 
+在项目的根目录下，也就是包含manage.py的目录下，运行下面的命令：
+python manage.py makemessages -l zh_hans
+python manage.py makemessages -l en
+python manage.py makemessages -l zh_hant
+
+编译语言文件
+django-admin compilemessages
+或者
+python manage.py compilemessages
+```
 
 
 
