@@ -1,44 +1,44 @@
-¹ÜÀíÔ±Ä£Ê½½øÈëcmd
+ï»¿
+```
+ç®¡ç†å‘˜æ¨¡å¼è¿›å…¥cmd
 C:\Windows\system32>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install -serviceName "MongoDB"
 2019-04-24T13:06:38.318+0800 I CONTROL  [main] Automatically disabling TLS 1.0,
 to force-enable TLS 1.0 specify --sslDisabledProtocols 'none'
 
 D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install --serviceName "MongoDB"
-Õâ¸öÊ±ºò·şÎñÀïÃæÒÑ¾­°²×°ºÃÁË
+è¿™ä¸ªæ—¶å€™æœåŠ¡é‡Œé¢å·²ç»å®‰è£…å¥½äº†
 
-¹ØÓÚÃüÁîÖĞµÄ²ÎÊıËµÃ÷
+å…³äºå‘½ä»¤ä¸­çš„å‚æ•°è¯´æ˜
 
-²ÎÊı ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ÃèÊö
---bind_ip¡¡¡¡ ¡¡¡¡¡¡¡¡¡¡¡¡°ó¶¨·şÎñIP£¬Èô°ó¶¨127.0.0.1£¬ÔòÖ»ÄÜ±¾»ú·ÃÎÊ£¬²»Ö¸¶¨Ä¬ÈÏ±¾µØËùÓĞIP
---logpath	¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¶¨MongoDBÈÕÖ¾ÎÄ¼ş£¬×¢ÒâÊÇÖ¸¶¨ÎÄ¼ş²»ÊÇÄ¿Â¼
---logappend	¡¡¡¡ ¡¡¡¡¡¡¡¡ Ê¹ÓÃ×·¼ÓµÄ·½Ê½Ğ´ÈÕÖ¾
---dbpath	¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ Ö¸¶¨Êı¾İ¿âÂ·¾¶
---port	¡¡¡¡¡¡¡¡¡¡ ¡¡¡¡¡¡¡¡ Ö¸¶¨·şÎñ¶Ë¿ÚºÅ£¬Ä¬ÈÏ¶Ë¿Ú27017
---serviceName    ¡¡¡¡¡¡¡¡  Ö¸¶¨·şÎñÃû³Æ
---serviceDisplayName	¡¡¡¡Ö¸¶¨·şÎñÃû³Æ£¬ÓĞ¶à¸ömongodb·şÎñÊ±Ö´ĞĞ¡£
---install	¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡   Ö¸¶¨×÷ÎªÒ»¸öWindows·şÎñ°²×°¡£
+å‚æ•° ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€æè¿°
+--bind_ipã€€ã€€ ã€€ã€€ã€€ã€€ã€€ã€€ç»‘å®šæœåŠ¡IPï¼Œè‹¥ç»‘å®š127.0.0.1ï¼Œåˆ™åªèƒ½æœ¬æœºè®¿é—®ï¼Œä¸æŒ‡å®šé»˜è®¤æœ¬åœ°æ‰€æœ‰IP
+--logpath	ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€å®šMongoDBæ—¥å¿—æ–‡ä»¶ï¼Œæ³¨æ„æ˜¯æŒ‡å®šæ–‡ä»¶ä¸æ˜¯ç›®å½•
+--logappend	ã€€ã€€ ã€€ã€€ã€€ã€€ ä½¿ç”¨è¿½åŠ çš„æ–¹å¼å†™æ—¥å¿—
+--dbpath	ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€ æŒ‡å®šæ•°æ®åº“è·¯å¾„
+--port	ã€€ã€€ã€€ã€€ã€€ ã€€ã€€ã€€ã€€ æŒ‡å®šæœåŠ¡ç«¯å£å·ï¼Œé»˜è®¤ç«¯å£27017
+--serviceName    ã€€ã€€ã€€ã€€  æŒ‡å®šæœåŠ¡åç§°
+--serviceDisplayName	ã€€ã€€æŒ‡å®šæœåŠ¡åç§°ï¼Œæœ‰å¤šä¸ªmongodbæœåŠ¡æ—¶æ‰§è¡Œã€‚
+--install	ã€€ã€€ã€€ã€€ã€€ã€€ã€€ã€€   æŒ‡å®šä½œä¸ºä¸€ä¸ªWindowsæœåŠ¡å®‰è£…ã€‚
 
-Á¬½ÓMongoDB
+è¿æ¥MongoDB
 mongo 192.168.99.100/admin -u root -p
 
 
 
 
-
-
-²é¿´ËùÓĞÊı¾İ¿âÁĞ±í
+æŸ¥çœ‹æ‰€æœ‰æ•°æ®åº“åˆ—è¡¨
 show dbs
 
-ÇĞ»»µ½´´½¨ÓÃ»§
+åˆ‡æ¢åˆ°åˆ›å»ºç”¨æˆ·
 use Admn
 
-Ê¹ÓÃÊı¾İ¿â¡¢´´½¨Êı¾İ¿â
+ä½¿ç”¨æ•°æ®åº“ã€åˆ›å»ºæ•°æ®åº“
 use douban
 
-´´½¨Êı¾İ¿â
+åˆ›å»ºæ•°æ®åº“
 db.douban
 
-´´½¨ÓÃ»§
+åˆ›å»ºç”¨æˆ·
 db.addUser("flack", "123456")
 db.createUser(
         {
@@ -48,136 +48,136 @@ db.createUser(
         }
 )
 
-ÉèÖÃÓÃ»§ÎªÔÊĞíÁ¬½ÓµÄÓÃ»§
+è®¾ç½®ç”¨æˆ·ä¸ºå…è®¸è¿æ¥çš„ç”¨æˆ·
 db.auth("flack", "123456")
 
-´´½¨±í
+åˆ›å»ºè¡¨
 db.createCollection("userinfo")
-²é¿´±íÊÇ·ñ´´½¨³É¹¦
+æŸ¥çœ‹è¡¨æ˜¯å¦åˆ›å»ºæˆåŠŸ
 show collections
 
-Ìí¼ÓÊı¾İ
+æ·»åŠ æ•°æ®
 db.userinfo.save({age: 1})
 
-²éÑ¯ËùÓĞ¼ÇÂ¼
+æŸ¥è¯¢æ‰€æœ‰è®°å½•
 db.userinfo.find()
 
 
-ÏÔÊ¾µ±Ç°µÄÊı¾İ¼¯ºÏ
+æ˜¾ç¤ºå½“å‰çš„æ•°æ®é›†åˆ
 show collections
 
-É¾³ıÊı¾İ¿â
+åˆ é™¤æ•°æ®åº“
 db.dropDatabase()
 
-É¾³ı¼¯ºÏ£¬É¾³ıÖ¸¶¨µÄ¼¯ºÏ É¾³ı±í
+åˆ é™¤é›†åˆï¼Œåˆ é™¤æŒ‡å®šçš„é›†åˆ åˆ é™¤è¡¨
 db.userinfo.drop()
 
 
-²åÈëÒ»ÌõÊı¾İ
-²åÈëÊı¾İ£¬Ëæ×ÅÊı¾İµÄ²åÈë£¬Êı¾İ¿â´´½¨³É¹¦ÁË£¬¼¯ºÏÒ²´´½¨³É¹¦ÁË¡£
+æ’å…¥ä¸€æ¡æ•°æ®
+æ’å…¥æ•°æ®ï¼Œéšç€æ•°æ®çš„æ’å…¥ï¼Œæ•°æ®åº“åˆ›å»ºæˆåŠŸäº†ï¼Œé›†åˆä¹Ÿåˆ›å»ºæˆåŠŸäº†ã€‚
 db.userinfo.insert({"name":"xiaoming"})
 db.userinfo.insert(
 {
 	"_id": ObjectId("57172b0f657f8bbb34d70144"),
-	"name": "²âÊÔ"
-}
-)
+	"name": "æµ‹è¯•"
+})
 
-²éÕÒÊı¾İ
-²éÑ¯ËùÓĞ¼ÇÂ¼
+
+æŸ¥æ‰¾æ•°æ®
+æŸ¥è¯¢æ‰€æœ‰è®°å½•
 db.userinfo.find()
-Ïàµ±ÓÚ£ºselect* from userInfo; 
+ç›¸å½“äºï¼šselect* from userInfo; 
 
-²éÑ¯È¥µôºóµÄµ±Ç°¾Û¼¯¼¯ºÏÖĞµÄÄ³ÁĞµÄÖØ¸´Êı¾İ
+æŸ¥è¯¢å»æ‰åçš„å½“å‰èšé›†é›†åˆä¸­çš„æŸåˆ—çš„é‡å¤æ•°æ®
 db.userinfo.distinct("name")
-»á¹ıÂËµô name ÖĞµÄÏàÍ¬Êı¾İ Ïàµ±ÓÚ£ºselect distict name from userinfo;
+ä¼šè¿‡æ»¤æ‰ name ä¸­çš„ç›¸åŒæ•°æ® ç›¸å½“äºï¼šselect distict name from userinfo;
 
-²éÑ¯ age = 22 µÄ¼ÇÂ¼
+æŸ¥è¯¢ age = 22 çš„è®°å½•
 db.userinfo.find({"age": 22})
-Ïàµ±ÓÚ£º select * from userInfo where age = 22; 
+ç›¸å½“äºï¼š select * from userInfo where age = 22; 
 
-²éÑ¯ age > 22 µÄ¼ÇÂ¼
+æŸ¥è¯¢ age > 22 çš„è®°å½•
 db.userinfo.find({age:{$gt: 22}})
-Ïàµ±ÓÚ£ºselect * from userInfo where age >22;
+ç›¸å½“äºï¼šselect * from userInfo where age >22;
 
-²éÑ¯ age < 22 µÄ¼ÇÂ¼
+æŸ¥è¯¢ age < 22 çš„è®°å½•
 db.userinfo.find({age: {$lt: 22}})
-Ïàµ±ÓÚ£ºselect * from userInfo where age <22; 
+ç›¸å½“äºï¼šselect * from userInfo where age <22; 
 
-²éÑ¯ age >= 25 µÄ¼ÇÂ¼
+æŸ¥è¯¢ age >= 25 çš„è®°å½•
 db.userinfo.find({age: {$gte: 25}})
-Ïàµ±ÓÚ£ºselect * from userInfo where age >= 25; 
+ç›¸å½“äºï¼šselect * from userInfo where age >= 25; 
 
-²éÑ¯ age <= 25 µÄ¼ÇÂ¼
+æŸ¥è¯¢ age <= 25 çš„è®°å½•
 db.userinfo.find({age: {$lte: 25}})
-Ïàµ±ÓÚ£ºselect * from userInfo where age <= 25; 
+ç›¸å½“äºï¼šselect * from userInfo where age <= 25; 
 
-²éÑ¯ age >= 23 ²¢ÇÒ age <= 26
+æŸ¥è¯¢ age >= 23 å¹¶ä¸” age <= 26
 db.userinfo.find({age: {$gte: 23, $lte: 26}})
-Ïàµ±ÓÚ£ºselect * from userInfo where age >= 23 and age <= 26; 
+ç›¸å½“äºï¼šselect * from userInfo where age >= 23 and age <= 26; 
 
-²éÑ¯ name ÖĞ°üº¬ mongo µÄÊı¾İ
-Ä£ºı²éÑ¯ÓÃÓÚËÑË÷
+æŸ¥è¯¢ name ä¸­åŒ…å« mongo çš„æ•°æ®
+æ¨¡ç³ŠæŸ¥è¯¢ç”¨äºæœç´¢
 db.userinfo.find({name: /mongo/})
-//Ïàµ±ÓÚ%% select * from userInfo where name like '%mongo%'; 
+//ç›¸å½“äº%% select * from userInfo where name like '%mongo%'; 
 
-²éÑ¯ name ÖĞÒÔ mongo ¿ªÍ·µÄ
+æŸ¥è¯¢ name ä¸­ä»¥ mongo å¼€å¤´çš„
 db.userinfo.find({name: /^mongo/})
-Ïàµ±ÓÚ£ºselect * from userInfo where name like 'mongo%'; 
+ç›¸å½“äºï¼šselect * from userInfo where name like 'mongo%'; 
 
-²éÑ¯Ö¸¶¨ÁĞ name¡¢age Êı¾İ
+æŸ¥è¯¢æŒ‡å®šåˆ— nameã€age æ•°æ®
 db.userinfo.find({}, {name: 1, age: 1})
-»òÕß
+æˆ–è€…
 db.userinfo.find({}, {name: true, age: true})
-µ±È» name Ò²¿ÉÒÔÓÃ true »ò false,µ±ÓÃ ture µÄÇé¿öÏÂºÓ name:1 Ğ§¹ûÒ»Ñù£¬Èç¹ûÓÃ false ¾Í ÊÇÅÅ³ı name£¬ÏÔÊ¾ name ÒÔÍâµÄÁĞĞÅÏ¢
+å½“ç„¶ name ä¹Ÿå¯ä»¥ç”¨ true æˆ– false,å½“ç”¨ ture çš„æƒ…å†µä¸‹æ²³ name:1 æ•ˆæœä¸€æ ·ï¼Œå¦‚æœç”¨ false å°± æ˜¯æ’é™¤ nameï¼Œæ˜¾ç¤º name ä»¥å¤–çš„åˆ—ä¿¡æ¯
 
-²éÑ¯Ö¸¶¨ÁĞ name¡¢age Êı¾İ, age > 25
+æŸ¥è¯¢æŒ‡å®šåˆ— nameã€age æ•°æ®, age > 25
 db.userinfo.find({age:{$gt: 25}}, {name:1, age: 1})
-Ïàµ±ÓÚ£ºselect name, age from userInfo where age >25; 
+ç›¸å½“äºï¼šselect name, age from userInfo where age >25; 
 
-°´ÕÕÄêÁäÅÅĞò 1 ÉıĞò -1 ½µĞò
-ÉıĞò£ºdb.userinfo.find().sort({age: 1})
-½µĞò£ºdb.userinfo.find().sort({age: -1})
+æŒ‰ç…§å¹´é¾„æ’åº 1 å‡åº -1 é™åº
+å‡åºï¼šdb.userinfo.find().sort({age: 1})
+é™åºï¼šdb.userinfo.find().sort({age: -1})
 
 
-²éÑ¯ name = zhangsan, age = 22 µÄÊı¾İ
+æŸ¥è¯¢ name = zhangsan, age = 22 çš„æ•°æ®
 db.userinfo.find({name: "zhangsan", age: 22})
-Ïàµ±ÓÚ£ºselect * from userInfo where name = 'zhangsan' and age = '22'; 
+ç›¸å½“äºï¼šselect * from userInfo where name = 'zhangsan' and age = '22'; 
 
 
-²éÑ¯Ç° 5 ÌõÊı¾İ
+æŸ¥è¯¢å‰ 5 æ¡æ•°æ®
 db.userinfo.find().limit(5)
-Ïàµ±ÓÚ£ºselect top 5 * from userInfo; 
+ç›¸å½“äºï¼šselect top 5 * from userInfo; 
 
 
-²éÑ¯ 10 ÌõÒÔºóµÄÊı¾İ
+æŸ¥è¯¢ 10 æ¡ä»¥åçš„æ•°æ®
 db.userinfo.find().skip(10)
-Ïàµ±ÓÚ£ºselect * from userInfo where id not in (  
+ç›¸å½“äºï¼šselect * from userInfo where id not in (  
 selecttop 10 * from userInfo  
 ); 
 
-²éÑ¯ÔÚ 5-10 Ö®¼äµÄÊı¾İ
+æŸ¥è¯¢åœ¨ 5-10 ä¹‹é—´çš„æ•°æ®
 db.userinfo.find().limit(10).skip(5)
-¿ÉÓÃÓÚ·ÖÒ³£¬limit ÊÇ pageSize£¬skip ÊÇµÚ¼¸Ò³*pageSize 
+å¯ç”¨äºåˆ†é¡µï¼Œlimit æ˜¯ pageSizeï¼Œskip æ˜¯ç¬¬å‡ é¡µ*pageSize 
 
-or Óë ²éÑ¯
+or ä¸ æŸ¥è¯¢
 db.userinfo.find({$or: [{age: 22}, {age: 25}]})
-Ïàµ±ÓÚ£ºselect * from userInfo where age = 22 or age = 25; 
+ç›¸å½“äºï¼šselect * from userInfo where age = 22 or age = 25; 
 
-findOne ²éÑ¯µÚÒ»ÌõÊı¾İ
+findOne æŸ¥è¯¢ç¬¬ä¸€æ¡æ•°æ®
 db.userinfo.findOne()
-Ïàµ±ÓÚ£ºselect top 1 * from userInfo;  
+ç›¸å½“äºï¼šselect top 1 * from userInfo;  
 db.userInfo.find().limit(1);  
 
-²éÑ¯Ä³¸ö½á¹û¼¯µÄ¼ÇÂ¼ÌõÊı Í³¼ÆÊıÁ¿
+æŸ¥è¯¢æŸä¸ªç»“æœé›†çš„è®°å½•æ¡æ•° ç»Ÿè®¡æ•°é‡
 db.userinfo.find({age: {$gte: 20}}).count()
-Ïàµ±ÓÚ£ºselect count(*) from userInfo where age >= 20;  
-Èç¹ûÒª·µ»ØÏŞÖÆÖ®ºóµÄ¼ÇÂ¼ÊıÁ¿£¬ÒªÊ¹ÓÃ count(true)»òÕß count(·Ç 0)  db.users.find().skip(10).limit(5).count(true);   
+ç›¸å½“äºï¼šselect count(*) from userInfo where age >= 20;  
+å¦‚æœè¦è¿”å›é™åˆ¶ä¹‹åçš„è®°å½•æ•°é‡ï¼Œè¦ä½¿ç”¨ count(true)æˆ–è€… count(é 0)  db.users.find().skip(10).limit(5).count(true);   
 
 
-ĞŞ¸ÄÊı¾İ
-update() ·½·¨ÓÃÓÚ¸üĞÂÒÑ´æÔÚµÄÎÄµµ
-update() ·½·¨ÓÃÓÚ¸üĞÂÒÑ´æÔÚµÄÎÄµµ¡£Óï·¨¸ñÊ½ÈçÏÂ£º
+ä¿®æ”¹æ•°æ®
+update() æ–¹æ³•ç”¨äºæ›´æ–°å·²å­˜åœ¨çš„æ–‡æ¡£
+update() æ–¹æ³•ç”¨äºæ›´æ–°å·²å­˜åœ¨çš„æ–‡æ¡£ã€‚è¯­æ³•æ ¼å¼å¦‚ä¸‹ï¼š
 update.collection.update(
 <query>,
 <update>,
@@ -187,84 +187,84 @@ update.collection.update(
 	writeConcern:<document>
 }
 )
-query : updateµÄ²éÑ¯Ìõ¼ş£¬ÀàËÆsql update²éÑ¯ÄÚwhereºóÃæµÄ¡£
-update : updateµÄ¶ÔÏóºÍÒ»Ğ©¸üĞÂµÄ²Ù×÷·û£¨Èç,inc¡­£©µÈ£¬Ò²¿ÉÒÔÀí½âÎªsql update²éÑ¯ÄÚsetºóÃæµÄ
-upsert : ¿ÉÑ¡£¬Õâ¸ö²ÎÊıµÄÒâË¼ÊÇ£¬Èç¹û²»´æÔÚupdateµÄ¼ÇÂ¼£¬ÊÇ·ñ²åÈëobjNew,trueÎª²åÈë£¬Ä¬ÈÏÊÇfalse£¬²»²åÈë¡£
-multi : ¿ÉÑ¡£¬mongodb Ä¬ÈÏÊÇfalse,Ö»¸üĞÂÕÒµ½µÄµÚÒ»Ìõ¼ÇÂ¼£¬Èç¹ûÕâ¸ö²ÎÊıÎªtrue,¾Í°Ñ°´Ìõ¼ş²é³öÀ´¶àÌõ¼ÇÂ¼È«²¿¸üĞÂ¡£
-writeConcern :¿ÉÑ¡£¬Å×³öÒì³£µÄ¼¶±ğ¡£
+query : updateçš„æŸ¥è¯¢æ¡ä»¶ï¼Œç±»ä¼¼sql updateæŸ¥è¯¢å†…whereåé¢çš„ã€‚
+update : updateçš„å¯¹è±¡å’Œä¸€äº›æ›´æ–°çš„æ“ä½œç¬¦ï¼ˆå¦‚,incâ€¦ï¼‰ç­‰ï¼Œä¹Ÿå¯ä»¥ç†è§£ä¸ºsql updateæŸ¥è¯¢å†…setåé¢çš„
+upsert : å¯é€‰ï¼Œè¿™ä¸ªå‚æ•°çš„æ„æ€æ˜¯ï¼Œå¦‚æœä¸å­˜åœ¨updateçš„è®°å½•ï¼Œæ˜¯å¦æ’å…¥objNew,trueä¸ºæ’å…¥ï¼Œé»˜è®¤æ˜¯falseï¼Œä¸æ’å…¥ã€‚
+multi : å¯é€‰ï¼Œmongodb é»˜è®¤æ˜¯false,åªæ›´æ–°æ‰¾åˆ°çš„ç¬¬ä¸€æ¡è®°å½•ï¼Œå¦‚æœè¿™ä¸ªå‚æ•°ä¸ºtrue,å°±æŠŠæŒ‰æ¡ä»¶æŸ¥å‡ºæ¥å¤šæ¡è®°å½•å…¨éƒ¨æ›´æ–°ã€‚
+writeConcern :å¯é€‰ï¼ŒæŠ›å‡ºå¼‚å¸¸çš„çº§åˆ«ã€‚
 
-ĞŞ¸ÄÀïÃæ»¹ÓĞ²éÑ¯Ìõ¼ş¡£ÄãÒªĞŞ¸ÄË­£¬Òª¸æËß mongo¡£ ²éÕÒÃû×Ö½Ğ×öĞ¡Ã÷µÄ£¬°ÑÄêÁä¸ü¸ÄÎª 16 Ëê£º
+ä¿®æ”¹é‡Œé¢è¿˜æœ‰æŸ¥è¯¢æ¡ä»¶ã€‚ä½ è¦ä¿®æ”¹è°ï¼Œè¦å‘Šè¯‰ mongoã€‚ æŸ¥æ‰¾åå­—å«åšå°æ˜çš„ï¼ŒæŠŠå¹´é¾„æ›´æ”¹ä¸º 16 å²ï¼š
 db.userinfo.update({"name":"xiaoming"}, {$set: {"age": 16}})
 
-²éÕÒÊıÑ§³É¼¨ÊÇ 70£¬°ÑÄêÁä¸ü¸ÄÎª 33 Ëê£º
+æŸ¥æ‰¾æ•°å­¦æˆç»©æ˜¯ 70ï¼ŒæŠŠå¹´é¾„æ›´æ”¹ä¸º 33 å²ï¼š
 db.userinfo.update({"score.shuxue": 70}, {$set: {"age": 33}})
 
 
-¸ü¸ÄËùÓĞÆ¥ÅäÏîÄ¿£º 
-ÒÔÉÏÓï¾äÖ»»áĞŞ¸ÄµÚÒ»Ìõ·¢ÏÖµÄÎÄµµ£¬Èç¹ûÄãÒªĞŞ¸Ä¶àÌõÏàÍ¬µÄÎÄµµ£¬ÔòĞèÒªÉèÖÃ multi ²ÎÊıÎª true¡£ 
-multi : ¿ÉÑ¡£¬mongodb Ä¬ÈÏÊÇfalse,Ö»¸üĞÂÕÒµ½µÄµÚÒ»Ìõ¼ÇÂ¼£¬Èç¹ûÕâ¸ö²ÎÊıÎªtrue,¾Í°Ñ°´Ìõ¼ş²é³öÀ´¶àÌõ¼ÇÂ¼È«²¿¸üĞÂ¡£
-db.userinfo.update({"sex": "ÄĞ"}, {$set: {"age": 33}}, {multi: true})
+æ›´æ”¹æ‰€æœ‰åŒ¹é…é¡¹ç›®ï¼š 
+ä»¥ä¸Šè¯­å¥åªä¼šä¿®æ”¹ç¬¬ä¸€æ¡å‘ç°çš„æ–‡æ¡£ï¼Œå¦‚æœä½ è¦ä¿®æ”¹å¤šæ¡ç›¸åŒçš„æ–‡æ¡£ï¼Œåˆ™éœ€è¦è®¾ç½® multi å‚æ•°ä¸º trueã€‚ 
+multi : å¯é€‰ï¼Œmongodb é»˜è®¤æ˜¯false,åªæ›´æ–°æ‰¾åˆ°çš„ç¬¬ä¸€æ¡è®°å½•ï¼Œå¦‚æœè¿™ä¸ªå‚æ•°ä¸ºtrue,å°±æŠŠæŒ‰æ¡ä»¶æŸ¥å‡ºæ¥å¤šæ¡è®°å½•å…¨éƒ¨æ›´æ–°ã€‚
+db.userinfo.update({"sex": "ç”·"}, {$set: {"age": 33}}, {multi: true})
 
 
-ÍêÕûÌæ»»£¬²»³öÏÖ$set ¹Ø¼ü×ÖÁË£º ×¢Òâ
+å®Œæ•´æ›¿æ¢ï¼Œä¸å‡ºç°$set å…³é”®å­—äº†ï¼š æ³¨æ„
 db.userinfo.update({"name": "xiaoming"}, {"name": "daming", "age": 16})
 
 db.userinfo.update({"name": "Lisi"}, {$inc: {age: 50}}, false, true)
-Ïàµ±ÓÚ£ºupdate users set age = age + 50 where name = 'Lisi'; 
+ç›¸å½“äºï¼šupdate users set age = age + 50 where name = 'Lisi'; 
 
 db.userinfo.update({"name": "Lisi"}, {$inc: {age: 50}, $set: {name: "hihi"}}, false, true)
-Ïàµ±ÓÚ£ºupdate userinfo set age = age + 50,name = "hihi"
+ç›¸å½“äºï¼šupdate userinfo set age = age + 50,name = "hihi"
 where name = "Lisi"
 
-Ö»¸üĞÂµÚÒ»Ìõ¼ÇÂ¼£º
+åªæ›´æ–°ç¬¬ä¸€æ¡è®°å½•ï¼š
 db.userinfo.update({"count": {$gt: 1}}, {$set: {"test2": "OK"}})
 
-È«²¿¸üĞÂ£º
+å…¨éƒ¨æ›´æ–°ï¼š
 db.userinfo.update({"count": {$gt: 3}}, {$set: {"test2": "OK"}}, false, true)
 
-Ö»Ìí¼ÓµÚÒ»Ìõ£º
+åªæ·»åŠ ç¬¬ä¸€æ¡ï¼š
 db.userinfo.update({"count": {$gt: 4}}, {$set: {"test5": "OK"}}, true, false)
 
-È«²¿Ìí¼Ó½øÈ¥:
+å…¨éƒ¨æ·»åŠ è¿›å»:
 db.userinfo.update({"count": {$gt: 5}}, {$set: {"test5": "OK"}}, true, true)
 
-È«²¿¸üĞÂ£º
+å…¨éƒ¨æ›´æ–°ï¼š
 db.userinfo.update({"count": {$gt: 15}}, {$inc: {"count": 1}}, false, true)
 
-Ö»¸üĞÂµÚÒ»Ìõ¼ÇÂ¼£º
+åªæ›´æ–°ç¬¬ä¸€æ¡è®°å½•ï¼š
 db.userinfo.update({"count": {$gt: 10}}, {$inc: {"count": 1}}, false, false)
 
-ÔÚ3.2°æ±¾¿ªÊ¼£¬MongoDBÌá¹©ÒÔÏÂ¸üĞÂ¼¯ºÏÎÄµµµÄ·½·¨£º
-db.collection.updateOne() ÏòÖ¸¶¨¼¯ºÏ¸üĞÂµ¥¸öÎÄµµ
-db.collection.updateMany() ÏòÖ¸¶¨¼¯ºÏ¸üĞÂ¶à¸öÎÄµµ
+åœ¨3.2ç‰ˆæœ¬å¼€å§‹ï¼ŒMongoDBæä¾›ä»¥ä¸‹æ›´æ–°é›†åˆæ–‡æ¡£çš„æ–¹æ³•ï¼š
+db.collection.updateOne() å‘æŒ‡å®šé›†åˆæ›´æ–°å•ä¸ªæ–‡æ¡£
+db.collection.updateMany() å‘æŒ‡å®šé›†åˆæ›´æ–°å¤šä¸ªæ–‡æ¡£
 
-¸üĞÂµ¥¸öÎÄµµ
+æ›´æ–°å•ä¸ªæ–‡æ¡£
 db.userinfo.updateOne({"name": "abc"}, {$set: {"age": "28"}})
 
-¸üĞÂ¶à¸öÎÄµµ
+æ›´æ–°å¤šä¸ªæ–‡æ¡£
 db.userinfo.updateMany({"age": {$gt: "10"}}, {$set: {"status": "xyz"}})
 
 
-É¾³ıÊı¾İ
-3.2°æ±¾Ö®Ç°
+åˆ é™¤æ•°æ®
+3.2ç‰ˆæœ¬ä¹‹å‰
 db.collection.remove() //
 
-3.2°æ±¾Ö®ºó
-db.collection.deleteMany() //É¾³ıÆ¥ÅäÌõ¼şµÄ¶àÌõ¼ÇÂ¼
-db.collection.deleteOne() //É¾³ıÆ¥ÅäÌõ¼şµÄµ¥Ìõ¼ÇÂ¼
-À¨ºÅÀïÃæµÄ²ÎÊıÊÇ²éÑ¯¹ıÂËÆ÷
+3.2ç‰ˆæœ¬ä¹‹å
+db.collection.deleteMany() //åˆ é™¤åŒ¹é…æ¡ä»¶çš„å¤šæ¡è®°å½•
+db.collection.deleteOne() //åˆ é™¤åŒ¹é…æ¡ä»¶çš„å•æ¡è®°å½•
+æ‹¬å·é‡Œé¢çš„å‚æ•°æ˜¯æŸ¥è¯¢è¿‡æ»¤å™¨
 {
   <field1>: <value1>,
   <field2>: { <operator>: <value> },
   ...
 }
 
-remove() ·½·¨µÄ»ù±¾Óï·¨¸ñÊ½ÈçÏÂËùÊ¾£º
+remove() æ–¹æ³•çš„åŸºæœ¬è¯­æ³•æ ¼å¼å¦‚ä¸‹æ‰€ç¤ºï¼š
 db.collection.remove(
    <query>,
    <justOne>
 )
-Èç¹ûÄãµÄ MongoDB ÊÇ 2.6 °æ±¾ÒÔºóµÄ£¬Óï·¨¸ñÊ½ÈçÏÂ£º
+å¦‚æœä½ çš„ MongoDB æ˜¯ 2.6 ç‰ˆæœ¬ä»¥åçš„ï¼Œè¯­æ³•æ ¼å¼å¦‚ä¸‹ï¼š
 db.collection.remove(
    <query>,
    {
@@ -272,11 +272,11 @@ db.collection.remove(
      writeConcern: <document>
    }
 )
-²ÎÊıËµÃ÷£º
+å‚æ•°è¯´æ˜ï¼š
 
-query :£¨¿ÉÑ¡£©É¾³ıµÄÎÄµµµÄÌõ¼ş¡£
-justOne : £¨¿ÉÑ¡£©Èç¹ûÉèÎª true »ò 1£¬ÔòÖ»É¾³ıÒ»¸öÎÄµµ¡£
-writeConcern :£¨¿ÉÑ¡£©Å×³öÒì³£µÄ¼¶±ğ¡£
+query :ï¼ˆå¯é€‰ï¼‰åˆ é™¤çš„æ–‡æ¡£çš„æ¡ä»¶ã€‚
+justOne : ï¼ˆå¯é€‰ï¼‰å¦‚æœè®¾ä¸º true æˆ– 1ï¼Œåˆ™åªåˆ é™¤ä¸€ä¸ªæ–‡æ¡£ã€‚
+writeConcern :ï¼ˆå¯é€‰ï¼‰æŠ›å‡ºå¼‚å¸¸çš„çº§åˆ«ã€‚
 
 db.userinfo.remove({"name": "manhattan"})
 
@@ -285,32 +285,32 @@ db.userinfo.remove({"age": 123})
 db.userinfo.remove({"name": "newyork"}, {justOne: true})
 
 
-É¾³ıtestÊı¾İ¿âÖĞËùÓĞ¼ÇÂ¼
+åˆ é™¤testæ•°æ®åº“ä¸­æ‰€æœ‰è®°å½•
 db.test.deleteMany({})
-{}±íÊ¾Ã»ÓĞÔ¼ÊøÌõ¼ş¡£
+{}è¡¨ç¤ºæ²¡æœ‰çº¦æŸæ¡ä»¶ã€‚
 
-É¾³ıtestÊı¾İ¿âÖĞ_idÎª5abb3b5bce69c048be080199µÄ¼ÇÂ¼¡£
+åˆ é™¤testæ•°æ®åº“ä¸­_idä¸º5abb3b5bce69c048be080199çš„è®°å½•ã€‚
 db.test.deleteMany({_id: ObjectId("5abb3b5bce69c048be080199")})
 
 
 
 
-µ¼³ömongodbÊı¾İ¿â
-mongodump -h IP --port ¶Ë¿Ú -u ÓÃ»§Ãû -p ÃÜÂë -d Êı¾İ¿â -o ÎÄ¼ş´æ´¢Â·¾¶
-Èç¹ûÃ»ÓĞÓÃ»§£¬¿ÉÒÔÈ¥µô -uºÍ-p
-Èç¹ûµ¼³ö±¾»úµÄÊı¾İ¿â£¬¿ÉÒÔÈ¥µô -h
-Èç¹ûÊÇÄ¬ÈÏ¶Ë¿Ú£¬¿ÉÒÔÈ¥µô --port
-Èç¹ûÏëµ¼³öËùÓĞÊı¾İ¿â£¬¿ÉÒÔÈ¥µô -d
+å¯¼å‡ºmongodbæ•°æ®åº“
+mongodump -h IP --port ç«¯å£ -u ç”¨æˆ·å -p å¯†ç  -d æ•°æ®åº“ -o æ–‡ä»¶å­˜å‚¨è·¯å¾„
+å¦‚æœæ²¡æœ‰ç”¨æˆ·ï¼Œå¯ä»¥å»æ‰ -uå’Œ-p
+å¦‚æœå¯¼å‡ºæœ¬æœºçš„æ•°æ®åº“ï¼Œå¯ä»¥å»æ‰ -h
+å¦‚æœæ˜¯é»˜è®¤ç«¯å£ï¼Œå¯ä»¥å»æ‰ --port
+å¦‚æœæƒ³å¯¼å‡ºæ‰€æœ‰æ•°æ®åº“ï¼Œå¯ä»¥å»æ‰ -d
 eg:
-mongodump -h IP --port 27017 -u flack -p 123456 -d test -o D:/MongoDB/Backups/  ±¾µØ²»ÓÃ¼Ó:-h IP
+mongodump -h IP --port 27017 -u flack -p 123456 -d test -o D:/MongoDB/Backups/  æœ¬åœ°ä¸ç”¨åŠ :-h IP
 
-µ¼³öÖ¸¶¨Êı¾İ¿â
+å¯¼å‡ºæŒ‡å®šæ•°æ®åº“
 mongodump -h IP -d test -o D:/MongoDB/Backups/ 
 
-µ¼ÈëMongoDBÊı¾İ¿â
-mongorestore -h IP --port ¶Ë¿Ú -u ÓÃ»§Ãû -p ÃÜÂë -d Êı¾İ¿â --drop ÎÄ¼ş´æÔÚÂ·¾¶
+å¯¼å…¥MongoDBæ•°æ®åº“
+mongorestore -h IP --port ç«¯å£ -u ç”¨æˆ·å -p å¯†ç  -d æ•°æ®åº“ --drop æ–‡ä»¶å­˜åœ¨è·¯å¾„
 eg:
-mongorestore -h IP --port 27017 -u flack -p 123456 -d test --drop D:/MongoDB/Backups/2019-04-27/test  ±¾µØ²»ÓÃ¼Ó -h IP
+mongorestore -h IP --port 27017 -u flack -p 123456 -d test --drop D:/MongoDB/Backups/2019-04-27/test  æœ¬åœ°ä¸ç”¨åŠ  -h IP
 
 
 
@@ -335,3 +335,9 @@ for x in mycol.find({ "name": { "$gt": "H" } })
 for x in mycol.find({ "name": { "$regex": "^R" } })
 
 for x in mycol.find().limit(3)
+
+
+mongoexport -h 192.168.1.141 --port 27018 -d configs -c NoDigikey --type=csv -q "{$and: [{link_status: {$ne: null}}, {link_status:{$gt: 200}}, {link_status:{$ne: 429}}, {link_status:{$ne: 908}}]}" -f _id,id,model_name,data_sheet,status,link_status -o D:/Flack/Work/nodigikey.csv
+```
+
+
