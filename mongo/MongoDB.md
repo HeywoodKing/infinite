@@ -241,7 +241,13 @@ db.userInfo.find().limit(1);
 ```
 db.userinfo.find({age: {$gte: 20}}).count()
 相当于：select count(*) from userInfo where age >= 20;  
-如果要返回限制之后的记录数量，要使用 count(true)或者 count(非 0)  db.users.find().skip(10).limit(5).count(true);   
+如果要返回限制之后的记录数量，要使用 count(true)或者 count(非 0)  db.users.find().skip(10).limit(5).count(true);
+以www.diodes.com开头
+db.NoDigikey.find({data_sheet:/^www.diodes.com/})
+以http://www.yageo.com开头
+db.NoDigikey.find({data_sheet:'/^http://www.yageo.com/'})
+以www.diodes.com结尾
+db.NoDigikey.find({data_sheet:/www.diodes.com^/})
 ```
 
 修改数据
@@ -495,5 +501,385 @@ for x in mycol.find().limit(3)
 ```
 
 
+```
+show dbs                     show database names  
+show collections             show collections in current database  
+show users                   show users in current database  
+show profile                 show most recent system.profile entries with time >= 1ms  
+use <db name>                set curent database to <db name>  
+db.help()                    help on DB methods  
+db.foo.help()                help on collection methods  
+db.foo.find()                list objects in collection foo  
+db.foo.find( { a : 1 } )     list objects in foo where a == 1  
+it                           result of the last line evaluated; use to further iterate  
+system.indexes
+
+
+do.help()
+db.adminCommand(nameOrDocument) - switches to 'admin' db, and runs command [just calls db.runCommand(...)]
+db.aggregate([pipeline], {options}) - performs a collectionless aggregation on this database; returns a cursor
+db.auth(username, password)
+db.cloneDatabase(fromhost) - deprecated
+db.commandHelp(name) returns the help for the command
+db.copyDatabase(fromdb, todb, fromhost) - deprecated
+db.createCollection(name, {size: ..., capped: ..., max: ...})
+db.createView(name, viewOn, [{$operator: {...}}, ...], {viewOptions})
+db.createUser(userDocument)
+db.currentOp() displays currently executing operations in the db
+db.dropDatabase()
+db.eval() - deprecated
+db.fsyncLock() flush data to disk and lock server for backups
+db.fsyncUnlock() unlocks server following a db.fsyncLock()
+db.getCollection(cname) same as db['cname'] or db.cname
+db.getCollectionInfos([filter]) - returns a list that contains the names and options of the db's collections
+db.getCollectionNames()
+db.getLastError() - just returns the err msg string
+db.getLastErrorObj() - return full status object
+db.getLogComponents()
+db.getMongo() get the server connection object
+db.getMongo().setSlaveOk() allow queries on a replication slave server
+db.getName()
+db.getPrevError()
+db.getProfilingLevel() - deprecated
+db.getProfilingStatus() - returns if profiling is on and slow threshold
+db.getReplicationInfo()
+db.getSiblingDB(name) get the db at the same server as this one
+db.getWriteConcern() - returns the write concern used for any operations on this db, inherited from server object if set
+db.hostInfo() get details about the server's host
+db.isMaster() check replica primary status
+db.killOp(opid) kills the current operation in the db
+db.listCommands() lists all the db commands
+db.loadServerScripts() loads all the scripts in db.system.js
+db.logout()
+db.printCollectionStats()
+db.printReplicationInfo()
+db.printShardingStatus()
+db.printSlaveReplicationInfo()
+db.dropUser(username)
+db.repairDatabase()
+db.resetError()
+db.runCommand(cmdObj) run a database command.  if cmdObj is a string, turns it into {cmdObj: 1}
+db.serverStatus()
+db.setLogLevel(level,<component>)
+db.setProfilingLevel(level,slowms) 0=off 1=slow 2=all
+db.setWriteConcern(<write concern doc>) - sets the write concern for writes to the db
+db.unsetWriteConcern(<write concern doc>) - unsets the write concern for writes to the db
+db.setVerboseShell(flag) display extra information in shell output
+db.shutdownServer()
+db.stats()
+db.version() current version of the server
+
+
+db.user.help();  user为表名
+db.foo.count()                统计表的行数  
+db.foo.dataSize()        统计表数据的大小  
+db.foo.distinct( key ) - eg. db.foo.distinct( 'x' )                按照给定的条件除重  
+db.foo.drop() drop the collection 删除表  
+db.foo.dropIndex(name)  删除指定索引  
+db.foo.dropIndexes() 删除所有索引  
+db.foo.ensureIndex(keypattern,options) - options should be an object with these possible fields: name, unique, dropDups  增加索引  
+db.foo.find( [query] , [fields]) - first parameter is an optional query filter. second parameter is optional set of fields to return. 
+通过条件查询： 
+db.foo.find( { x : 77 } , { name : 1 , x : 1 } ) 
+
+db.foo.find(...).count() 
+db.foo.find(...).limit(n) 根据条件查找数据并返回指定记录数 
+db.foo.find(...).skip(n) 
+db.foo.find(...).sort(...) 查找排序 
+db.foo.findOne([query]) 根据条件查询只查询一条数据 
+db.foo.getDB() get DB object associated with collection  返回表所属的库 
+db.foo.getIndexes() 显示表的所有索引 
+db.foo.group( { key : ..., initial: ..., reduce : ...[, cond: ...] } ) 根据条件分组 
+db.foo.mapReduce( mapFunction , reduceFunction , <optional params> ) 
+db.foo.remove(query) 根据条件删除数据 
+db.foo.renameCollection( newName ) renames the collection  重命名表 
+db.foo.save(obj) 保存数据 
+db.foo.stats()  查看表的状态 
+db.foo.storageSize() - includes free space allocated to this collection 查询分配到表空间大小 
+db.foo.totalIndexSize() - size in bytes of all the indexes 查询所有索引的大小 
+db.foo.totalSize() - storage allocated for all data and indexes 查询表的总大小 
+db.foo.update(query, object[, upsert_bool]) 根据条件更新数据 
+db.foo.validate() - SLOW 验证表的详细信息 
+db.foo.getShardVersion() - only for use with sharding
+
+
+mongodump --help
+删除user表  
+db.user.drop(); 
+
+
+
+1. 超级用户相关： 
+#增加或修改用户密码 
+
+db.addUser('admin','pwd') 
+
+#查看用户列表 
+
+db.system.users.find() 
+
+#用户认证 
+
+db.auth('admin','pwd') 
+
+#删除用户 
+
+db.removeUser('mongodb') 
+
+#查看所有用户 
+
+show users 
+
+#查看所有数据库 
+
+show dbs 
+
+#查看所有的collection 
+
+show collections 
+
+#查看各collection的状态 
+
+db.printCollectionStats() 
+
+#查看主从复制状态 
+
+db.printReplicationInfo() 
+
+#修复数据库 
+
+db.repairDatabase() 
+
+#设置记录profiling，0=off 1=slow 2=all 
+
+db.setProfilingLevel(1) 
+
+#查看profiling 
+
+show profile 
+
+#拷贝数据库 
+
+db.copyDatabase('mail_addr','mail_addr_tmp') 
+
+#删除collection 
+
+db.mail_addr.drop() 
+
+#删除当前的数据库 
+
+db.dropDatabase() 
+
+
+2. 客户端连接 
+/usr/local/mongodb/bin/mongo user_addr -u user -p 'pwd' 
+
+
+3. 增删改 
+#存储嵌套的对象 
+
+db.foo.save({'name':'ysz','address':{'city':'beijing','post':100096},'phone':[138,139]}) 
+
+#存储数组对象 
+
+db.user_addr.save({'Uid':'yushunzhi@sohu.com','Al':['test-1@sohu.com','test-2@sohu.com']}) 
+
+#根据query条件修改，如果不存在则插入，允许修改多条记录 
+
+db.foo.update({'yy':5},{'$set':{'xx':2}},upsert=true,multi=true) 
+
+#删除yy=5的记录 
+
+db.foo.remove({'yy':5}) 
+
+#删除所有的记录 
+
+db.foo.remove() 
+
+
+4. 索引 
+
+增加索引：1(ascending),-1(descending) 
+
+db.things.ensureIndex({firstname: 1, lastname: 1}, {unique: true}); 
+
+#索引子对象 
+
+db.user_addr.ensureIndex({'Al.Em': 1}) 
+
+#查看索引信息 
+
+db.deliver_status.getIndexes() 
+
+db.deliver_status.getIndexKeys() 
+
+#根据索引名删除索引 
+
+db.user_addr.dropIndex('Al.Em_1') 
+
+5. 查询 
+
+查找所有 
+
+db.foo.find() 
+
+#查找一条记录 
+
+db.foo.findOne() 
+
+#根据条件检索10条记录 
+
+db.foo.find({'msg':'Hello 1'}).limit(10) 
+
+#sort排序 
+
+db.deliver_status.find({'From':'yushunzhi@sohu.com'}).sort({'Dt',-1}) 
+
+db.deliver_status.find().sort({'Ct':-1}).limit(1) 
+
+#count操作 
+
+db.user_addr.count() 
+
+#distinct操作 
+
+db.foo.distinct('msg') 
+
+#>操作 
+
+db.foo.find({"timestamp": {"$gte" : 2}}) 
+
+#子对象的查找 
+
+db.foo.find({'address.city':'beijing'}) 
+
+6. 管理 
+
+查看collection数据的大小 
+
+db.deliver_status.dataSize() 
+
+#查看colleciont状态 
+
+db.deliver_status.stats() 
+
+#查询所有索引的大小 
+
+db.deliver_status.totalIndexSize() 
+
+
+```
+
+
+```
+import pymongo
+con = pymongo.Connection('localhost', 27017)
+
+mydb = con.mydb # new a database
+mydb.add_user('test', 'test') # add a user
+mydb.authenticate('test', 'test') # check auth
+
+muser = mydb.user # new a table
+ 
+muser.save({'id':1, 'name':'test'}) # add a record
+
+muser.insert({'id':2, 'name':'hello'}) # add a record
+muser.find_one() # find a record
+
+muser.find_one({'id':2}) # find a record by query
+ 
+muser.create_index('id')
+
+muser.find().sort('id', pymongo.ASCENDING) # DESCENDING
+# muser.drop() delete table
+muser.find({'id':1}).count() # get records number
+
+muser.find({'id':1}).limit(3).skip(2) # start index is 2 limit 3 records
+
+muser.remove({'id':1}) # delet records where id = 1
+ 
+muser.update({'id':2}, {'$set':{'name':'haha'}}) # update one recor
+```
+
+
+```
+下面再贴一些类似非python的api参考： 
+mongo -path
+db.AddUser(username,password) 添加用户
+db.auth(usrename,password) 设置数据库连接验证
+db.cloneDataBase(fromhost) 从目标服务器克隆一个数据库
+db.commandHelp(name) returns the help for the command
+db.copyDatabase(fromdb,todb,fromhost) 复制数据库fromdb—源数据库名称，todb—目标数据库名称，fromhost—源数据库服务器地址
+db.createCollection(name,{size:3333,capped:333,max:88888}) 创建一个数据集，相当于一个表
+db.currentOp() 取消当前库的当前操作
+db.dropDataBase() 删除当前数据库
+db.eval_r(func,args) run code server-side
+db.getCollection(cname) 取得一个数据集合，同用法：db['cname'] or db.cname
+db.getCollenctionNames() 取得所有数据集合的名称列表
+db.getLastError() 返回最后一个错误的提示消息
+db.getLastErrorObj() 返回最后一个错误的对象
+db.getMongo() 取得当前服务器的连接对象get the server connection object
+db.getMondo().setSlaveOk() allow this connection to read from then nonmaster membr of a replica pair
+db.getName() 返回当操作数据库的名称
+db.getPrevError() 返回上一个错误对象
+db.getProfilingLevel() ?什么等级
+db.getReplicationInfo() ?什么信息
+db.getSisterDB(name) get the db at the same server as this onew
+db.killOp() 停止（杀死）在当前库的当前操作
+db.printCollectionStats() 返回当前库的数据集状态
+db.printReplicationInfo()
+db.printSlaveReplicationInfo()
+db.printShardingStatus() 返回当前数据库是否为共享数据库
+db.removeUser(username) 删除用户
+db.repairDatabase() 修复当前数据库
+db.resetError()
+db.runCommand(cmdObj) run a database command. if cmdObj is a string, turns it into {cmdObj:1}
+db.setProfilingLevel(level) 0=off,1=slow,2=all
+db.shutdownServer() 关闭当前服务程序
+db.version() 返回当前程序的版本信息
+db.linlin.find({id:10}) 返回linlin数据集ID=10的数据集
+db.linlin.find({id:10}).count() 返回linlin数据集ID=10的数据总数
+db.linlin.find({id:10}).limit(2)返回linlin数据集ID=10的数据集从第二条开始的数据集
+db.linlin.find({id:10}).skip(8) 返回linlin数据集ID=10的数据集从0到第八条的数据集
+db.linlin.find({id:10}).limit(2).skip(8) 返回linlin数据集ID=1=的数据集从第二条到第八条的数据
+db.linlin.find({id:10}).sort() 返回linlin数据集ID=10的排序数据集
+db.linlin.findOne([query]) 返回符合条件的一条数据
+db.linlin.getDB() 返回此数据集所属的数据库名称
+db.linlin.getIndexes() 返回些数据集的索引信息
+db.linlin.group({key:…,initial:…,reduce:…[,cond:...]})
+db.linlin.mapReduce(mayFunction,reduceFunction,
+)
+db.linlin.remove(query) 在数据集中删除一条数据
+db.linlin.renameCollection(newName) 重命名些数据集名称
+db.linlin.save(obj) 往数据集中插入一条数据
+db.linlin.stats() 返回此数据集的状态
+db.linlin.storageSize() 返回此数据集的存储大小
+db.linlin.totalIndexSize() 返回此数据集的索引文件大小
+db.linlin.totalSize() 返回些数据集的总大小
+db.linlin.update(query,object[,upsert_bool])在此数据集中更新一条数据
+db.linlin.validate() 验证此数据集
+db.linlin.getShardVersion() 返回数据集共享版本号
+db.linlin.find({‘name’:'foobar’}) select * from linlin where name=’foobar’
+db.linlin.find() select * from linlin
+db.linlin.find({‘ID’:10}).count() select count(*) from linlin where ID=10
+db.linlin.find().skip(10).limit(20) 从查询结果的第十条开始读20条数据 select * from linlin limit 10,20 ———-mysql
+db.linlin.find({‘ID’:{$in:[25,35,45]}}) select * from linlin where ID in (25,35,45)
+db.linlin.find().sort({‘ID’:-1}) select * from linlin order by ID desc
+db.linlin.distinct(‘name’,{‘ID’:{$lt:20}}) select distinct(name) from linlin where ID<20
+db.linlin.group({key:{'name':true},cond:{'name':'foo'},reduce:function(obj,prev){prev.msum+=obj.marks;},initial:{msum:0}})
+select name,sum(marks) from linlin group by name
+db.linlin.find('this.ID<20′,{name:1}) select name from linlin where ID<20
+db.linlin.insert({'name':'foobar’,'age':25}) insert into linlin ('name','age’)values('foobar',25)
+db.linlin.insert({'name':'foobar’,'age':25,’email’:'cclove2@163.com’})
+db.linlin.remove({}) delete * from linlin
+db.linlin.remove({'age':20}) delete linlin where age=20
+db.linlin.remove({'age':{$lt:20}}) delete linlin where age<20
+db.linlin.remove({'age':{$lte:20}}) delete linlin where age<=20
+db.linlin.remove({'age':{$gt:20}}) delete linlin where age>20
+db.linlin.remove({‘age’:{$gte:20}}) delete linlin where age>=20
+db.linlin.remove({‘age’:{$ne:20}}) delete linlin where age!=20
+db.linlin.update({‘name’:'foobar’},{‘$set’:{‘age’:36}}) update linlin set age=36 where name=’foobar’
+db.linlin.update({‘name’:'foobar’},{‘$inc’:{‘age’:3}}) update linlin set age=age+3 where name=’foobar’
+```
 
 
