@@ -438,6 +438,7 @@ db.NoDigikey.find({link_status:{$in:[301,302,404,403,905,908]}});
 db.NoDigikey.find({link_status:{$ne:[200,301,302,404,403,905,908]}}).count();
 db.NoDigikey.find({$and:[{link_status:{$ne: null},status:{$ne:1}]}).count();
 db.NoDigikey.find({$or:[{status: 2},{status: 3}]}).count();
+db.NoDigikey.aggregate([{'$sample': {'size': count}}])
 db.NoDigikey.aggregate([{$match:{status:4}},{$sample:{size:300}}])
 ```
 
@@ -473,6 +474,15 @@ mongorestore -h IP --port 27017 -u flack -p 123456 -d test --drop D:/MongoDB/Bac
 ### 导出文档
 ```
 mongoexport -h 192.168.1.141 --port 27018 -d configs -c NoDigikey --type=csv -q "{$and: [{link_status: {$ne: null}}, {link_status:{$gt: 200}}, {link_status:{$ne: 429}}, {link_status:{$ne: 908}}]}" -f _id,id,model_name,data_sheet,status,link_status -o D:/Flack/Work/nodigikey.csv
+
+mongoexport --host 192.168.1.141 --port 27018 -d configs -c digikey -q "{$or:[{status:2},{status:3},{status:4}]}" --out D:\flack\work\digikey.json
+mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey2 -q "{$or:[{status:2},{status:20}]}" --out D:\flack\work\digikey2.json
+mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey3 -q "{$or:[{status:2},{status:10}]}" --out D:\flack\work\digikey3.json
+```
+
+### 导入文档
+```
+
 ```
 
 

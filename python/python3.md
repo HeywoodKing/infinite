@@ -569,7 +569,88 @@ redis特点：
 
 
 19. 
+os.listdir(path)
+os.walk(path)
+os.walk(top[, topdown=True[, onerror=None[, followlinks=False]]])
+方法参数说明：
+top：要遍历的目录的路径
+topdown：可选，如果为 True，则优先遍历 top 目录，以及 top 目录下的每一个子目录，否则优先遍历 top 的子目录，默认为 True
+onerror: 可选， 需要一个 callable 对象，当 walk 异常时调用
+followlinks：可选， 如果为 True，则会遍历目录下的快捷方式(linux 下是 symbolic link)实际所指的目录，默认为 False
+args：包含那些没有 '-' 或 '--' 的参数列表
 
+返回值: 三元组 (root, dirs, files)
+root ：所指的是当前正在遍历的目录的地址
+dirs ：当前文件夹中所有目录名字的 list (不包括子目录)
+files ：当前文件夹中所有的文件 (不包括子目录中的文件)
+def work_dir(file_dir):
+    print'\n\n<><><><><> work dir <><><><><>'
+    for root, dirs, files in os.walk(file_dir):
+        print'\n========================================'
+        print "root : {0}".format(root)
+        print "dirs : {0}".format(dirs)
+        print "files : {0}".format(files)
+​
+        for file in files:
+            try:
+                print'-----------------------------------'
+                
+                file_name = os.path.splitext(file)[0]
+                file_suffix = os.path.splitext(file)[1]
+                file_path = os.path.join(root, file)
+                file_abs_path = os.path.abspath(file)
+                file_parent = os.path.dirname(file_path)
+​
+                print "file : {0}".format(file)
+                print "file_name : {0}".format(file_name)
+                print "file_suffix : {0}".format(file_suffix)
+                print "file_path : {0}".format(file_path)
+                print "file_abs_path : {0}".format(file_abs_path)
+                print "file_parent : {0}".format(file_parent)
+                
+            except Exception, e:
+                print "Exception", e
+
+
+
+os.path.splitext()：分离文件名和扩展名
+
+file = "file_test.txt"
+file_name = os.path.splitext(file)[0] # 输出：file_test
+file_suffix = os.path.splitext(file)[1] # 输出：.txt
+
+os.path.exists()：判断文件或目录是否存在
+os.path.isfile()：判断是否是文件
+os.path.isdir()：判断是否是目录
+os.path.dirname()：获取当前文件所在的目录，即父目录
+os.makedirs()：创建多级目录
+os.mkdir()：创建单级目录
+os.path.getsize()：获取文件大小
 
 20. 
+格式化符号
 
+%y 两位数的年份表示（00-99）
+%Y 四位数的年份表示（000-9999）
+%m 月份（01-12）
+%d 月内中的一天（0-31）
+%H 24小时制小时数（0-23）
+%I 12小时制小时数（01-12）
+%M 分钟数（00=59）
+%S 秒（00-59）
+%a本地简化星期名称
+%A 本地完整星期名称
+%b 本地简化的月份名称
+%B 本地完整的月份名称
+%c 本地相应的日期表示和时间表示
+%j年内的一天（001-366）
+%p 本地A.M.或P.M.的等价符
+%U 一年中的星期数（00-53）星期天为星期的开始
+%w星期（0-6），星期天为星期的开始
+%W 一年中的星期数（00-53）星期一为星期的开始
+%x 本地相应的日期表示
+%X本地相应的时间表示
+%Z 当前时区的名称
+%% %号本身
+
+21.
