@@ -1,13 +1,11 @@
-﻿
-## MongoDB
+
+# MongoDB
 
 ### 安装
 管理员模式进入cmd
 ```
 C:\Windows\system32>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install -serviceName "MongoDB"
-2019-04-24T13:06:38.318+0800 I CONTROL  [main] Automatically disabling TLS 1.0,
-to force-enable TLS 1.0 specify --sslDisabledProtocols 'none'
-
+或
 D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install --serviceName "MongoDB"
 这个时候服务里面已经安装好了
 
@@ -27,7 +25,7 @@ D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB
 ### 连接
 连接MongoDB
 ```
-mongo 192.168.99.100/admin -u root -p
+mongo 192.168.99.100:27017/admin -u root -p
 ```
 
 ### 基本使用
@@ -451,42 +449,46 @@ db.NoDigikey.update({link_status:200,status:1},{$set:{link_status:null}},{multi:
 ```
 
 
-### 高级用法
-导出mongodb数据库
-```
-mongodump -h IP --port 端口 -u 用户名 -p 密码 -d 数据库 -o 文件存储路径
-如果没有用户，可以去掉 -u和-p
-如果导出本机的数据库，可以去掉 -h
-如果是默认端口，可以去掉 --port
-如果想导出所有数据库，可以去掉 -d
-eg:
-mongodump -h IP --port 27017 -u flack -p 123456 -d test -o D:/MongoDB/Backups/  本地不用加:-h IP
-
-导出指定数据库
-mongodump -h IP -d test -o D:/MongoDB/Backups/ 
-
-导入MongoDB数据库
-mongorestore -h IP --port 端口 -u 用户名 -p 密码 -d 数据库 --drop 文件存在路径
-eg:
-mongorestore -h IP --port 27017 -u flack -p 123456 -d test --drop D:/MongoDB/Backups/2019-04-27/test  本地不用加 -h IP
-```
+## 高级用法
 
 ### 导出文档
 ```
 mongoexport -h 192.168.1.141 --port 27018 -d configs -c NoDigikey --type=csv -q "{$and: [{link_status: {$ne: null}}, {link_status:{$gt: 200}}, {link_status:{$ne: 429}}, {link_status:{$ne: 908}}]}" -f _id,id,model_name,data_sheet,status,link_status -o D:/Flack/Work/nodigikey.csv
 
-mongoexport --host 192.168.1.141 --port 27018 -d configs -c digikey -q "{$or:[{status:2},{status:3},{status:4}]}" --out D:\flack\work\digikey.json
-mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey2 -q "{$or:[{status:2},{status:20}]}" --out D:\flack\work\digikey2.json
-mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey3 -q "{$or:[{status:2},{status:10}]}" --out D:\flack\work\digikey3.json
+mongoexport --host 192.168.1.141 --port 27018 -d configs -c digikey -u king -p king@2016 -q "{$or:[{status:2},{status:3},{status:4}]}" --out D:\flack\work\digikey.json
+mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey2 -u king -p king@2016 -q "{$or:[{status:2},{status:20}]}" --out D:\flack\work\digikey2.json
+mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey3 -u king -p king@2016 -q "{$or:[{status:2},{status:10}]}" --out D:\flack\work\digikey3.json
 ```
 
 ### 导入文档
 ```
-
+mongoimport --host 192.168.1.163 --port 27017 -d configs -c digikey -u king -p king@2016 --numInsertionWorkers 50 --file export/digikey.json
+mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWorkers 50 --file digikey2.json
+mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
 ```
 
 
-### python使用mongodb
+### 备份MongoDB数据库
+```
+导出指定数据库
+mongodump -h IP --port 27017 -u flack -p 123456 -d test -o D:/MongoDB/Backups/  本地不用加:-h IP
+mongodump -h IP -d test -o D:/MongoDB/Backups/ 
+
+mongodump -h IP --port 端口 -u 用户名 -p 密码 -d 数据库 -o 文件存储路径
+如果没有用户，可以去掉 -u和-p
+如果导出本机的数据库，可以去掉 -h
+如果是默认端口，可以去掉 --port
+如果想导出所有数据库，可以去掉 -d
+```
+
+### 还原MongoDB数据库
+```
+mongorestore -h IP --port 端口 -u 用户名 -p 密码 -d 数据库 --drop 文件存在路径
+mongorestore -h IP --port 27017 -u flack -p 123456 -d test --drop D:/MongoDB/Backups/2019-04-27/test  本地不用加 -h IP
+```
+
+
+## python使用mongodb
 ```
 pymongo
 
@@ -511,6 +513,7 @@ for x in mycol.find().limit(3)
 ```
 
 
+## MongoDB常用命令大全
 ```
 show dbs                     show database names  
 show collections             show collections in current database  
@@ -780,7 +783,7 @@ db.deliver_status.totalIndexSize()
 
 ```
 
-
+### pymongo
 ```
 import pymongo
 con = pymongo.Connection('localhost', 27017)

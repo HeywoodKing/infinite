@@ -614,3 +614,66 @@ rollbck;
 
 ```
 
+
+```
+select distinct model_name,factory 
+from m_electron 
+where id >= (select floor(rand() * ((select max(id) from m_electron) - (select min(id) from m_electron)) +
+(select min(id) from m_electron)))
+and factory in 
+(
+'Analog Devices Inc.',
+'Maxim Integrated',
+'NXP USA Inc.',
+'ON Semiconductor',
+'STMicroelectronics',
+'Texas Instruments',
+'Xilinx Inc.',
+'Microchip Technology',
+'Vishay Dale',
+'Yageo',
+'Rohm Semiconductor',
+'Murata Electronics North America',
+'AVX Corporation',
+'Molex',
+'TE Connectivity AMP Connectors'
+)
+and pintopin in (select a.pintopin from ((select pintopin,count(*) from m_electron group by pintopin having  count(*) > 1)) a) limit 50
+
+
+SELECT model_name,factory
+FROM m_electron AS t1 JOIN (SELECT ROUND(RAND() * ((SELECT MAX(id) FROM m_electron)-(SELECT MIN(id) FROM m_electron))+(SELECT MIN(id) FROM m_electron)) AS id) AS t2
+WHERE t1.id >= t2.id
+and factory in 
+(
+'Analog Devices Inc.',
+'Maxim Integrated',
+'NXP USA Inc.',
+'ON Semiconductor',
+'STMicroelectronics',
+'Texas Instruments',
+'Xilinx Inc.',
+'Microchip Technology',
+'Vishay Dale',
+'Yageo',
+'Rohm Semiconductor',
+'Murata Electronics North America',
+'AVX Corporation',
+'Molex',
+'TE Connectivity AMP Connectors'
+) 
+and t1.pintopin in (select a.pintopin from ((select pintopin,count(*) from m_electron group by pintopin having  count(*) > 1)) a)
+ORDER BY t1.id LIMIT 50;
+```
+
+
+
+随机数
+```
+(SELECT floor( RAND() * ((SELECT MAX(id) FROM `table`)-(SELECT MIN(id) FROM `table`)) + (SELECT MIN(id) FROM `table`)))
+```
+
+
+
+
+
