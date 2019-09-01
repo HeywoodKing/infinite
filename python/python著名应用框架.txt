@@ -22,6 +22,7 @@ Trac - 使用Python编写的BUG管理系统
 Mailman - 使用Python编写的邮件列表软件
 Mezzanine - 基于Django编写的内容管理系统
 Blender - 以C与Python开发的开源3D绘图软件
+
 16学习网站编辑
 Python官方文档[8] 
 Python学习资源
