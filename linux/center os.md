@@ -99,6 +99,12 @@ Options:
   Plugin Options:
 ```
 
+### 安装
+```
+yum install -y zip unzip
+```
+
+
 `vi start.sh`
 编辑脚本代码如下：
 ```

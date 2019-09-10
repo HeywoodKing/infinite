@@ -343,6 +343,51 @@ db.userinfo.updateOne({"name": "abc"}, {$set: {"age": "28"}})
 db.userinfo.updateMany({"age": {$gt: "10"}}, {$set: {"status": "xyz"}})
 ```
 
+更新字段前缀+本身
+db.userinfo.find({'status':{'$ne': 1}}).forEach(
+  function(item){
+    db.userinfo.update({'_id': item._id},{$set: {'date_sheet': 'http://www.ecliptek.com/SpecSheetGenerator/specific.aspx?PartNumber=' + item.model_name}})
+  }
+)
+
+查询出hospitalName是xx医院和openId以2开头的所有记录，并且更新my_booking表中的payType为1
+db.getCollection('my_booking').find({"hospitalName":/xx医院/,openId:/^2/}).forEach(
+  function(item){                
+    db.getCollection('my_booking').update({"_id":item._id},{$set:{"payType": "1"}})
+  }
+)
+
+查询出hospitalName是xx医院和openId不以2开头的所有记录，并且更新my_booking表中的payType为2.
+db.getCollection('my_booking').find({"hospitalName":/xx医院/,openId:{$not:/^2/}}).forEach(
+   function(item){                
+       db.getCollection('my_booking').update({"_id":item._id},{$set:{"payType": "2"}})
+   }
+)
+查询出xx医院和不已2开头的openId的所有记录，并且将每条记录的outTradeNo2赋值给outTradeNo1.
+db.getCollection('my_booking').find({"hospitalName":/xx医院/,openId:{$not:/^2/}}).forEach(
+   function(item){                
+       db.getCollection('my_booking').update({"_id":item._id},{$set:{"outTradeNo1": item.outTradeNo2}})
+   }
+)
+
+db.Goods.find().forEach(
+  function(item){
+    if(!item.goodsCode.indexOf("ABCD")){
+      var tempGoodId=item._id;
+      var tempGoodCode=item.goodsCode;
+      var temp=db.Goods.findOne({"goodsCode":{"$regex":"^"+tempGoodCode+".+"}});
+      if(temp){
+        // print(tempGoodCode+"="+item._id);
+        var cursor=db.GoodAttr.find({"goodsId":tempGoodId});
+          cursor.forEach(function(a){
+            print(a);        
+        })
+      }
+    }
+  }
+)
+
+
 删除数据
 3.2版本之前
 ```
@@ -446,6 +491,14 @@ db.NoDigikey.aggregate([{$match:{status:4}},{$sample:{size:300}}])
 db.NoDigikey.update({link_status:200,status:1},{$set:{link_status:null}});
 更新多条
 db.NoDigikey.update({link_status:200,status:1},{$set:{link_status:null}},{multi:true});
+更新多条记录，将data_sheet=https://www.alliedelec.comhttps:开头的数据字段替换为https:
+db.getCollection('NoDigikey').find({status:{$gt:1},data_sheet:{$regex:/^https:\/\/www.alliedelec.comhttps:/}}).forEach(
+  function(item){
+    item.data_sheet = item.data_sheet.replace('https://www.alliedelec.comhttps:', 'https:');
+    print(item.data_sheet);
+    db.getCollection('NoDigikey').update({_id:item._id},{$set:{data_sheet:item.data_sheet}});
+  }
+)
 ```
 
 
@@ -465,6 +518,9 @@ mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey3 -u king -p 
 mongoimport --host 192.168.1.163 --port 27017 -d configs -c digikey -u king -p king@2016 --numInsertionWorkers 50 --file export/digikey.json
 mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWorkers 50 --file digikey2.json
 mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
+mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
+mongoimport --host 127.0.0.1 --port 27017 -d wc -c male --numInsertionWorkers 8 --file "digikey - test.json"
+mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
 ```
 
 
