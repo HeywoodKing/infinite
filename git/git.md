@@ -6,25 +6,25 @@ git add <file> ... 添加文件到代码库中。
 git rm <file> ... 删除代码库的文件。
 git commit -m <message> 提交更改，在修改了文件以后，使用这个命令提交修改。
 git pull 从远程同步代码库到本地。相当于是从远程获取最新版本并merge到本地
-    git pull origin dev 本地分支与远程分支相关联
-    git pull origin master (该命令其实相当于git fetch 和 git merge
+git pull origin dev 本地分支与远程分支相关联
+git pull origin master (该命令其实相当于git fetch 和 git merge
 在实际使用中，git fetch更安全一些)
 git push 推送代码到远程代码库。
-    git push origin test 这样远程仓库中也就创建了一个test分支
-    git push origin dev:dev # 同步dev分支的代码到远程服务器
+git push origin test 这样远程仓库中也就创建了一个test分支
+git push origin dev:dev # 同步dev分支的代码到远程服务器
 git branch 查看当前分支。带*是当前分支。
-    git branch <branch-name> 新建一个分支。
-    git branch -d <branch-name> #删除一个本地分支。（首先要切换到其他分支，然后进行删除操作）
-    git branch -a 查看远程分支  git branch --all 查看远程分支
+git branch <branch-name> 新建一个分支。
+git branch -d <branch-name> #删除一个本地分支。（首先要切换到其他分支，然后进行删除操作）
+git branch -a 查看远程分支  git branch --all 查看远程分支
 git checkout <branch-name> 切换到指定分支。
-    git checkout -b feature-catelog origin/feature-catelog 新建并切换到本地feature-catelog分支
-    git checkout -b test 在本地创建test分支
-    git checkout master 切换回master分支
+git checkout -b feature-catelog origin/feature-catelog 新建并切换到本地feature-catelog分支
+git checkout -b test 在本地创建test分支
+git checkout master 切换回master分支
 git log 查看提交记录（即历史的 commit 记录）。
 git status 当前修改的状态，是否修改了还没提交，或者那些文件未使用。
 git reset <log> 恢复到历史版本。
-    git reset <log> --hard 恢复到制定的版本
-    git reset HEAD 恢复到上一个提交的版本
+git reset <log> --hard 恢复到制定的版本
+git reset HEAD 恢复到上一个提交的版本
 
 git push origin :dev # 删除远程dev分支，危险命令哦
 git remote -v 查看远程仓库
