@@ -1,4 +1,3 @@
-
 # MongoDB
 
 ### 安装
@@ -52,11 +51,13 @@ db.douban
 创建用户
 ```
 db.addUser("flack", "123456")
-db.createUser({
-  	user: "flack",
-  	pwd: "123456",
-  	roles: [{role: "userAdmin", db: "test"}]
-})
+db.createUser(
+        {
+	user: "flack",
+	pwd: "123456",
+	roles: [{role: "userAdmin", db: "test"}]
+        }
+)
 ```
 
 设置用户为允许连接的用户
@@ -98,7 +99,6 @@ db.dropDatabase()
 删除集合，删除指定的集合 删除表
 ```
 db.userinfo.drop()
-db.user.drop();
 ```
 
 
@@ -341,15 +341,51 @@ db.userinfo.updateOne({"name": "abc"}, {$set: {"age": "28"}})
 ```
 db.userinfo.updateMany({"age": {$gt: "10"}}, {$set: {"status": "xyz"}})
 ```
-
-更新
 ```
-更新一条
-db.NoDigikey.update({link_status:200,status:1},{$set:{link_status:null}});
-更新多条
-db.NoDigikey.update({link_status:200,status:1},{$set:{link_status:null}},{multi:true});
-```
+更新字段前缀+本身
+db.userinfo.find({'status':{'$ne': 1}}).forEach(
+  function(item){
+    db.userinfo.update({'_id': item._id},{$set: {'date_sheet': 'http://www.ecliptek.com/SpecSheetGenerator/specific.aspx?PartNumber=' + item.model_name}})
+  }
+)
 
+查询出hospitalName是xx医院和openId以2开头的所有记录，并且更新my_booking表中的payType为1
+db.getCollection('my_booking').find({"hospitalName":/xx医院/,openId:/^2/}).forEach(
+  function(item){                
+    db.getCollection('my_booking').update({"_id":item._id},{$set:{"payType": "1"}})
+  }
+)
+
+查询出hospitalName是xx医院和openId不以2开头的所有记录，并且更新my_booking表中的payType为2.
+db.getCollection('my_booking').find({"hospitalName":/xx医院/,openId:{$not:/^2/}}).forEach(
+   function(item){                
+       db.getCollection('my_booking').update({"_id":item._id},{$set:{"payType": "2"}})
+   }
+)
+查询出xx医院和不已2开头的openId的所有记录，并且将每条记录的outTradeNo2赋值给outTradeNo1.
+db.getCollection('my_booking').find({"hospitalName":/xx医院/,openId:{$not:/^2/}}).forEach(
+   function(item){                
+       db.getCollection('my_booking').update({"_id":item._id},{$set:{"outTradeNo1": item.outTradeNo2}})
+   }
+)
+
+db.Goods.find().forEach(
+  function(item){
+    if(!item.goodsCode.indexOf("ABCD")){
+      var tempGoodId=item._id;
+      var tempGoodCode=item.goodsCode;
+      var temp=db.Goods.findOne({"goodsCode":{"$regex":"^"+tempGoodCode+".+"}});
+      if(temp){
+        // print(tempGoodCode+"="+item._id);
+        var cursor=db.GoodAttr.find({"goodsId":tempGoodId});
+          cursor.forEach(function(a){
+            print(a);        
+        })
+      }
+    }
+  }
+)
+```
 
 删除数据
 3.2版本之前
@@ -409,7 +445,7 @@ db.test.deleteMany({})
 db.test.deleteMany({_id: ObjectId("5abb3b5bce69c048be080199")})
 ```
 
-分组 统计
+分组
 ```
 db.NoDigikey.distinct('link_status');
 
@@ -448,6 +484,36 @@ db.NoDigikey.aggregate([{'$sample': {'size': count}}])
 db.NoDigikey.aggregate([{$match:{status:4}},{$sample:{size:300}}])
 ```
 
+更新
+```
+db.collection.update(
+   <query>,
+   <update>,
+   {
+     upsert: <boolean>,
+     multi: <boolean>,
+     writeConcern: <document>
+   }
+)
+query : update的查询条件，类似sql update查询内where后面的。
+update : update的对象和一些更新的操作符（如$,$inc...）等，也可以理解为sql update查询内set后面的
+upsert : 可选，这个参数的意思是，如果不存在update的记录，是否插入objNew,true为插入，默认是false，不插入。
+multi : 可选，mongodb 默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
+writeConcern :可选，抛出异常的级别。
+
+更新一条
+db.NoDigikey.update({link_status:200,status:1},{$set:{link_status:null}});
+更新多条
+db.NoDigikey.update({link_status:200,status:1},{$set:{link_status:null}},{multi:true});
+更新多条记录，将data_sheet=https://www.alliedelec.comhttps:开头的数据字段替换为https:
+db.getCollection('NoDigikey').find({status:{$gt:1},data_sheet:{$regex:/^https:\/\/www.alliedelec.comhttps:/}}).forEach(
+  function(item){
+    item.data_sheet = item.data_sheet.replace('https://www.alliedelec.comhttps:', 'https:');
+    print(item.data_sheet);
+    db.getCollection('NoDigikey').update({_id:item._id},{$set:{data_sheet:item.data_sheet}});
+  }
+)
+```
 
 
 ## 高级用法
@@ -466,6 +532,9 @@ mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey3 -u king -p 
 mongoimport --host 192.168.1.163 --port 27017 -d configs -c digikey -u king -p king@2016 --numInsertionWorkers 50 --file export/digikey.json
 mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWorkers 50 --file digikey2.json
 mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
+mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
+mongoimport --host 127.0.0.1 --port 27017 -d wc -c male --numInsertionWorkers 8 --file "digikey - test.json"
+mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
 ```
 
 
@@ -489,8 +558,140 @@ mongorestore -h IP --port 27017 -u flack -p 123456 -d test --drop D:/MongoDB/Bac
 ```
 
 
+## python使用mongodb
+```
+pymongo
+
+client = pymongo.MongoClient("127.0.0.1", 27017)
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = client["douban"]
+mycol = mydb["userinfo"]
+
+x = mycol.find_one()
+
+for x in mycol.find():
+
+for x in mycol.find({}, {"_id":0, "name":1, "alexa":1})
+
+for x in mycol.find({}, {"alexa":0})
+
+for x in mycol.find({ "name": { "$gt": "H" } })
+
+for x in mycol.find({ "name": { "$regex": "^R" } })
+
+for x in mycol.find().limit(3)
+```
+
+
 ## MongoDB常用命令大全
 ```
+show dbs                     show database names  
+show collections             show collections in current database  
+show users                   show users in current database  
+show profile                 show most recent system.profile entries with time >= 1ms  
+use <db name>                set curent database to <db name>  
+db.help()                    help on DB methods  
+db.foo.help()                help on collection methods  
+db.foo.find()                list objects in collection foo  
+db.foo.find( { a : 1 } )     list objects in foo where a == 1  
+it                           result of the last line evaluated; use to further iterate  
+system.indexes
+
+
+do.help()
+db.adminCommand(nameOrDocument) - switches to 'admin' db, and runs command [just calls db.runCommand(...)]
+db.aggregate([pipeline], {options}) - performs a collectionless aggregation on this database; returns a cursor
+db.auth(username, password)
+db.cloneDatabase(fromhost) - deprecated
+db.commandHelp(name) returns the help for the command
+db.copyDatabase(fromdb, todb, fromhost) - deprecated
+db.createCollection(name, {size: ..., capped: ..., max: ...})
+db.createView(name, viewOn, [{$operator: {...}}, ...], {viewOptions})
+db.createUser(userDocument)
+db.currentOp() displays currently executing operations in the db
+db.dropDatabase()
+db.eval() - deprecated
+db.fsyncLock() flush data to disk and lock server for backups
+db.fsyncUnlock() unlocks server following a db.fsyncLock()
+db.getCollection(cname) same as db['cname'] or db.cname
+db.getCollectionInfos([filter]) - returns a list that contains the names and options of the db's collections
+db.getCollectionNames()
+db.getLastError() - just returns the err msg string
+db.getLastErrorObj() - return full status object
+db.getLogComponents()
+db.getMongo() get the server connection object
+db.getMongo().setSlaveOk() allow queries on a replication slave server
+db.getName()
+db.getPrevError()
+db.getProfilingLevel() - deprecated
+db.getProfilingStatus() - returns if profiling is on and slow threshold
+db.getReplicationInfo()
+db.getSiblingDB(name) get the db at the same server as this one
+db.getWriteConcern() - returns the write concern used for any operations on this db, inherited from server object if set
+db.hostInfo() get details about the server's host
+db.isMaster() check replica primary status
+db.killOp(opid) kills the current operation in the db
+db.listCommands() lists all the db commands
+db.loadServerScripts() loads all the scripts in db.system.js
+db.logout()
+db.printCollectionStats()
+db.printReplicationInfo()
+db.printShardingStatus()
+db.printSlaveReplicationInfo()
+db.dropUser(username)
+db.repairDatabase()
+db.resetError()
+db.runCommand(cmdObj) run a database command.  if cmdObj is a string, turns it into {cmdObj: 1}
+db.serverStatus()
+db.setLogLevel(level,<component>)
+db.setProfilingLevel(level,slowms) 0=off 1=slow 2=all
+db.setWriteConcern(<write concern doc>) - sets the write concern for writes to the db
+db.unsetWriteConcern(<write concern doc>) - unsets the write concern for writes to the db
+db.setVerboseShell(flag) display extra information in shell output
+db.shutdownServer()
+db.stats()
+db.version() current version of the server
+
+
+db.user.help();  user为表名
+db.foo.count()                统计表的行数  
+db.foo.dataSize()        统计表数据的大小  
+db.foo.distinct( key ) - eg. db.foo.distinct( 'x' )                按照给定的条件除重  
+db.foo.drop() drop the collection 删除表  
+db.foo.dropIndex(name)  删除指定索引  
+db.foo.dropIndexes() 删除所有索引  
+db.foo.ensureIndex(keypattern,options) - options should be an object with these possible fields: name, unique, dropDups  增加索引  
+db.foo.find( [query] , [fields]) - first parameter is an optional query filter. second parameter is optional set of fields to return. 
+通过条件查询： 
+db.foo.find( { x : 77 } , { name : 1 , x : 1 } ) 
+
+db.foo.find(...).count() 
+db.foo.find(...).limit(n) 根据条件查找数据并返回指定记录数 
+db.foo.find(...).skip(n) 
+db.foo.find(...).sort(...) 查找排序 
+db.foo.findOne([query]) 根据条件查询只查询一条数据 
+db.foo.getDB() get DB object associated with collection  返回表所属的库 
+db.foo.getIndexes() 显示表的所有索引 
+db.foo.group( { key : ..., initial: ..., reduce : ...[, cond: ...] } ) 根据条件分组 
+db.foo.mapReduce( mapFunction , reduceFunction , <optional params> ) 
+db.foo.remove(query) 根据条件删除数据 
+db.foo.renameCollection( newName ) renames the collection  重命名表 
+db.foo.save(obj) 保存数据 
+db.foo.stats()  查看表的状态 
+db.foo.storageSize() - includes free space allocated to this collection 查询分配到表空间大小 
+db.foo.totalIndexSize() - size in bytes of all the indexes 查询所有索引的大小 
+db.foo.totalSize() - storage allocated for all data and indexes 查询表的总大小 
+db.foo.update(query, object[, upsert_bool]) 根据条件更新数据 
+db.foo.validate() - SLOW 验证表的详细信息 
+db.foo.getShardVersion() - only for use with sharding
+
+
+mongodump --help
+删除user表  
+db.user.drop(); 
+
+
+
 1. 超级用户相关： 
 #增加或修改用户密码 
 
@@ -649,112 +850,43 @@ db.deliver_status.stats()
 
 db.deliver_status.totalIndexSize() 
 
+
+```
+
+### pymongo
+```
+import pymongo
+con = pymongo.Connection('localhost', 27017)
+
+mydb = con.mydb # new a database
+mydb.add_user('test', 'test') # add a user
+mydb.authenticate('test', 'test') # check auth
+
+muser = mydb.user # new a table
+ 
+muser.save({'id':1, 'name':'test'}) # add a record
+
+muser.insert({'id':2, 'name':'hello'}) # add a record
+muser.find_one() # find a record
+
+muser.find_one({'id':2}) # find a record by query
+ 
+muser.create_index('id')
+
+muser.find().sort('id', pymongo.ASCENDING) # DESCENDING
+# muser.drop() delete table
+muser.find({'id':1}).count() # get records number
+
+muser.find({'id':1}).limit(3).skip(2) # start index is 2 limit 3 records
+
+muser.remove({'id':1}) # delet records where id = 1
+ 
+muser.update({'id':2}, {'$set':{'name':'haha'}}) # update one recor
 ```
 
 
 ```
 下面再贴一些类似非python的api参考： 
-show dbs                     show database names  
-show collections             show collections in current database  
-show users                   show users in current database  
-show profile                 show most recent system.profile entries with time >= 1ms  
-use <db name>                set curent database to <db name>  
-db.help()                    help on DB methods  
-db.foo.help()                help on collection methods  
-db.foo.find()                list objects in collection foo  
-db.foo.find( { a : 1 } )     list objects in foo where a == 1  
-it                           result of the last line evaluated; use to further iterate  
-system.indexes
-
-
-do.help()
-db.adminCommand(nameOrDocument) - switches to 'admin' db, and runs command [just calls db.runCommand(...)]
-db.aggregate([pipeline], {options}) - performs a collectionless aggregation on this database; returns a cursor
-db.auth(username, password)
-db.cloneDatabase(fromhost) - deprecated
-db.commandHelp(name) returns the help for the command
-db.copyDatabase(fromdb, todb, fromhost) - deprecated
-db.createCollection(name, {size: ..., capped: ..., max: ...})
-db.createView(name, viewOn, [{$operator: {...}}, ...], {viewOptions})
-db.createUser(userDocument)
-db.currentOp() displays currently executing operations in the db
-db.dropDatabase()
-db.eval() - deprecated
-db.fsyncLock() flush data to disk and lock server for backups
-db.fsyncUnlock() unlocks server following a db.fsyncLock()
-db.getCollection(cname) same as db['cname'] or db.cname
-db.getCollectionInfos([filter]) - returns a list that contains the names and options of the db's collections
-db.getCollectionNames()
-db.getLastError() - just returns the err msg string
-db.getLastErrorObj() - return full status object
-db.getLogComponents()
-db.getMongo() get the server connection object
-db.getMongo().setSlaveOk() allow queries on a replication slave server
-db.getName()
-db.getPrevError()
-db.getProfilingLevel() - deprecated
-db.getProfilingStatus() - returns if profiling is on and slow threshold
-db.getReplicationInfo()
-db.getSiblingDB(name) get the db at the same server as this one
-db.getWriteConcern() - returns the write concern used for any operations on this db, inherited from server object if set
-db.hostInfo() get details about the server's host
-db.isMaster() check replica primary status
-db.killOp(opid) kills the current operation in the db
-db.listCommands() lists all the db commands
-db.loadServerScripts() loads all the scripts in db.system.js
-db.logout()
-db.printCollectionStats()
-db.printReplicationInfo()
-db.printShardingStatus()
-db.printSlaveReplicationInfo()
-db.dropUser(username)
-db.repairDatabase()
-db.resetError()
-db.runCommand(cmdObj) run a database command.  if cmdObj is a string, turns it into {cmdObj: 1}
-db.serverStatus()
-db.setLogLevel(level,<component>)
-db.setProfilingLevel(level,slowms) 0=off 1=slow 2=all
-db.setWriteConcern(<write concern doc>) - sets the write concern for writes to the db
-db.unsetWriteConcern(<write concern doc>) - unsets the write concern for writes to the db
-db.setVerboseShell(flag) display extra information in shell output
-db.shutdownServer()
-db.stats()
-db.version() current version of the server
-
-
-db.user.help();  user为表名
-db.foo.count()                统计表的行数  
-db.foo.dataSize()        统计表数据的大小  
-db.foo.distinct( key ) - eg. db.foo.distinct( 'x' )                按照给定的条件除重  
-db.foo.drop() drop the collection 删除表  
-db.foo.dropIndex(name)  删除指定索引  
-db.foo.dropIndexes() 删除所有索引  
-db.foo.ensureIndex(keypattern,options) - options should be an object with these possible fields: name, unique, dropDups  增加索引  
-db.foo.find( [query] , [fields]) - first parameter is an optional query filter. second parameter is optional set of fields to return. 
-通过条件查询： 
-db.foo.find( { x : 77 } , { name : 1 , x : 1 } ) 
-
-db.foo.find(...).count() 
-db.foo.find(...).limit(n) 根据条件查找数据并返回指定记录数 
-db.foo.find(...).skip(n) 
-db.foo.find(...).sort(...) 查找排序 
-db.foo.findOne([query]) 根据条件查询只查询一条数据 
-db.foo.getDB() get DB object associated with collection  返回表所属的库 
-db.foo.getIndexes() 显示表的所有索引 
-db.foo.group( { key : ..., initial: ..., reduce : ...[, cond: ...] } ) 根据条件分组 
-db.foo.mapReduce( mapFunction , reduceFunction , <optional params> ) 
-db.foo.remove(query) 根据条件删除数据 
-db.foo.renameCollection( newName ) renames the collection  重命名表 
-db.foo.save(obj) 保存数据 
-db.foo.stats()  查看表的状态 
-db.foo.storageSize() - includes free space allocated to this collection 查询分配到表空间大小 
-db.foo.totalIndexSize() - size in bytes of all the indexes 查询所有索引的大小 
-db.foo.totalSize() - storage allocated for all data and indexes 查询表的总大小 
-db.foo.update(query, object[, upsert_bool]) 根据条件更新数据 
-db.foo.validate() - SLOW 验证表的详细信息 
-db.foo.getShardVersion() - only for use with sharding
-
-
 mongo -path
 db.AddUser(username,password) 添加用户
 db.auth(usrename,password) 设置数据库连接验证
@@ -831,65 +963,5 @@ db.linlin.remove({‘age’:{$gte:20}}) delete linlin where age>=20
 db.linlin.remove({‘age’:{$ne:20}}) delete linlin where age!=20
 db.linlin.update({‘name’:'foobar’},{‘$set’:{‘age’:36}}) update linlin set age=36 where name=’foobar’
 db.linlin.update({‘name’:'foobar’},{‘$inc’:{‘age’:3}}) update linlin set age=age+3 where name=’foobar’
-mongodump --help
 ```
-
-
-### pymongo
-```
-import pymongo
-con = pymongo.Connection('localhost', 27017)
-
-mydb = con.mydb # new a database
-mydb.add_user('test', 'test') # add a user
-mydb.authenticate('test', 'test') # check auth
-
-muser = mydb.user # new a table
- 
-muser.save({'id':1, 'name':'test'}) # add a record
-
-muser.insert({'id':2, 'name':'hello'}) # add a record
-muser.find_one() # find a record
-
-muser.find_one({'id':2}) # find a record by query
- 
-muser.create_index('id')
-
-muser.find().sort('id', pymongo.ASCENDING) # DESCENDING
-# muser.drop() delete table
-muser.find({'id':1}).count() # get records number
-
-muser.find({'id':1}).limit(3).skip(2) # start index is 2 limit 3 records
-
-muser.remove({'id':1}) # delet records where id = 1
- 
-muser.update({'id':2}, {'$set':{'name':'haha'}}) # update one recor
-
-```
-
-## python使用mongodb
-```
-pymongo
-
-client = pymongo.MongoClient("127.0.0.1", 27017)
-client = pymongo.MongoClient("mongodb://localhost:27017/")
-mydb = client["douban"]
-mycol = mydb["userinfo"]
-
-x = mycol.find_one()
-
-for x in mycol.find():
-  pass
-
-for x in mycol.find({}, {"_id":0, "name":1, "alexa":1})
-
-for x in mycol.find({}, {"alexa":0})
-
-for x in mycol.find({ "name": { "$gt": "H" } })
-
-for x in mycol.find({ "name": { "$regex": "^R" } })
-
-for x in mycol.find().limit(3)
-```
-
 
