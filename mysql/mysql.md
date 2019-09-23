@@ -11,6 +11,7 @@
 ### Incorrect string value: '\\xE5\\x93\\x81\\xE7\\x89\\x8C...' for column 'name'
 这个问题一般都是字符集的问题
 创建数据库的时候指定字符集：
+create database chin default charset=utf8;
 create database if not exists chf default character set = 'utf8';
 
 在mysql配置文件中指定数据库的字符集
