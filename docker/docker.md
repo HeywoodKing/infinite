@@ -650,7 +650,18 @@ Error response from daemon: You cannot remove a running container bf08b7f2cd897b
 ```
 
 查看docker容器虚拟主机所在的IP
-`docker-machine ip`
+```
+docker-machine ip
+
+docker inspect
+docker inspect <container_id> | grep IPAddress
+docker inspect --format '{{.NetworkSettings.IPAddress}}' <container_id>
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id
+显示所有容器IP
+docker inspect --format='{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+```
+
+
 ```
 docker-machine
 

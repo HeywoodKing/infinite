@@ -1,4 +1,3 @@
-
 # MongoDB
 
 ### 安装
@@ -342,7 +341,7 @@ db.userinfo.updateOne({"name": "abc"}, {$set: {"age": "28"}})
 ```
 db.userinfo.updateMany({"age": {$gt: "10"}}, {$set: {"status": "xyz"}})
 ```
-
+```
 更新字段前缀+本身
 db.userinfo.find({'status':{'$ne': 1}}).forEach(
   function(item){
@@ -386,7 +385,7 @@ db.Goods.find().forEach(
     }
   }
 )
-
+```
 
 删除数据
 3.2版本之前
@@ -965,5 +964,4 @@ db.linlin.remove({‘age’:{$ne:20}}) delete linlin where age!=20
 db.linlin.update({‘name’:'foobar’},{‘$set’:{‘age’:36}}) update linlin set age=36 where name=’foobar’
 db.linlin.update({‘name’:'foobar’},{‘$inc’:{‘age’:3}}) update linlin set age=age+3 where name=’foobar’
 ```
-
 

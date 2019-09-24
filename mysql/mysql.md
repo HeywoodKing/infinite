@@ -1,3 +1,5 @@
+## mysql
+
 1、首先安装mysqld服务器，输入命令：mysqld --install
 2、接下来就是启动服务器了，输入命令：net start mysql
 3、如果第2不不成功，则执行输入命令：mysqld --initialize-insecure
@@ -400,9 +402,6 @@ alter table students drop aa;
 alter table students drop column aa;
 
 alter table students engine=innodb|bdb;
-
-修改列名
-alter table students change column name name1 varchar(200);
 
 <!-- 查看外键 -->
 show create table my_foreign1;
@@ -834,8 +833,3 @@ mysql json
 
 alter table users add id int auto_increment primary key;  #将自增字段设置为primary key
 alter table users AUTO_INCREMENT=10000;
-
-
-
-
-
