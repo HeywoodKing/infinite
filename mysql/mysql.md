@@ -401,6 +401,9 @@ alter table students drop column aa;
 
 alter table students engine=innodb|bdb;
 
+修改列名
+alter table students change column name name1 varchar(200);
+
 <!-- 查看外键 -->
 show create table my_foreign1;
 
@@ -822,6 +825,15 @@ ORDER BY t1.id LIMIT 50;
 ```
 (SELECT floor( RAND() * ((SELECT MAX(id) FROM `table`)-(SELECT MIN(id) FROM `table`)) + (SELECT MIN(id) FROM `table`)))
 ```
+
+<!-- 获取某库某表当前自增id的值 -->
+SELECT auto_increment FROM information_schema.tables where table_schema="db_electron" and table_name="tb_electron";
+
+mysql json
+
+
+alter table users add id int auto_increment primary key;  #将自增字段设置为primary key
+alter table users AUTO_INCREMENT=10000;
 
 
 

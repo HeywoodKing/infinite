@@ -567,4 +567,31 @@ The key's randomart image is:
 
 
 
+Git global setup
+git config --global user.name "flack.chen"
+git config --global user.email "flack.chen@icmofang.com"
+
+Create a new repository
+git clone git@gitlab:icmofang/moli_restapi.git
+cd moli_restapi
+touch README.md
+git add README.md
+git commit -m "add README"
+git push -u origin master
+
+Existing folder
+cd existing_folder
+git init
+git remote add origin git@gitlab:icmofang/moli_restapi.git
+git add .
+git commit -m "Initial commit"
+git push -u origin master
+
+Existing Git repository
+cd existing_repo
+git remote rename origin old-origin
+git remote add origin git@gitlab:icmofang/moli_restapi.git
+git push -u origin --all
+git push -u origin --tags
+
 
