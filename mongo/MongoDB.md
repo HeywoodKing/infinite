@@ -849,8 +849,6 @@ db.deliver_status.stats()
 #查询所有索引的大小 
 
 db.deliver_status.totalIndexSize() 
-
-
 ```
 
 ### pymongo
