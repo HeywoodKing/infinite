@@ -833,3 +833,8 @@ mysql json
 
 alter table users add id int auto_increment primary key;  #将自增字段设置为primary key
 alter table users AUTO_INCREMENT=10000;
+
+
+<!-- 更新分类id -->
+update tb_electron_digikey_category set category_id = (select distinct a.category_id from tb_electron_category_cleaning a where tb_electron_digikey_category.zh_category = a.cname);
+
