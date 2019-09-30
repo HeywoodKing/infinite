@@ -2,7 +2,7 @@
 
 1、首先安装mysqld服务器，输入命令：mysqld --install
 2、接下来就是启动服务器了，输入命令：net start mysql
-3、如果第2不不成功，则执行输入命令：mysqld --initialize-insecure
+3、如果第2步不成功，则执行输入命令：mysqld --initialize-insecure
 完了再次输入：net start mysql
 4、又给我出了个问题:Access denied for user 'root'@'localhost' (using password: YES)
 5、 安装的时候设了密码，为什么不用密码就可以登录
@@ -304,16 +304,18 @@ sqlFilePath : sql脚本的路径。如我将sql脚本放在了D盘，我的sql�
 导出某个数据库：
 
 mysqldump -u root -p dbName > sqlFilePath
+mysqldump -h 172.17.0.1 -u root -p teacher > /home/flack/bak_teacher.sql
 
 导出多个数据库：
 
-mysqldump -u root -p –add-drop-database –databases dbName1 dbName2… > sqlFilePath 
-–add-drop-database ： 该选项表示在创建数据库的时候先执行删除数据库操作 
-–database : 该选项后面跟着要导出的多个数据库，以空格分隔
+mysqldump -h 172.17.0.1 -u root -p --add-drop-database --databases dbName1 dbName2 … > /home/flack/bak.sql 
+--add-drop-database ： 该选项表示在创建数据库的时候先执行删除数据库操作 
+--database : 该选项后面跟着要导出的多个数据库，以空格分隔
 
 导出某个数据库的某个表：
 
-mysqldump -u root -p dbName tableName > sqlFilePath
+mysqldump -h 172.17.0.1 -u root -p dbName tableName > sqlFilePath
+mysqldump -h 172.17.0.1 -u root -p teacher course > /home/flack/bak_course.sql
 
 只导出数据库结构，不带数据：
 
