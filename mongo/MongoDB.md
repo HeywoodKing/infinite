@@ -849,8 +849,6 @@ db.deliver_status.stats()
 #查询所有索引的大小 
 
 db.deliver_status.totalIndexSize() 
-
-
 ```
 
 ### pymongo
@@ -964,4 +962,38 @@ db.linlin.remove({‘age’:{$ne:20}}) delete linlin where age!=20
 db.linlin.update({‘name’:'foobar’},{‘$set’:{‘age’:36}}) update linlin set age=36 where name=’foobar’
 db.linlin.update({‘name’:'foobar’},{‘$inc’:{‘age’:3}}) update linlin set age=age+3 where name=’foobar’
 ```
+
+```
+eg:
+db.deliveries.aggregate([
+  { $project : { city_state : { $split: ["$city", ", "] }, qty : 1 } },
+  { $unwind : "$city_state" },
+  { $match : { city_state : /[A-Z]{2}/ } },
+  { $group : { _id: { "state" : "$city_state" }, total_qty : { "$sum" : "$qty" } } },
+  { $sort : { total_qty : -1 } }
+]);
+
+
+{ "_id" : 1, "city" : "Berkeley, CA", "qty" : 648 }
+{ "_id" : 2, "city" : "Bend, OR", "qty" : 491 }
+{ "_id" : 3, "city" : "Kensington, CA", "qty" : 233 }
+{ "_id" : 4, "city" : "Eugene, OR", "qty" : 842 }
+{ "_id" : 5, "city" : "Reno, NV", "qty" : 655 }
+{ "_id" : 6, "city" : "Portland, OR", "qty" : 408 }
+{ "_id" : 7, "city" : "Sacramento, CA", "qty" : 574 }
+
+db.digikey_param_zh.aggregate([
+  { $project : { city_state : { $split: ["$city", ", "] }, qty : 1 } },
+  { $unwind : "$city_state" },
+  { $match : { city_state : /[A-Z]{2}/ } },
+  { $group : { _id: { "state" : "$city_state" }, total_qty : { "$sum" : "$qty" } } },
+  { $sort : { total_qty : -1 } }
+]);
+
+
+{ "_id" : { "state" : "OR" }, "total_qty" : 1741 }
+{ "_id" : { "state" : "CA" }, "total_qty" : 1455 }
+{ "_id" : { "state" : "NV" }, "total_qty" : 655 }
+```
+
 
