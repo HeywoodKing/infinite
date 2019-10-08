@@ -30,6 +30,7 @@ show tables;
 即可查看到用户和密码
 ```
 select host,user,password from mysql.user;
+select * from mysql.user;
 ```
 修改密码
 ```
@@ -80,10 +81,18 @@ rename table students to|as student;
 alter table students add is_delete bit default;
 alter table students add column aa bool default true;
 ```
+增加多列字段
+```
+alter table students add column(aa bool default true, bb varchar(256) default '');
+```
 修改列字段
 ```
 alter table students modify id int auto_increment unique;
 alter table students modify column id int auto_increment unique;
+```
+修改多列字段
+```
+alter table students modify column(id int auto_increment unique,name varchar(100) not null);
 ```
 删除列字段
 ```
@@ -127,6 +136,7 @@ select * from subjects where id between 3 and 5;
 select * from students where id is null;
 select * from students where id is not null;
 ```
+统计查询
 ```
 select count(*),sum(id),max(id),min(id),floor(avg(id)),ceil(avg(id)) from subjects;
 select * from subjects where id=(select min(id) from subjects);
@@ -144,6 +154,49 @@ select id,name,gender,birthday from students where gender in
 select * from students order by birthday asc,gender desc;
 ```
 
+查看表的索引
+```
+show index from students;
+show view from students;
+```
+创建索引
+```
+create index idx_students_id on students(id, name(11), gender);
+```
+删除索引
+```
+drop index idx_students_id on students;
+```
+
+开启运行时间检测
+```
+set profiling=1;
+```
+查看执行时间
+```
+show profiles;
+```
+修改表users自动序列值
+```
+alter table users AUTO_INCREMENT=10000;
+```
+
+随机数
+```
+(SELECT floor( RAND() * ((SELECT MAX(id) FROM `table`)-(SELECT MIN(id) FROM `table`)) + (SELECT MIN(id) FROM `table`)))
+```
+
+获取某库某表当前自增id的值
+```
+SELECT auto_increment FROM information_schema.tables where table_schema="db_electron" and table_name="tb_electron";
+```
+
+更新分类id
+```
+update tb_electron_digikey_category set category_id = (select distinct a.category_id from tb_electron_category_cleaning a where tb_electron_digikey_category.zh_category = a.cname);
+```
+
+```
 <!-- 取5条记录 -->
 select * from students limit 5;
 +----+-----------+--------+---------------------+--------+-----------+
@@ -273,46 +326,8 @@ begin;
 update region set name='北京' where id=1;
 commit;
 --rollbck;
-
-查看表的索引
-```
-show index from students;
-show view from students;
-```
-创建索引
-```
-create index idx_students_id on students(id, name(11), gender);
-```
-删除索引
-```
-drop index idx_students_id on students;
 ```
 
-开启运行时间检测
-```
-set profiling=1;
-```
-查看执行时间
-```
-show profiles;
-```
-修改表users自动序列值
-```
-alter table users AUTO_INCREMENT=10000;
-```
-
-随机数
-```
-(SELECT floor( RAND() * ((SELECT MAX(id) FROM `table`)-(SELECT MIN(id) FROM `table`)) + (SELECT MIN(id) FROM `table`)))
-```
-
-获取某库某表当前自增id的值
-```
-SELECT auto_increment FROM information_schema.tables where table_schema="db_electron" and table_name="tb_electron";
-```
-
-更新分类id
-update tb_electron_digikey_category set category_id = (select distinct a.category_id from tb_electron_category_cleaning a where tb_electron_digikey_category.zh_category = a.cname);
 
 数学函数
 ```
@@ -325,12 +340,13 @@ select ceiling(2/3);
 
 日期时间查询，转换等函数
 ```
-date_format(date,format), time_format(time,format) 能够把一个日期/时间转换成各种各样的字符串格式。它是 str_to_date(str,format) 函数的 一个逆转换
+date_format(date,format), time_format(time,format) 能够把一个日期/时间转换成各种各样的字符串格式。
+它是 str_to_date(str,format) 函数的 一个逆转换
 
 select now(),sleet(3),timestamp();
-select date_format('2008-08-08 20:00:05','%Y-%m-%d %H:%i:%s')
-select time_format('2008-08-08 20:00:05','%Y-%m-%d %H:%i:%s')
-select str_to_date('2008-08-08 20:00:05','%Y-%m-%d %H:%i:%s')
+select date_format('2008-08-08 20:00:05','%Y-%m-%d %H:%i:%s');
+select time_format('2008-08-08 20:00:05','%Y-%m-%d %H:%i:%s');
+select str_to_date('2008-08-08 20:00:05','%Y-%m-%d %H:%i:%s');
 select str_to_date('08/09/2008', '%m/%d/%Y'); -- 2008-08-09
 select str_to_date('08/09/08' , '%m/%d/%y'); -- 2008-08-09
 select str_to_date('08.09.2008', '%m.%d.%Y'); -- 2008-08-09
@@ -346,7 +362,6 @@ select time_to_sec('01:00:05'); -- 3605
 select sec_to_time(3605); -- '01:00:05'
 
 拼凑日期、时间函数：makdedate(year,dayofyear), maketime(hour,minute,second)
-
 select makedate(2001,31); -- '2001-01-31'
 select makedate(2001,32); -- '2001-02-01'
 select maketime(12,15,30); -- '12:15:30'
