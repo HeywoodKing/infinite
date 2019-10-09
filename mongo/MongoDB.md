@@ -3,6 +3,8 @@
 ### 安装
 管理员模式进入cmd
 ```
+mongod --dbpath "D:\Program Files\MongoDB\Server\4.0\data" --logpath "D:\Program Files\MongoDB\Server\4.0\log\mongodb.log" --serviceName "mongodb" --serviceDisplayName "mongodb" --install
+
 C:\Windows\system32>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install -serviceName "MongoDB"
 或
 D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install --serviceName "MongoDB"
@@ -19,6 +21,11 @@ D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB
 --serviceName    　　　　  指定服务名称
 --serviceDisplayName	　　指定服务名称，有多个mongodb服务时执行。
 --install	　　　　　　　　   指定作为一个Windows服务安装。
+```
+
+### 配置远程连接
+```
+mongod --config "D:\Program Files\MongoDB\Server\4.0\bin\mongod.cfg" --install
 ```
 
 ### 连接

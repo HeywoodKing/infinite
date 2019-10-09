@@ -474,6 +474,10 @@ ssh-keygen -t rsa -C "opencoding@hotmail.com"
 如果你已经有了一套名为 id_rsa 的公秘钥，将要生成另外一个公钥，比如 aysee ，你也可以使用任何你喜欢的名字。
 1、生成一个新的自定义名称的公钥和私钥：
 ssh-keygen -t rsa -C "YOUR_EMAIL@YOUREMAIL.COM" -f ~/.ssh/aysee
+```
+eg:
+$ ssh-keygen -t rsa -C "opencoding@hotmail.com" -f D:/Flack/Work/.ssh/aysee
+```
 执行完成后，会在 ~/.ssh/目录下生成一个 aysee 和 aysee.pub 文件。
 2、在 SSH 用户配置文件 ~/.ssh/config 中指定对应服务所使用的公秘钥名称，如果没有 config 文件的话就新建一个，并输入以下内容：
 Host github.com www.github.com
@@ -486,24 +490,20 @@ Hi USERNAME! You've successfully authenticated, but github does not provide shel
 
 多用户时出现权限问题的原因：
 github使用SSH与客户端连接。如果是单用户（first），生成密钥对后，将公钥保存至 GitHub ，每次连接时SSH客户端发送本地私钥（默认~/.ssh/id_rsa）到服务端验证。单用户情况下，连接的服务器上保存的公钥和发送的私钥自然是配对的。但是如果是 多用户 （first，second），我们在连接到second的帐号时，second保存的是自己的公钥，但是SSH客户端依然发送默认私钥，即first的私钥，那么这个验证自然无法通过。
-
 解决ssh权限问题（）:
 通常一台电脑生成一个ssh不会有这个问题，当一台电脑生成多个ssh的时候，就可能遇到这个问题，解决步骤如下：
 1、查看系统ssh-key代理,执行如下命令
 ssh-add -l
 以上命令如果输出  The agent has no identities. 则表示没有代理。如果系统有代理，可以执行下面的命令清除代理:
 ssh-add -D
-
 2、然后依次将不同的ssh添加代理，执行命令如下：
 ssh-add ~/.ssh/id_rsa
 ssh-add ~/.ssh/aysee
-
 你会分别得到如下提示：
 2048 8e:71:ad:88:78:80:b2:d9:e1:2d:1d:e4:be:6b:db:8e /Users/aysee/.ssh/id_rsa (RSA)
 和
 2048 8e:71:ad:88:78:80:b2:d9:e1:2d:1d:e4:be:6b:db:8e /Users/aysee/.ssh/id_rsa (RSA)
 2048 a7:f4:0d:f1:b1:76:0b:bf:ed:9f:53:8c:3f:4c:f4:d6 /Users/aysee/.ssh/aysee (RSA)
-
 如果使用 ssh-add ~/.ssh/id_rsa的时候报如下错误，则需要先运行一下 ssh-agent bash 命令后再执行 ssh-add ...等命令
 Could not open a connection to your authentication agent.
 

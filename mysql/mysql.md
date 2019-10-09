@@ -478,7 +478,12 @@ select timestampadd(hour, -8, '2008-08-08 12:00:00'); -- 2008-08-08 04:00:00
 ```
 
 ## 进阶操作
+```
+排序
+将pony表中的d 进行排序，可d的定义为varchar，可以这样解决
+select * from pony order by (d+0)
 
+```
 
 ### mysql json
 
@@ -578,6 +583,28 @@ create view v_clouse_lg as
 select * from students
 inner join
 select * from subjects
+```
+
+
+#### 函数
+```
+CAST,CONVERT
+CAST(xxx AS 类型),CONVERT(xxx,类型)，类型必须用下列的类型：
+可用的类型：　   
+  二进制,同带binary前缀的效果 : BINARY    
+  字符型,可带参数 : CHAR()     
+  日期 : DATE     
+  时间: TIME     
+  日期时间型 : DATETIME     
+  浮点数 : DECIMAL      
+  整数 : SIGNED     
+  无符号整数 : UNSIGNED
+
+select CAST(category_id as UNSIGNED) from tb_electron_category;
+select CONVERT(category_id, UNSIGNED) from tb_electron_category;
+
+
+字符集转换: CONVERT(xxx  USING   gb2312)
 ```
 
 
@@ -711,6 +738,10 @@ You can turn off this feature to get a quicker startup with -A
 show processlist;
 kill 180;
 然后既可以了
+```
+
+```
+在进行ifnull处理时，比如 ifnull(a/b,'0') 这样就会导致 a/b成了字符串，因此需要把'0'改成0，即可解决此困扰
 ```
 
 
