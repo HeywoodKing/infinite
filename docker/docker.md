@@ -649,7 +649,7 @@ docker rm wizardly_chandrasekhar
 Error response from daemon: You cannot remove a running container bf08b7f2cd897b5964943134aa6d373e355c286db9b9885b1f60b6e8f82b2b85. Stop the container before attempting removal or force remove
 ```
 
-查看docker容器虚拟主机所在的IP
+查看docker容器虚拟主机所在的IP（查看IP）
 ```
 docker-machine ip
 

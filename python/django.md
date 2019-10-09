@@ -1,38 +1,38 @@
-´´½¨¹¤³Ì
+åˆ›å»ºå·¥ç¨‹
 django-admin startproject projectname
 
-´´½¨Ó¦ÓÃ
+åˆ›å»ºåº”ç”¨
 django-admin startapp appname
-»òÕß
+æˆ–è€…
 python manage.py startapp appname
 
-Æô¶¯¿ª·¢Ó¦ÓÃ·şÎñÆ÷
+å¯åŠ¨å¼€å‘åº”ç”¨æœåŠ¡å™¨
 `python manage.py runserver 192.168.1.100:9090`
 
-nohupÖ¸Ã÷·şÎñºóÌ¨ÔËĞĞ£¬0.0.0.0Ö¸Ã÷ÏîÄ¿ÅÜÔÚ±¾µØµÄ127.0.0.1ÉÏ£¬8000Ö¸Ã÷¶Ë¿Ú
+nohupæŒ‡æ˜æœåŠ¡åå°è¿è¡Œï¼Œ0.0.0.0æŒ‡æ˜é¡¹ç›®è·‘åœ¨æœ¬åœ°çš„127.0.0.1ä¸Šï¼Œ8000æŒ‡æ˜ç«¯å£
 `nohup python manage.py runserver 0.0.0.0:8000`
 
-Éú³ÉÊı¾İ¿âÇ¨ÒÆ½Å±¾
+ç”Ÿæˆæ•°æ®åº“è¿ç§»è„šæœ¬
 python manage.py makemigrations [appname]
 
-Éú³É±í£¨ÕâÒ»²½Ê×ÏÈÒªÈ·±£ÄÜÁ¬½Óµ½Êı¾İ¿â£©
+ç”Ÿæˆè¡¨ï¼ˆè¿™ä¸€æ­¥é¦–å…ˆè¦ç¡®ä¿èƒ½è¿æ¥åˆ°æ•°æ®åº“ï¼‰
 python manage.py migrate [appname]
 
 
-´´½¨³¬¼¶ÓÃ»§
-python manage.py createsuperuser »Ø³µ
-ÊäÈë³¬¼¶ÓÃ»§ÃûºÍÃÜÂë
+åˆ›å»ºè¶…çº§ç”¨æˆ·
+python manage.py createsuperuser å›è½¦
+è¾“å…¥è¶…çº§ç”¨æˆ·åå’Œå¯†ç 
 
 
-¿Ó1£º
-±¨´í£ºdjango Table 'django_session' doesn't exist
+å‘1ï¼š
+æŠ¥é”™ï¼šdjango Table 'django_session' doesn't exist
 
-Éú³ÉÊı¾İ¿âÇ¨ÒÆ½Å±¾
+ç”Ÿæˆæ•°æ®åº“è¿ç§»è„šæœ¬
 python manage.py makemigrations [appname]
-Éú³É±í£¨ÕâÒ»²½Ê×ÏÈÒªÈ·±£ÄÜÁ¬½Óµ½Êı¾İ¿â£©
+ç”Ÿæˆè¡¨ï¼ˆè¿™ä¸€æ­¥é¦–å…ˆè¦ç¡®ä¿èƒ½è¿æ¥åˆ°æ•°æ®åº“ï¼‰
 python manage.py migrate [appname]
-Èç¹ûÊäÈëÁËappnameÔòÉÙÁËÒÔÏÂÈı¸ö±í
-Ö´ĞĞ½á¹ûÈçÏÂ£º
+å¦‚æœè¾“å…¥äº†appnameåˆ™å°‘äº†ä»¥ä¸‹ä¸‰ä¸ªè¡¨
+æ‰§è¡Œç»“æœå¦‚ä¸‹ï¼š
 mysql> show tables;
 +----------------------------------+
 | Tables_in_chf                    |
@@ -41,8 +41,8 @@ mysql> show tables;
 | django_content_type              |
 | django_session                   |
 +----------------------------------+
-Èç¹û²»ÊäÈëappnameÔò´´½¨ÁËÒÔÏÂÈı¸ö±í
-Ö´ĞĞ½á¹ûÈçÏÂ£º
+å¦‚æœä¸è¾“å…¥appnameåˆ™åˆ›å»ºäº†ä»¥ä¸‹ä¸‰ä¸ªè¡¨
+æ‰§è¡Œç»“æœå¦‚ä¸‹ï¼š
 mysql> show tables;
 +----------------------------------+
 | Tables_in_chf                    |
@@ -56,108 +56,191 @@ mysql> show tables;
 
 
 
-Django template ¹ıÂËÆ÷
+Django template è¿‡æ»¤å™¨
 
-Ò»¡¢ĞÎÊ½£ºĞ¡Ğ´
+ä¸€ã€å½¢å¼ï¼šå°å†™
 {{ name | lower }}
 
-¶ş¡¢¹ıÂËÆ÷ÊÇ¿ÉÒÔÇ¶Ì×µÄ£¬×Ö·û´®¾­¹ıÈı¸ö¹ıÂËÆ÷£¬µÚÒ»¸ö¹ıÂËÆ÷×ª»»ÎªĞ¡Ğ´£¬µÚ¶ş¸ö¹ıÂËÆ÷Êä³öÊ××ÖÄ¸£¬µÚÈı¸ö¹ıÂËÆ÷½«Ê××ÖÄ¸×ª»»³É´óĞ´
+äºŒã€è¿‡æ»¤å™¨æ˜¯å¯ä»¥åµŒå¥—çš„ï¼Œå­—ç¬¦ä¸²ç»è¿‡ä¸‰ä¸ªè¿‡æ»¤å™¨ï¼Œç¬¬ä¸€ä¸ªè¿‡æ»¤å™¨è½¬æ¢ä¸ºå°å†™ï¼Œç¬¬äºŒä¸ªè¿‡æ»¤å™¨è¾“å‡ºé¦–å­—æ¯ï¼Œç¬¬ä¸‰ä¸ªè¿‡æ»¤å™¨å°†é¦–å­—æ¯è½¬æ¢æˆå¤§å†™
 
-±êÇ©
+æ ‡ç­¾
 {{ str|lower|first|upper }} 
 
-Èı¡¢¹ıÂËÆ÷µÄ²ÎÊı
-ÏÔÊ¾Ç°30¸ö×Ö
+ä¸‰ã€è¿‡æ»¤å™¨çš„å‚æ•°
+æ˜¾ç¤ºå‰30ä¸ªå­—
 {{ bio | truncatewords:"30" }}
-¸ñÊ½»¯
+æ ¼å¼åŒ–
 {{ pub_date | date:"F j, Y" }}
 
-¹ıÂËÆ÷ÁĞ±í
-{{ 123|add:"5" }} ¸øvalue¼ÓÉÏÒ»¸öÊıÖµ
-{{ "AB'CD"|addslashes }} µ¥ÒıºÅ¼ÓÉÏ×ªÒåºÅ£¬Ò»°ãÓÃÓÚÊä³öµ½javascriptÖĞ
-{{ "abcd"|capfirst }} µÚÒ»¸ö×ÖÄ¸´óĞ´
-{{ "abcd"|center:"50" }} Êä³öÖ¸¶¨³¤¶ÈµÄ×Ö·û´®£¬²¢°ÑÖµ¶ÔÖĞ
-{{ "123spam456spam789"|cut:"spam" }} ²éÕÒÉ¾³ıÖ¸¶¨×Ö·û´®
-{{ value|date:"F j, Y" }} ¸ñÊ½»¯ÈÕÆÚ
-{{ value|default:"(N/A)" }} Öµ²»´æÔÚ£¬Ê¹ÓÃÖ¸¶¨Öµ
-{{ value|default_if_none:"(N/A)" }} ÖµÊÇNone£¬Ê¹ÓÃÖ¸¶¨Öµ
-{{ ÁĞ±í±äÁ¿|dictsort:"Êı×Ö" }} ÅÅĞò´ÓĞ¡µ½´ó
-{{ ÁĞ±í±äÁ¿|dictsortreversed:"Êı×Ö" }} ÅÅĞò´Ó´óµ½Ğ¡
-{% if 92|pisibleby:"2" %} ÅĞ¶ÏÊÇ·ñÕû³ıÖ¸¶¨Êı×Ö
-{{ string|escape }} ×ª»»ÎªhtmlÊµÌå
-{{ 21984124|filesizeformat }} ÒÔ1024Îª»ùÊı£¬¼ÆËã×î´óÖµ£¬±£Áô1Î»Ğ¡Êı£¬Ôö¼Ó¿É¶ÁĞÔ
-{{ list|first }} ·µ»ØÁĞ±íµÚÒ»¸öÔªËØ
-{{ "ik23hr&jqwh"|fix_ampersands }} &×ªÎª&
-{{ 13.414121241|floatformat }} ±£Áô1Î»Ğ¡Êı£¬¿ÉÎª¸ºÊı£¬¼¸ÖÖĞÎÊ½
-{{ 13.414121241|floatformat:"2" }} ±£Áô2Î»Ğ¡Êı
-{{ 23456 |get_digit:"1" }} ´Ó¸öÎ»Êı¿ªÊ¼½ØÈ¡Ö¸¶¨Î»ÖÃµÄ1¸öÊı×Ö
-{{ list|join:", " }} ÓÃÖ¸¶¨·Ö¸ô·ûÁ¬½ÓÁĞ±í
-{{ list|length }} ·µ»ØÁĞ±í¸öÊı
-{% if ÁĞ±í|length_is:"3" %} ÁĞ±í¸öÊıÊÇ·ñÖ¸¶¨ÊıÖµ
+è¿‡æ»¤å™¨åˆ—è¡¨
+{{ 123|add:"5" }} ç»™valueåŠ ä¸Šä¸€ä¸ªæ•°å€¼
+{{ "AB'CD"|addslashes }} å•å¼•å·åŠ ä¸Šè½¬ä¹‰å·ï¼Œä¸€èˆ¬ç”¨äºè¾“å‡ºåˆ°javascriptä¸­
+{{ "abcd"|capfirst }} ç¬¬ä¸€ä¸ªå­—æ¯å¤§å†™
+{{ "abcd"|center:"50" }} è¾“å‡ºæŒ‡å®šé•¿åº¦çš„å­—ç¬¦ä¸²ï¼Œå¹¶æŠŠå€¼å¯¹ä¸­
+{{ "123spam456spam789"|cut:"spam" }} æŸ¥æ‰¾åˆ é™¤æŒ‡å®šå­—ç¬¦ä¸²
+{{ value|date:"F j, Y" }} æ ¼å¼åŒ–æ—¥æœŸ
+{{ value|default:"(N/A)" }} å€¼ä¸å­˜åœ¨ï¼Œä½¿ç”¨æŒ‡å®šå€¼
+{{ value|default_if_none:"(N/A)" }} å€¼æ˜¯Noneï¼Œä½¿ç”¨æŒ‡å®šå€¼
+{{ åˆ—è¡¨å˜é‡|dictsort:"æ•°å­—" }} æ’åºä»å°åˆ°å¤§
+{{ åˆ—è¡¨å˜é‡|dictsortreversed:"æ•°å­—" }} æ’åºä»å¤§åˆ°å°
+{% if 92|pisibleby:"2" %} åˆ¤æ–­æ˜¯å¦æ•´é™¤æŒ‡å®šæ•°å­—
+{{ string|escape }} è½¬æ¢ä¸ºhtmlå®ä½“
+{{ 21984124|filesizeformat }} ä»¥1024ä¸ºåŸºæ•°ï¼Œè®¡ç®—æœ€å¤§å€¼ï¼Œä¿ç•™1ä½å°æ•°ï¼Œå¢åŠ å¯è¯»æ€§
+{{ list|first }} è¿”å›åˆ—è¡¨ç¬¬ä¸€ä¸ªå…ƒç´ 
+{{ "ik23hr&jqwh"|fix_ampersands }} &è½¬ä¸º&
+{{ 13.414121241|floatformat }} ä¿ç•™1ä½å°æ•°ï¼Œå¯ä¸ºè´Ÿæ•°ï¼Œå‡ ç§å½¢å¼
+{{ 13.414121241|floatformat:"2" }} ä¿ç•™2ä½å°æ•°
+{{ 23456 |get_digit:"1" }} ä»ä¸ªä½æ•°å¼€å§‹æˆªå–æŒ‡å®šä½ç½®çš„1ä¸ªæ•°å­—
+{{ list|join:", " }} ç”¨æŒ‡å®šåˆ†éš”ç¬¦è¿æ¥åˆ—è¡¨
+{{ list|length }} è¿”å›åˆ—è¡¨ä¸ªæ•°
+{% if åˆ—è¡¨|length_is:"3" %} åˆ—è¡¨ä¸ªæ•°æ˜¯å¦æŒ‡å®šæ•°å€¼
 
-{{ "ABCD"|linebreaks }} ÓÃĞÂĞĞÓÃ¡¢
-±ê¼Ç°ü¹ü
-{{ "ABCD"|linebreaksbr }} ÓÃĞÂĞĞÓÃ
-±ê¼Ç°ü¹ü
+{{ "ABCD"|linebreaks }} ç”¨æ–°è¡Œç”¨ã€
+æ ‡è®°åŒ…è£¹
+{{ "ABCD"|linebreaksbr }} ç”¨æ–°è¡Œç”¨
+æ ‡è®°åŒ…è£¹
 
-{{ ±äÁ¿|linenumbers }} Îª±äÁ¿ÖĞÃ¿Ò»ĞĞ¼ÓÉÏĞĞºÅ
-{{ "abcd"|ljust:"50" }} °Ñ×Ö·û´®ÔÚÖ¸¶¨¿í¶ÈÖĞ¶Ô×ó£¬ÆäËüÓÃ¿Õ¸ñÌî³ä
-{{ "ABCD"|lower }} Ğ¡Ğ´
-{% for i in "1abc1"|make_list %}ABCDE,{% endfor %} °Ñ×Ö·û´®»òÊı×ÖµÄ×Ö·û¸öÊı×÷ÎªÒ»¸öÁĞ±í
-{{ "abcdefghijklmnopqrstuvwxyz"|phone2numeric }} °Ñ×Ö·û×ªÎª¿ÉÒÔ¶ÔÓ¦µÄÊı×Ö£¿£¿
-{{ ÁĞ±í»òÊı×Ö|pluralize }} µ¥´ÊµÄ¸´ÊıĞÎÊ½£¬ÈçÁĞ±í×Ö·û´®¸öÊı´óÓÚ1£¬·µ»Øs£¬·ñÔò·µ»Ø¿Õ´®
-{{ ÁĞ±í»òÊı×Ö|pluralize:"es" }} Ö¸¶¨es
-{{ ÁĞ±í»òÊı×Ö|pluralize:"y,ies" }} Ö¸¶¨iesÌæ»»Îªy
-{{ object|pprint }} ÏÔÊ¾Ò»¸ö¶ÔÏóµÄÖµ
-{{ ÁĞ±í|random }} ·µ»ØÁĞ±íµÄËæ»úÒ»Ïî
-{{ string|removetags:"br p p" }} É¾³ı×Ö·û´®ÖĞÖ¸¶¨html±ê¼Ç
-{{ string|rjust:"50" }} °Ñ×Ö·û´®ÔÚÖ¸¶¨¿í¶ÈÖĞ¶ÔÓÒ£¬ÆäËüÓÃ¿Õ¸ñÌî³ä
-{{ ÁĞ±í|slice:":2" }} ÇĞÆ¬
-{{ string|slugify }} ×Ö·û´®ÖĞÁôÏÂ¼õºÅºÍÏÂ»®Ïß£¬ÆäËü·ûºÅÉ¾³ı£¬¿Õ¸ñÓÃ¼õºÅÌæ»»
-{{ 3|stringformat:"02i" }} ×Ö·û´®¸ñÊ½£¬Ê¹ÓÃPythonµÄ×Ö·û´®¸ñÊ½Óï·¨
-{{ "EABCD"|striptags }} °şÈ¥[X]HTMLÓï·¨±ê¼Ç
-{{ Ê±¼ä±äÁ¿|time:"P" }} ÈÕÆÚµÄÊ±¼ä²¿·Ö¸ñÊ½
-{{ datetime|timesince }} ¸ø¶¨ÈÕÆÚµ½ÏÖÔÚ¹ıÈ¥ÁË¶àÉÙÊ±¼ä
-{{ datetime|timesince:"other_datetime" }} Á½ÈÕÆÚ¼ä¹ıÈ¥ÁË¶àÉÙÊ±¼ä
-{{ datetime|timeuntil }} ¸ø¶¨ÈÕÆÚµ½ÏÖÔÚ¹ıÈ¥ÁË¶àÉÙÊ±¼ä£¬ÓëÉÏÃæµÄÇø±ğÔÚÓÚ2ÈÕÆÚµÄÇ°ºóÎ»ÖÃ¡£
-{{ datetime|timeuntil:"other_datetime" }} Á½ÈÕÆÚ¼ä¹ıÈ¥ÁË¶àÉÙÊ±¼ä
-{{ "abdsadf"|title }} Ê××ÖÄ¸´óĞ´
-{{ "A B C D E F"|truncatewords:"3" }} ½ØÈ¡Ö¸¶¨¸öÊıµÄµ¥´Ê
-{{ "111221"|truncatewords_html:"2" }} ½ØÈ¡Ö¸¶¨¸öÊıµÄhtml±ê¼Ç£¬²¢²¹ÍêÕû
-{{ list|unordered_list }}¶àÖØÇ¶Ì×ÁĞ±íÕ¹ÏÖÎªhtmlµÄÎŞĞòÁĞ±í
-{{ string|upper }} È«²¿´óĞ´
+{{ å˜é‡|linenumbers }} ä¸ºå˜é‡ä¸­æ¯ä¸€è¡ŒåŠ ä¸Šè¡Œå·
+{{ "abcd"|ljust:"50" }} æŠŠå­—ç¬¦ä¸²åœ¨æŒ‡å®šå®½åº¦ä¸­å¯¹å·¦ï¼Œå…¶å®ƒç”¨ç©ºæ ¼å¡«å……
+{{ "ABCD"|lower }} å°å†™
+{% for i in "1abc1"|make_list %}ABCDE,{% endfor %} æŠŠå­—ç¬¦ä¸²æˆ–æ•°å­—çš„å­—ç¬¦ä¸ªæ•°ä½œä¸ºä¸€ä¸ªåˆ—è¡¨
+{{ "abcdefghijklmnopqrstuvwxyz"|phone2numeric }} æŠŠå­—ç¬¦è½¬ä¸ºå¯ä»¥å¯¹åº”çš„æ•°å­—ï¼Ÿï¼Ÿ
+{{ åˆ—è¡¨æˆ–æ•°å­—|pluralize }} å•è¯çš„å¤æ•°å½¢å¼ï¼Œå¦‚åˆ—è¡¨å­—ç¬¦ä¸²ä¸ªæ•°å¤§äº1ï¼Œè¿”å›sï¼Œå¦åˆ™è¿”å›ç©ºä¸²
+{{ åˆ—è¡¨æˆ–æ•°å­—|pluralize:"es" }} æŒ‡å®šes
+{{ åˆ—è¡¨æˆ–æ•°å­—|pluralize:"y,ies" }} æŒ‡å®šiesæ›¿æ¢ä¸ºy
+{{ object|pprint }} æ˜¾ç¤ºä¸€ä¸ªå¯¹è±¡çš„å€¼
+{{ åˆ—è¡¨|random }} è¿”å›åˆ—è¡¨çš„éšæœºä¸€é¡¹
+{{ string|removetags:"br p p" }} åˆ é™¤å­—ç¬¦ä¸²ä¸­æŒ‡å®šhtmlæ ‡è®°
+{{ string|rjust:"50" }} æŠŠå­—ç¬¦ä¸²åœ¨æŒ‡å®šå®½åº¦ä¸­å¯¹å³ï¼Œå…¶å®ƒç”¨ç©ºæ ¼å¡«å……
+{{ åˆ—è¡¨|slice:":2" }} åˆ‡ç‰‡
+{{ string|slugify }} å­—ç¬¦ä¸²ä¸­ç•™ä¸‹å‡å·å’Œä¸‹åˆ’çº¿ï¼Œå…¶å®ƒç¬¦å·åˆ é™¤ï¼Œç©ºæ ¼ç”¨å‡å·æ›¿æ¢
+{{ 3|stringformat:"02i" }} å­—ç¬¦ä¸²æ ¼å¼ï¼Œä½¿ç”¨Pythonçš„å­—ç¬¦ä¸²æ ¼å¼è¯­æ³•
+{{ "EABCD"|striptags }} å‰¥å»[X]HTMLè¯­æ³•æ ‡è®°
+{{ æ—¶é—´å˜é‡|time:"P" }} æ—¥æœŸçš„æ—¶é—´éƒ¨åˆ†æ ¼å¼
+{{ datetime|timesince }} ç»™å®šæ—¥æœŸåˆ°ç°åœ¨è¿‡å»äº†å¤šå°‘æ—¶é—´
+{{ datetime|timesince:"other_datetime" }} ä¸¤æ—¥æœŸé—´è¿‡å»äº†å¤šå°‘æ—¶é—´
+{{ datetime|timeuntil }} ç»™å®šæ—¥æœŸåˆ°ç°åœ¨è¿‡å»äº†å¤šå°‘æ—¶é—´ï¼Œä¸ä¸Šé¢çš„åŒºåˆ«åœ¨äº2æ—¥æœŸçš„å‰åä½ç½®ã€‚
+{{ datetime|timeuntil:"other_datetime" }} ä¸¤æ—¥æœŸé—´è¿‡å»äº†å¤šå°‘æ—¶é—´
+{{ "abdsadf"|title }} é¦–å­—æ¯å¤§å†™
+{{ "A B C D E F"|truncatewords:"3" }} æˆªå–æŒ‡å®šä¸ªæ•°çš„å•è¯
+{{ "111221"|truncatewords_html:"2" }} æˆªå–æŒ‡å®šä¸ªæ•°çš„htmlæ ‡è®°ï¼Œå¹¶è¡¥å®Œæ•´
+{{ list|unordered_list }}å¤šé‡åµŒå¥—åˆ—è¡¨å±•ç°ä¸ºhtmlçš„æ— åºåˆ—è¡¨
+{{ string|upper }} å…¨éƒ¨å¤§å†™
 
-linkage url±àÂë
-{{ string|urlize }} ½«URLsÓÉ´¿ÎÄ±¾±äÎª¿Éµã»÷µÄÁ´½Ó¡£ 
-{{ string|urlizetrunc:"30" }} Í¬ÉÏ£¬¶à¸ö½ØÈ¡×Ö·ûÊı¡£ 
-{{ "B C D E F"|wordcount }} µ¥´ÊÊı
-{{ "a b c d e f g h i j k"|wordwrap:"5" }} Ã¿Ö¸¶¨ÊıÁ¿µÄ×Ö·û¾Í²åÈë»Ø³µ·û
-{{ boolean|yesno:"Yes,No,Perhaps" }} ¶ÔÈıÖÖÖµµÄ·µ»Ø×Ö·û´®£¬¶ÔÓ¦ÊÇ ·Ç¿Õ,¿Õ,None¡£
+linkage urlç¼–ç 
+{{ string|urlize }} å°†URLsç”±çº¯æ–‡æœ¬å˜ä¸ºå¯ç‚¹å‡»çš„é“¾æ¥ã€‚ 
+{{ string|urlizetrunc:"30" }} åŒä¸Šï¼Œå¤šä¸ªæˆªå–å­—ç¬¦æ•°ã€‚ 
+{{ "B C D E F"|wordcount }} å•è¯æ•°
+{{ "a b c d e f g h i j k"|wordwrap:"5" }} æ¯æŒ‡å®šæ•°é‡çš„å­—ç¬¦å°±æ’å…¥å›è½¦ç¬¦
+{{ boolean|yesno:"Yes,No,Perhaps" }} å¯¹ä¸‰ç§å€¼çš„è¿”å›å­—ç¬¦ä¸²ï¼Œå¯¹åº”æ˜¯ éç©º,ç©º,Noneã€‚
 
 
 
-¸üĞÂpip
+æ›´æ–°pip
 python -m pip install --upgrade pip
 
-¹ú¼Ê»¯( Make sure you have GNU gettext tools 0.15 or newer installed.)
-WindowsÏÂµÄgettext(linuxÏÂ¿ÉÄÜ²»ÓÃ°²×°)
-´Óhttp://sourceforge.net/projects/gettextÏÂÔØÒÔÏÂzipÎÄ¼ş
+å›½é™…åŒ–( Make sure you have GNU gettext tools 0.15 or newer installed.)
+Windowsä¸‹çš„gettext(linuxä¸‹å¯èƒ½ä¸ç”¨å®‰è£…)
+ä»http://sourceforge.net/projects/gettextä¸‹è½½ä»¥ä¸‹zipæ–‡ä»¶
 gettext-runtime-0.17.zip: http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime-0.17.zip
 gettext-tools-0.17.zip: http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-tools-0.17.zip
-½âÑ¹ÎÄ¼ş
-ÔÚÍ¬Ò»ÎÄ¼ş¼ĞÏÂ£¨Èç: C:\Downloads\gettext£©Õ¹¿ªÕâ2¸öÑ¹ËõÎÄ¼şÖĞµÄbin\¡£(×¢ÒâÄ¿Â¼ºÏ²¢ÁË)
-¸üĞÂÏµÍ³Â·¾¶£º¿ØÖÆÃæ°å>ÏµÍ³>¸ß¼¶>»·¾³±äÁ¿£¬ÔÚÏµÍ³±äÁ¿ÁĞ±íÖĞ£¬°Ñ;D:\Downloads\Programming\gettext\bin¼Óµ½±äÁ¿Öµ×Ö¶ÎµÄÄ©Î²¡£
-ÔÚCMDÖĞÑéÖ¤ÏÂÎÒÃÇµÄÅäÖÃÊÇ·ñÕıÈ·xgettext --version»òÕßgettext --version¡£
+è§£å‹æ–‡ä»¶
+åœ¨åŒä¸€æ–‡ä»¶å¤¹ä¸‹ï¼ˆå¦‚: C:\Downloads\gettextï¼‰å±•å¼€è¿™2ä¸ªå‹ç¼©æ–‡ä»¶ä¸­çš„bin\ã€‚(æ³¨æ„ç›®å½•åˆå¹¶äº†)
+æ›´æ–°ç³»ç»Ÿè·¯å¾„ï¼šæ§åˆ¶é¢æ¿>ç³»ç»Ÿ>é«˜çº§>ç¯å¢ƒå˜é‡ï¼Œåœ¨ç³»ç»Ÿå˜é‡åˆ—è¡¨ä¸­ï¼ŒæŠŠ;D:\Downloads\Programming\gettext\binåŠ åˆ°å˜é‡å€¼å­—æ®µçš„æœ«å°¾ã€‚
+åœ¨CMDä¸­éªŒè¯ä¸‹æˆ‘ä»¬çš„é…ç½®æ˜¯å¦æ­£ç¡®xgettext --versionæˆ–è€…gettext --versionã€‚
 
 python manage.py makemessages -l en
 python manage.py makemessages -l zh-Hans
 python manage.py makemessages -l zh-Hant
 
-±àÒë¹ú¼Ê»¯·­ÒëÎÄ¼ş
+ç¼–è¯‘å›½é™…åŒ–ç¿»è¯‘æ–‡ä»¶
 python manage.py compilemessages
 django-admin compilemessages
-Django½«×Ô¶¯ËÑË÷ËùÓĞµÄ.poÎÄ¼ş£¬½«ËüÃÇ¶¼·­Òë³É.moÎÄ¼ş¡£
+Djangoå°†è‡ªåŠ¨æœç´¢æ‰€æœ‰çš„.poæ–‡ä»¶ï¼Œå°†å®ƒä»¬éƒ½ç¿»è¯‘æˆ.moæ–‡ä»¶ã€‚
 
 
 
+
+
+Django:
+
+FIELD_TYPE.BLOB: 'TextField',
+FIELD_TYPE.CHAR: 'CharField',
+FIELD_TYPE.DECIMAL: 'DecimalField',
+FIELD_TYPE.NEWDECIMAL: 'DecimalField',
+FIELD_TYPE.DATE: 'DateField',
+FIELD_TYPE.DATETIME: 'DateTimeField',
+FIELD_TYPE.DOUBLE: 'FloatField',
+FIELD_TYPE.FLOAT: 'FloatField',
+FIELD_TYPE.INT24: 'IntegerField',
+FIELD_TYPE.LONG: 'IntegerField',
+FIELD_TYPE.LONGLONG: 'BigIntegerField',
+FIELD_TYPE.SHORT: 'SmallIntegerField',
+FIELD_TYPE.STRING: 'CharField',
+FIELD_TYPE.TIME: 'TimeField',
+FIELD_TYPE.TIMESTAMP: 'DateTimeField',
+FIELD_TYPE.TINY: 'IntegerField',
+FIELD_TYPE.TINY_BLOB: 'TextField',
+FIELD_TYPE.MEDIUM_BLOB: 'TextField',
+FIELD_TYPE.LONG_BLOB: 'TextField',
+FIELD_TYPE.VAR_STRING: 'CharField',
+
+
+
+'AutoField': 'integer AUTO_INCREMENT',
+'BigAutoField': 'bigint AUTO_INCREMENT',
+'BinaryField': 'longblob',
+'BooleanField': 'bool',
+'CharField': 'varchar(%(max_length)s)',
+'DateField': 'date',
+'DateTimeField': 'datetime(6)',
+'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+'DurationField': 'bigint',
+'FileField': 'varchar(%(max_length)s)',
+'FilePathField': 'varchar(%(max_length)s)',
+'FloatField': 'double precision',
+'IntegerField': 'integer',
+'BigIntegerField': 'bigint',
+'IPAddressField': 'char(15)',
+'GenericIPAddressField': 'char(39)',
+'NullBooleanField': 'bool',
+'OneToOneField': 'integer',
+'PositiveIntegerField': 'integer UNSIGNED',
+'PositiveSmallIntegerField': 'smallint UNSIGNED',
+'SlugField': 'varchar(%(max_length)s)',
+'SmallIntegerField': 'smallint',
+'TextField': 'longtext',
+'TimeField': 'time(6)',
+'UUIDField': 'char(32)',
+
+
+
+'exact': '= %s',
+'iexact': 'LIKE %s',
+'contains': 'LIKE BINARY %s',
+'icontains': 'LIKE %s',
+'gt': '> %s',
+'gte': '>= %s',
+'lt': '< %s',
+'lte': '<= %s',
+'startswith': 'LIKE BINARY %s',
+'endswith': 'LIKE BINARY %s',
+'istartswith': 'LIKE %s',
+'iendswith': 'LIKE %s',
+
+pattern_ops = {
+    'contains': "LIKE BINARY CONCAT('%%', {}, '%%')",
+    'icontains': "LIKE CONCAT('%%', {}, '%%')",
+    'startswith': "LIKE BINARY CONCAT({}, '%%')",
+    'istartswith': "LIKE CONCAT({}, '%%')",
+    'endswith': "LIKE BINARY CONCAT('%%', {})",
+    'iendswith': "LIKE CONCAT('%%', {})",
+}
+
+isolation_levels = {
+    'read uncommitted',
+    'read committed',
+    'repeatable read',
+    'serializable',
+}
 
