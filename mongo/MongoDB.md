@@ -3,13 +3,6 @@
 ### 安装
 管理员模式进入cmd
 ```
-mongod --dbpath "D:\Program Files\MongoDB\Server\4.0\data" --logpath "D:\Program Files\MongoDB\Server\4.0\log\mongodb.log" --serviceName "mongodb" --serviceDisplayName "mongodb" --install
-
-C:\Windows\system32>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install -serviceName "MongoDB"
-或
-D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install --serviceName "MongoDB"
-这个时候服务里面已经安装好了
-
 关于命令中的参数说明
 
 参数 　　　　　　　　　　　描述
@@ -23,9 +16,43 @@ D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB
 --install	　　　　　　　　   指定作为一个Windows服务安装。
 ```
 
-### 配置远程连接
+### 配置本地和远程连接
 ```
+A.安装mongodb支持本地服务
+mongod --dbpath "D:\Program Files\MongoDB\Server\4.0\data" --logpath "D:\Program Files\MongoDB\Server\4.0\log\mongodb.log" --serviceName "mongodb" --serviceDisplayName "mongodb" --install
+
+C:\Windows\system32>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install -serviceName "MongoDB"
+或
+D:\MongoDB\bin>mongod --dbpath "D:\MongoDB\db" --logpath "D:\MongoDB\log\MongoDB.log" --install --serviceName "MongoDB"
+这个时候服务里面已经安装好了
+
+B.安装mongodb支持本地和远程服务
+1. 在安装路径D:\Program Files\MongoDB\Server\4.0\bin\mongod.cfg修改文件
+net:
+    bindIp: 127.0.0.1,0.0.0.0
+    port: 27017
+2. 关闭防火墙或者将端口加入到防火墙规则中让其通过
+3. 以管理员身份在bin目录下执行如下命令，使配置生效
 mongod --config "D:\Program Files\MongoDB\Server\4.0\bin\mongod.cfg" --install
+4. cmd中重启服务
+net stop mongodb
+net start mongodb
+5. 为了安全起见，还需要添加一层用户
+这里虽然设置了0.0.0.0允许远程访问，还需要加一层验证，添加mongo用户
+mongo 127.0.0.1:27017/admin
+use admin
+db.createUser({
+    "user":"admin","pwd":"123456",
+    "roles":[
+        {role:"userAdminAnyDatabase", db: "admin"}, 
+        {role:"readWriteAnyDatabase", db: "admin"} 
+]});
+这里就添加了一个admin的用户，密码为123456
+6. 修改一下注册表，添加auth参数
+运行-> regedit-> HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services->MongoDB（mongodb注册的名称，我的是MongoDB)
+在它的ImgPath中，我们修改一下，加入 –auth
+7. 连接服务
+mongo 192.168.1.79:27017/mofang [-u root -p]
 ```
 
 ### 连接
