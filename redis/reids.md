@@ -472,3 +472,10 @@ Do you want to proceed with the proposed reshard plan (yes/no)? Yes
 
 #### 查看集群状态，一切还原为集群最初状态啦！大功告成﻿！
 ![示例](https://static.oschina.net/uploads/space/2018/0402/212924_Swu4_3796575.png "示例")
+
+
+### 连接redis
+```
+redis-cli -h host -p port -a password
+-h 服务器地址 -p 端口号 -a 密码
+```

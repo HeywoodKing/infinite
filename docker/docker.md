@@ -714,3 +714,27 @@ Commands:
 ```
 
 
+### docker安装redis
+```
+docker run -p 6379:6379 -v $PWD/data:/data --name redis_foxy -d redis:latest redis-server --appendonly yes
+```
+
+### docker安装es
+```
+
+```
+
+### docker安装mongodb
+```
+
+```
+
+### docker安装mysql/maridb
+```
+
+```
+
+### docker安装
+```
+
+```
