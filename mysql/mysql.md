@@ -486,6 +486,30 @@ select * from pony order by (d+0)
 ```
 
 ### mysql json
+```
+json_keys()
+
+json_set()
+update tb_electron_category_mapping_factory set data=JSON_SET(data, '$."aaa"', 1), state=%s, update_at=%s, update_uid=%s where category_id=%s
+update tb_electron_label_mapping_factory set data=JSON_SET(data, '$."100"', 1),state=%s,update_at=%s,update_uid=%s where id=%s
+
+json_insert()
+
+json_remove()
+update tb_electron_category_mapping_factory set data=json_remove(data, %s),update_at=%s,update_uid=%s where category_id=%s
+
+json_object()
+update tb_electron_factory set extra_data=json_object(1,1,2,1,"agent_mobile","","agent_area_code","","agent_email","","agent_contacts","","agent_position","","agent_address","");
+
+json_contains()
+select * from tb_electron_label_mapping_category where json_contains(data,'{"100":1}')
+
+json_contains_path()
+select {} from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$."100"')
+select {} from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$.www')
+
+
+```
 
 
 ## 高级操作
@@ -540,6 +564,10 @@ mysqldump -u root -p --add-drop-database --databases dbName1 dbName2 … > sqlFi
 导出某个数据库的某个表：
 ```
 mysqldump -u root -p dbName tableName > sqlFilePath
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/czl/Temp.sql
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/czl/Temp.sql
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/czl/Temp.sql
+mysqldump -umagic_ro -h121.201.107.32 -pMagic_ro.mofang123 magic m_electron --where=" category_id=34 and factory='Texas Instruments'" > /home/flack.chen/ti.log
 ```
 
 只导出数据库结构，不带数据：

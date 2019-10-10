@@ -153,6 +153,7 @@ sudo apt-get --fix-broken install
 ```
 1. 修改chfweb文件夹权限为777
 sudo chmod 777 chfweb
+sudo chmod 777 /data1/from_163/digikey_pdf6/ -R
 2. 修改文件夹chfweb以及子文件夹和子文件的权限为777
 sudo chmod -R 777 chfweb
 3. 增加组
