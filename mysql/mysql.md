@@ -578,6 +578,32 @@ mysqldump -u root -p -d dbName > sqlFilePath
 导出命令执行情况如下图所示： 
 ![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
 
+跨服务器访问数据库表
+1.首先在mysql配置文件中添加federated
+windows:
+在my.ini中加入federated
+
+linux:
+vim /etc/my.cnf中mysqld节点下添加
+federated
+2.重启mysql服务
+service mysqld restart
+3.进入mysql查看引擎状态
+show engines;
+4.创建映射表结构
+在mysql中创建远程服务器数据库中的需要映射的表，映射表名称可以随意命名，但是数据结构必要一样
+```
+CREATE TABLE `hn_user` (
+  `id` varchar(32) NOT NULL,
+  `name` varchar(20) DEFAULT NULL,
+  `phone` varchar(11) DEFAULT NULL,
+  `idcard` varchar(18) DEFAULT NULL,
+  `update_time` bigint(13) DEFAULT NULL,
+  `add_time` bigint(13) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=FEDERATED CONNECTION='mysql://root:123456@192.168.1.8:3306/magic/m_electron'; 
+```
+
 
 #### 设置事务隔离级别
 ```
