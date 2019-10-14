@@ -649,7 +649,7 @@ docker rm wizardly_chandrasekhar
 Error response from daemon: You cannot remove a running container bf08b7f2cd897b5964943134aa6d373e355c286db9b9885b1f60b6e8f82b2b85. Stop the container before attempting removal or force remove
 ```
 
-查看docker容器虚拟主机所在的IP
+查看docker容器虚拟主机所在的IP（查看IP）
 ```
 docker-machine ip
 
@@ -714,3 +714,46 @@ Commands:
 ```
 
 
+### docker安装redis
+```
+docker run -p 6379:6379 -v $PWD/data:/data --name redis_foxy -d redis:latest redis-server --appendonly yes
+```
+
+### docker安装es
+```
+-e ES_JAVA_OPTS="-Xms256m -Xmx256m" //设置初始内存 和最大内存
+
+docker run -e ES_JAVA_OPTS="-Xms256m -Xmx256m" -d -p 9200:9200 -p 9300:9300 --name elasticsearch_foxy elasticsearch:latest
+
+```
+
+### docker安装mongodb
+```
+https://www.jianshu.com/p/1e1847cdf3b9
+-v后面的参数表示把数据文件挂载到宿主机的路径
+-p把mongo端口映射到宿主机的指定端口
+--auth表示连接mongodb需要授权
+
+docker run --name mongodb_foxy -v /data/mongodb:/data/db -p 27017:27017 -d mongodb --auth
+
+docker exec -it mongo_foxy /bin/bash
+
+mongo 192.168.31.206:27017/admin
+```
+
+### docker安装mysql/maridb
+```
+-p 3306:3306：将容器的 3306 端口映射到主机的 3306 端口。
+-v -v $PWD/conf:/etc/mysql/conf.d：将主机当前目录下的 conf/my.cnf 挂载到容器的 /etc/mysql/my.cnf。
+-v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。
+-v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。
+-e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。
+
+docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql
+
+```
+
+### docker安装
+```
+
+```
