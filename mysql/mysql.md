@@ -499,6 +499,30 @@ select * from pony order by (d+0)
 ```
 
 ### mysql json
+```
+json_keys()
+
+json_set()
+update tb_electron_category_mapping_factory set data=JSON_SET(data, '$."aaa"', 1), state=%s, update_at=%s, update_uid=%s where category_id=%s
+update tb_electron_label_mapping_factory set data=JSON_SET(data, '$."100"', 1),state=%s,update_at=%s,update_uid=%s where id=%s
+
+json_insert()
+
+json_remove()
+update tb_electron_category_mapping_factory set data=json_remove(data, %s),update_at=%s,update_uid=%s where category_id=%s
+
+json_object()
+update tb_electron_factory set extra_data=json_object(1,1,2,1,"agent_mobile","","agent_area_code","","agent_email","","agent_contacts","","agent_position","","agent_address","");
+
+json_contains()
+select * from tb_electron_label_mapping_category where json_contains(data,'{"100":1}')
+
+json_contains_path()
+select {} from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$."100"')
+select {} from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$.www')
+
+
+```
 
 
 ## 高级操作
@@ -553,6 +577,10 @@ mysqldump -u root -p --add-drop-database --databases dbName1 dbName2 … > sqlFi
 导出某个数据库的某个表：
 ```
 mysqldump -u root -p dbName tableName > sqlFilePath
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/czl/Temp.sql
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/czl/Temp.sql
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/czl/Temp.sql
+mysqldump -umagic_ro -h121.201.107.32 -pMagic_ro.mofang123 magic m_electron --where=" category_id=34 and factory='Texas Instruments'" > /home/flack.chen/ti.log
 ```
 
 只导出数据库结构，不带数据：
@@ -562,6 +590,32 @@ mysqldump -u root -p -d dbName > sqlFilePath
 ```
 导出命令执行情况如下图所示： 
 ![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
+
+跨服务器访问数据库表
+1.首先在mysql配置文件中添加federated
+windows:
+在my.ini中加入federated
+
+linux:
+vim /etc/my.cnf中mysqld节点下添加
+federated
+2.重启mysql服务
+service mysqld restart
+3.进入mysql查看引擎状态
+show engines;
+4.创建映射表结构
+在mysql中创建远程服务器数据库中的需要映射的表，映射表名称可以随意命名，但是数据结构必要一样
+```
+CREATE TABLE `hn_user` (
+  `id` varchar(32) NOT NULL,
+  `name` varchar(20) DEFAULT NULL,
+  `phone` varchar(11) DEFAULT NULL,
+  `idcard` varchar(18) DEFAULT NULL,
+  `update_time` bigint(13) DEFAULT NULL,
+  `add_time` bigint(13) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=FEDERATED CONNECTION='mysql://root:123456@192.168.1.8:3306/magic/m_electron'; 
+```
 
 
 #### 设置事务隔离级别

@@ -1161,3 +1161,73 @@ The key's randomart image is:
 
 
 
+
+错误：   在终端（终端）下
+
+执行git clone git@github.com：accountName / repository.git命令时不出错，
+
+运行git push时出错，提示如下
+
+权限被拒绝（publickey）。
+
+致命：无法从远程存储库读取。
+
+请确保您具有正确的访问权限并且存储库存在。
+
+
+
+原因：   可能是没有与github上上的账号成功建立密钥对。
+
+
+
+解决： 
+
+【1】ssh-keygen -t rsa -C“youremail@example.com”
+
+    注意，上述youremail@example.com是指GitHub的账户的注册邮箱
+
+【2】ssh -v git@github.com
+
+    上述命令执行后，出现的提示最后两句是
+
+          没有更多的身份验证方法可以试
+
+          权限被拒绝（publickey）。
+
+【3】ssh-agent -s
+
+    上述命令执行后，出现的提示最后两句是
+
+          SSH_AUTH_SOCK = / TMP / SSH-GTpABX1a05qH / agent.404; export SSH_AUTH_SOCK;
+
+          SSH_AGENT_PID = 13144; export SSH_AGENT_PID;
+
+          echo agent pid 13144;
+
+【4】ssh-add~ / .ssh / id_rsa  
+
+    上述命令执行后，出现提示
+
+          身份补充：。。。（这里是一些ssh key文件路径）
+
+          无法打开与身份验证代理的连接。
+
+【5】若【4】中出现上述提示，则执行此步骤，否则执行【6】
+
+   eval`ssh-agent -s`回车
+
+   ssh-add~ / .ssh / id_rsa回车
+
+【6】cat~ / .ssh / id_rsa.pub（也可以用其他方式打开）  
+
+    上述命令执行后id_rsa.pub文件内容将输出到终端，复制里面的密钥（内容一般是以ssh-rsa开头，以github账号的注册邮箱结尾的，全部复制下来）
+
+【7】进入github账号，在设置下，选择SSH和GPG密钥，点击新的SSH密钥
+
+点击新的SSH密钥后，在标题栏里自定义名字，然后将上一步复制的密钥（以及ssh-rsa开头，以及github账号的注册邮箱结尾的）粘贴到此处。
+
+然后点击添加SSH密钥
+
+【8】ssh -T git@github.com回车
+
+提示：嗨---！您已成功通过身份验证，但GitHub不提供shell访问权限。
