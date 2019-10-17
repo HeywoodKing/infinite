@@ -1,3 +1,103 @@
+###Docker简介
+>Docker是一个开源的容器引擎，它有助于更快地交付应用。 
+>Docker可将应用程序和基础设施层隔离，并且能将基础设施当作程序一样进行管理。使用 
+>Docker可更快地打包、测试以及部署应用程序，并可以缩短从编写到部署运行代码的周期。
+>Docker 是一个开源的商业产品，有两个版本：社区版（Community Edition，缩写为 CE）和企业版（Enterprise Edition，缩写为 EE）。企业版包含了一些收费服务，个人开发者一般用不到。下面的介绍都针对社区版。
+
+Docker的优点如下：
+
+1. 简化程序
+Docker 让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的 Linux 机器上，便可以实现虚拟化。Docker改变了虚拟化的方式，使开发者可以直接将自己的成果放入Docker中进行管理。方便快捷已经是 Docker的最大优势，过去需要用数天乃至数周的 任务，在Docker容器的处理下，只需要数秒就能完成。
+
+2. 避免选择恐惧症
+如果你有选择恐惧症，还是资深患者。Docker 帮你 打包你的纠结！比如 Docker 镜像；Docker 镜像中包含了运行环境和配置，所以 Docker 可以简化部署多种应用实例工作。比如 Web 应用、后台应用、数据库应用、大数据应用比如 Hadoop 集群、消息队列等等都可以打包成一个镜像部署。
+
+3. 节省开支
+一方面，云计算时代到来，使开发者不必为了追求效果而配置高额的硬件，Docker 改变了高性能必然高价格的思维定势。Docker 与云的结合，让云空间得到更充分的利用。不仅解决了硬件管理的问题，也改变了虚拟化的方式。
+
+###Docker架构 
+![Docker架构 ](https://oscimg.oschina.net/oscnet/4b0f439b7bb3d382139a82db0260075b5ba.jpg "Docker架构 ")
+
++ Docker daemon（ Docker守护进程）
+Docker daemon是一个运行在宿主机（ DOCKER-HOST）的后台进程。可通过 Docker客户端与之通信。
+
++ Client（ Docker客户端）
+Docker客户端是 Docker的用户界面，它可以接受用户命令和配置标识，并与 Docker daemon通信。图中， docker build等都是 Docker的相关命令。
+
++ Images（ Docker镜像）
+Docker镜像是一个只读模板，它包含创建 Docker容器的说明。它和系统安装光盘有点像，使用系统安装光盘可以安装系统，同理，使用Docker镜像可以运行 Docker镜像中的程序。
+
++ Container（容器）
+容器是镜像的可运行实例。镜像和容器的关系有点类似于面向对象中，类和对象的关系。可通过 Docker API或者 CLI命令来启停、移动、删除容器。
+
++ Registry
+Docker Registry是一个集中存储与分发镜像的服务。构建完 Docker镜像后，就可在当前宿主机上运行。但如果想要在其他机器上运行这个镜像，就需要手动复制。此时可借助 Docker Registry来避免镜像的手动复制。
+
+一个 Docker Registry可包含多个 Docker仓库，每个仓库可包含多个镜像标签，每个标签对应一个 Docker镜像。这跟 Maven的仓库有点类似，如果把 Docker Registry比作 Maven仓库的话，那么 Docker仓库就可理解为某jar包的路径，而镜像标签则可理解为jar包的版本号。
+
+
+```
+Docker CE 的安装请参考官方文档。以下列出不同操作系统的安装方法，直接点击进入查看
+[Mac](https://docs.docker.com/docker-for-mac/install/ "Mac")
+[Windows](https://docs.docker.com/docker-for-windows/install/ "Windows")
+[Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/ "Ubuntu")
+[Debian](https://docs.docker.com/install/linux/docker-ce/debian/ "Debian")
+[CentOS](https://docs.docker.com/install/linux/docker-ce/centos/ "CentOS")
+[Fedora](https://docs.docker.com/install/linux/docker-ce/fedora/ "Fedora")
+[其他 Linux 发行版](https://docs.docker.com/install/linux/docker-ce/binaries/ "其他 Linux 发行版")
+```
+
+###CentOS安装Docker安装：
+
+1.Docker 要求 CentOS 系统的内核版本高于 3.10 ，查看本页面的前提条件来验证你的CentOS 版本是否支持 Docker 。
+通过 uname -r 命令查看你当前的内核版本
+```
+uname -r
+```
+
+2.使用 root 权限登录 Centos。确保 yum 包更新到最新。
+
+`yum -y update`
+
+3.卸载旧版本(如果安装过旧版本的话)
+
+`yum remove docker docker-common docker-selinux docker-engine`
+
+4.安装需要的软件包， yum-util 提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
+
+`yum install -y yum-utils device-mapper-persistent-data lvm2`
+
+5.设置yum源
+
+`yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo`
+
+6.可以查看所有仓库中所有docker版本，并选择特定版本安装
+
+`yum list docker-ce --showduplicates | sort -r`
+
+![查看所有仓库中所有docker版本](https://oscimg.oschina.net/oscnet/c4d2d3fa03fa71d6dee4e623f2b6e02f77d.jpg "查看所有仓库中所有docker版本")
+
+7.安装docker
+
+`sudo yum install -y docker-ce     #由于repo中默认只开启stable仓库，故这里安装的是最新稳定版18.03.1`
+
+8.启动并加入开机启动
+```
+systemctl start docker
+systemctl enable docker
+```
+
+9.验证安装是否成功(有client和service两部分表示docker安装启动都成功了)
+
+`docker version`
+
+![验证安装是否成功](https://oscimg.oschina.net/oscnet/61265623f6eb9d1d8bde3116dcb898e7cb6.jpg "验证安装是否成功")
+
+10.卸载docker
+
+`yum -y remove docker-engine`
+
+
 ## Ubuntu 18.0.4安装docker
 
 ###第一步：如果之前安装过docker，执行下面命令删除
@@ -45,8 +145,6 @@ sudo apt-get -y install docker-ce
 执行如下命令命令查看有哪些版本，
 apt-cache madison docker-ce
 输出如下：
-
-复制代码
 ```
 docker-ce | 5:18.09.0~3-0~ubuntu-bionic | http://mirrors.aliyun.com/docker-ce/linux/ubuntu bionic/stable amd64 Packages
 
@@ -63,138 +161,55 @@ docker-ce | 18.03.1~ce~3-0~ubuntu | http://mirrors.aliyun.com/docker-ce/linux/ub
 ###安装完成 后执行docker -v命令，
 如果正常输出说明安装成功，下面继续填坑吧。
 ```
+查看当前系统docker信息：docker info
 搜索镜像：docker search ubuntu
 获取镜像：docker pull ubuntu
-查看镜像id：docker images -q 
+查看所有镜像id：docker images -q 
 删除镜像：docker rmi image_id 
 删除所有镜像：docker rmi $(docker images -q) 
-创建容器：docker run --name <container_name> centos:7,container_name是自己定义的容器名 
+
+创建容器：docker run --name xxx_foxy centos:7
 查看所有容器：docker ps -a 
 查看运行容器：docker ps 
-查看容器id：docker ps -q 
+查看所有容器id：docker ps -q 
+
 进入容器：docker exec -it <container_id> bash 
 退出容器：exit 
-删除容器：docker rm <container_id> 
+删除容器：docker rm <container_id>/<container_name>
 删除所有容器：docker rm $(docker ps -aq) 
+
 端口映射：docker run -d -p 8080:80 hub.c.163.com/library/nginx
 说明：-d 表示后台运行，-p 8080:80 表示将宿主机的8080端口映射到容器端口80。容器开放的端口在镜像说明里面会有，nginx开放80，mysql开放3306，一般本来他们监听什么端口，容器就开放什么端口
 
 启动/停止/重启容器：
-docker start/stop/restart <container_id> 
+docker start <container_id>/<container_name>
+docker stop <container_id>/<container_name>
+docker restart <container_id>/<container_name>
+
+启动容器后，进入到容器
+docker attach <container_name>/<container_id>
 
 获取容器/镜像的元数据：
-docker inspect <container_id> 
+docker inspect <container_id>/<container_name>
 
-挂载数据卷：
-docker run -v host/machine/dir :container/path/dir --name volume_test_container centos:7
+运行容器（挂载数据卷）：
+docker run -v host/machine/dir:container/path/dir --name <container_name> centos:7
 说明：数据卷的挂载相当于在宿主机的目录与容器目录创建了一个链接，你修改任何一方的内容，另一方的内容也会同步修改。创建数据卷的作用：当容器被删除的时候，容器内的数据也一起被删除。像数据库、媒体资源等文件我们通常都会使用 -v 将容器中的内容链接到宿主机，这样我们重新创建容器的时候再次-v，数据又回来了
 
 启动mysql容器：
-docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=qwerasdf -d mysql:5.7 
-默认用户为root，密码qwerasdf
+-d:后台进程
+docker run --name mysql_foxy -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7 
+默认用户为root，密码123456
+
 mysql容器启动后，其他容器就可以来连接使用了，方法如下：
 容器连接：
-docker run --name some-app --link some-mysql:mysql -d application-that-uses-mysql
+docker run --name some-app --link mysql_foxy:mysql -d application-that-uses-mysql
 ```
 
 ##十分钟学会用docker部署微服务
 ![docker](https://oscimg.oschina.net/oscnet/f23f11d5dd57c2cf07aee5239c9ebffbb70.jpg "docker")
 
-###Docker简介
-Docker是一个开源的容器引擎，它有助于更快地交付应用。 Docker可将应用程序和基础设施层隔离，并且能将基础设施当作程序一样进行管理。使用 Docker可更快地打包、测试以及部署应用程序，并可以缩短从编写到部署运行代码的周期。
 
-Docker的优点如下：
-
-1. 简化程序
-Docker 让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的 Linux 机器上，便可以实现虚拟化。Docker改变了虚拟化的方式，使开发者可以直接将自己的成果放入Docker中进行管理。方便快捷已经是 Docker的最大优势，过去需要用数天乃至数周的 任务，在Docker容器的处理下，只需要数秒就能完成。
-
-2. 避免选择恐惧症
-如果你有选择恐惧症，还是资深患者。Docker 帮你 打包你的纠结！比如 Docker 镜像；Docker 镜像中包含了运行环境和配置，所以 Docker 可以简化部署多种应用实例工作。比如 Web 应用、后台应用、数据库应用、大数据应用比如 Hadoop 集群、消息队列等等都可以打包成一个镜像部署。
-
-3. 节省开支
-一方面，云计算时代到来，使开发者不必为了追求效果而配置高额的硬件，Docker 改变了高性能必然高价格的思维定势。Docker 与云的结合，让云空间得到更充分的利用。不仅解决了硬件管理的问题，也改变了虚拟化的方式。
-
-###Docker架构 
-![Docker架构 ](https://oscimg.oschina.net/oscnet/4b0f439b7bb3d382139a82db0260075b5ba.jpg "Docker架构 ")
-
-+ Docker daemon（ Docker守护进程）
-Docker daemon是一个运行在宿主机（ DOCKER-HOST）的后台进程。可通过 Docker客户端与之通信。
-
-+ Client（ Docker客户端）
-Docker客户端是 Docker的用户界面，它可以接受用户命令和配置标识，并与 Docker daemon通信。图中， docker build等都是 Docker的相关命令。
-
-+ Images（ Docker镜像）
-Docker镜像是一个只读模板，它包含创建 Docker容器的说明。它和系统安装光盘有点像，使用系统安装光盘可以安装系统，同理，使用Docker镜像可以运行 Docker镜像中的程序。
-
-+ Container（容器）
-容器是镜像的可运行实例。镜像和容器的关系有点类似于面向对象中，类和对象的关系。可通过 Docker API或者 CLI命令来启停、移动、删除容器。
-
-+ Registry
-Docker Registry是一个集中存储与分发镜像的服务。构建完 Docker镜像后，就可在当前宿主机上运行。但如果想要在其他机器上运行这个镜像，就需要手动复制。此时可借助 Docker Registry来避免镜像的手动复制。
-
-一个 Docker Registry可包含多个 Docker仓库，每个仓库可包含多个镜像标签，每个标签对应一个 Docker镜像。这跟 Maven的仓库有点类似，如果把 Docker Registry比作 Maven仓库的话，那么 Docker仓库就可理解为某jar包的路径，而镜像标签则可理解为jar包的版本号。
-
-###Docker安装
-Docker 是一个开源的商业产品，有两个版本：社区版（Community Edition，缩写为 CE）和企业版（Enterprise Edition，缩写为 EE）。企业版包含了一些收费服务，个人开发者一般用不到。下面的介绍都针对社区版。
-
-Docker CE 的安装请参考官方文档。以下列出不同操作系统的安装方法，直接点击进入查看
-[Mac](https://docs.docker.com/docker-for-mac/install/ "Mac")
-[Windows](https://docs.docker.com/docker-for-windows/install/ "Windows")
-[Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/ "Ubuntu")
-[Debian](https://docs.docker.com/install/linux/docker-ce/debian/ "Debian")
-[CentOS](https://docs.docker.com/install/linux/docker-ce/centos/ "CentOS")
-[Fedora](https://docs.docker.com/install/linux/docker-ce/fedora/ "Fedora")
-[其他 Linux 发行版](https://docs.docker.com/install/linux/docker-ce/binaries/ "其他 Linux 发行版")
-
-这里以CentOS为例：
-
-1.Docker 要求 CentOS 系统的内核版本高于 3.10 ，查看本页面的前提条件来验证你的CentOS 版本是否支持 Docker 。
-
-通过 uname -r 命令查看你当前的内核版本
-
-`uname -r`
-
-2.使用 root 权限登录 Centos。确保 yum 包更新到最新。
-
-`yum -y update`
-
-3.卸载旧版本(如果安装过旧版本的话)
-
-`yum remove docker docker-common docker-selinux docker-engine`
-
-4.安装需要的软件包， yum-util 提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
-
-`yum install -y yum-utils device-mapper-persistent-data lvm2`
-
-5.设置yum源
-
-`yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo`
-
-6.可以查看所有仓库中所有docker版本，并选择特定版本安装
-
-`yum list docker-ce --showduplicates | sort -r`
-
-![查看所有仓库中所有docker版本](https://oscimg.oschina.net/oscnet/c4d2d3fa03fa71d6dee4e623f2b6e02f77d.jpg "查看所有仓库中所有docker版本")
-
-7.安装docker
-
-`sudo yum install -y docker-ce     #由于repo中默认只开启stable仓库，故这里安装的是最新稳定版18.03.1`
-
-8.启动并加入开机启动
-```
-systemctl start docker
-systemctl enable docker
-```
-
-9.验证安装是否成功(有client和service两部分表示docker安装启动都成功了)
-
-`docker version`
-
-![验证安装是否成功](https://oscimg.oschina.net/oscnet/61265623f6eb9d1d8bde3116dcb898e7cb6.jpg "验证安装是否成功")
-
-10.卸载docker
-
-`yum -y remove docker-engine`
 
 ###Docker常用命令
 ####镜像相关命令
@@ -717,6 +732,10 @@ Commands:
 ### docker安装redis
 ```
 docker run -p 6379:6379 -v $PWD/data:/data --name redis_foxy -d redis:latest redis-server --appendonly yes
+
+连接redis
+-h 服务器地址 -p 端口号 -a 密码
+redis-cli -h host -p port -a password
 ```
 
 ### docker安装es
@@ -739,6 +758,51 @@ docker run --name mongodb_foxy -v /data/mongodb:/data/db -p 27017:27017 -d mongo
 docker exec -it mongo_foxy /bin/bash
 
 mongo 192.168.31.206:27017/admin
+
+部署mongodb集群
+1. 本示例基于Centos 7, 三台主机的ip分别为：
+
+主机一：10.21.14.164
+
+主机二：10.21.14.165
+
+主机三：10.21.14.166
+
+2. 主机上建立挂载目录和redis配置文件：
+
+cd /app
+
+mkdir -p mongo/data
+
+3. 主机一运行MongoDB：
+
+docker run --name mongo -v /app/mongo/data:/data/db -p 27017:27017 -d mongo --replSet "rs"
+
+4. 主机二运行MongoDB：
+
+docker run --name mongo -v /app/mongo/data:/data/db -p 27017:27017 -d mongo --replSet "rs"
+
+5. 主机三运行MongoDB：
+
+docker run --name mongo -v /app/mongo/data:/data/db -p 27017:27017 -d mongo --replSet "rs"
+
+6. 进入主机一容器：
+
+docker exec -it mongo /bin/bash
+
+./mongo 10.21.14.164:27017
+
+>use admin 
+
+>config = { "_id": "rs", "members": [{ "_id": 0, "host": "10.21.14.164:27017", "priority": 2 }, { "_id": 1, "host": "10.21.14.165:27017", "priority": 1 }, { "_id": 2, "host": "10.21.14.166:27017", "arbiterOnly":true }] }
+
+>rs.initiate(config)
+
+>rs.status()
+
+6. 主机一运行Mongo-express容器：
+
+docker run -d -it --rm --name mongo-express -p 18081:8081 -e ME_CONFIG_MONGODB_SERVER="10.21.14.164"  -e ME_CONFIG_MONGODB_PORT="27017" mongo-express
 ```
 
 ### docker安装mysql/maridb
@@ -751,9 +815,108 @@ mongo 192.168.31.206:27017/admin
 
 docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql
 
+进入容器
+docker exec -it 62349aa31687 /bin/bash
 ```
 
-### docker安装
+### docker run 安装
 ```
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+OPTIONS说明：
+
+-a stdin: 指定标准输入输出内容类型，可选 STDIN/STDOUT/STDERR 三项；
+-d: 后台运行容器，并返回容器ID；
+-i: 以交互模式运行容器，通常与 -t 同时使用；
+-P: 随机端口映射，容器内部端口随机映射到主机的高端口
+-p: 指定端口映射，格式为：主机(宿主)端口:容器端口
+-t: 为容器重新分配一个伪输入终端，通常与 -i 同时使用；
+--name="nginx-lb": 为容器指定一个名称；
+--dns 8.8.8.8: 指定容器使用的DNS服务器，默认和宿主一致；
+--dns-search example.com: 指定容器DNS搜索域名，默认和宿主一致；
+-h "mars": 指定容器的hostname；
+-e username="ritchie": 设置环境变量；
+--env-file=[]: 从指定文件读入环境变量；
+--cpuset="0-2" or --cpuset="0,1,2": 绑定容器到指定CPU运行；
+-m :设置容器使用内存最大值；
+--net="bridge": 指定容器的网络连接类型，支持 bridge/host/none/container: 四种类型；
+--link=[]: 添加链接到另一个容器；
+--expose=[]: 开放一个端口或一组端口；
+--volume , -v: 绑定一个卷
+
+-d, --detach=false， 指定容器运行于前台还是后台，默认为false
+-i, --interactive=false， 打开STDIN，用于控制台交互
+-t, --tty=false， 分配tty设备，该可以支持终端登录，默认为false
+-u, --user=""， 指定容器的用户
+-a, --attach=[]， 登录容器（必须是以docker run -d启动的容器）
+-w, --workdir=""， 指定容器的工作目录
+-c, --cpu-shares=0， 设置容器CPU权重，在CPU共享场景使用
+-e, --env=[]， 指定环境变量，容器中可以使用该环境变量
+-m, --memory=""， 指定容器的内存上限
+-P, --publish-all=false， 指定容器暴露的端口
+-p, --publish=[]， 指定容器暴露的端口
+-h, --hostname=""， 指定容器的主机名
+-v, --volume=[]， 给容器挂载存储卷，挂载到容器的某个目录
+--volumes-from=[]， 给容器挂载其他容器上的卷，挂载到容器的某个目录
+--cap-add=[]， 添加权限，权限清单详见：http://linux.die.net/man/7/capabilities
+--cap-drop=[]， 删除权限，权限清单详见：http://linux.die.net/man/7/capabilities
+--cidfile=""， 运行容器后，在指定文件中写入容器PID值，一种典型的监控系统用法
+--cpuset=""， 设置容器可以使用哪些CPU，此参数可以用来容器独占CPU
+--device=[]， 添加主机设备给容器，相当于设备直通
+--dns=[]， 指定容器的dns服务器
+--dns-search=[]， 指定容器的dns搜索域名，写入到容器的/etc/resolv.conf文件
+--entrypoint=""， 覆盖image的入口点
+--env-file=[]， 指定环境变量文件，文件格式为每行一个环境变量
+--expose=[]， 指定容器暴露的端口，即修改镜像的暴露端口
+--link=[]， 指定容器间的关联，使用其他容器的IP、env等信息
+--lxc-conf=[]， 指定容器的配置文件，只有在指定--exec-driver=lxc时使用
+--name=""， 指定容器名字，后续可以通过名字进行容器管理，links特性需要使用名字
+--net="bridge"， 容器网络设置:
+bridge 使用docker daemon指定的网桥
+host //容器使用主机的网络
+container:NAME_or_ID >//使用其他容器的网路，共享IP和PORT等网络资源
+none 容器使用自己的网络（类似--net=bridge），但是不进行配置
+--privileged=false， 指定容器是否为特权容器，特权容器拥有所有的capabilities
+--restart="no"， 指定容器停止后的重启策略:
+no：容器退出时不重启
+on-failure：容器故障退出（返回值非零）时重启
+always：容器退出时总是重启
+--rm=false， 指定容器停止后自动删除容器(不支持以docker run -d启动的容器)
+--sig-proxy=true， 设置由代理接受并处理信号，但是SIGCHLD、SIGSTOP和SIGKILL不能被代理
+
+
+eg:
+使用docker镜像nginx:latest以后台模式启动一个容器,并将容器命名为mynginx。
+docker run --name mynginx -d nginx:latest
+
+使用镜像nginx:latest以后台模式启动一个容器,并将容器的80端口映射到主机随机端口。
+docker run -P -d nginx:latest
+
+使用镜像 nginx:latest，以后台模式启动一个容器,将容器的 80 端口映射到主机的 80 端口,主机的目录 /data 映射到容器的 /data。
+docker run -p 80:80 -v /data:/data -d nginx:latest
+
+绑定容器的 8080 端口，并将其映射到本地主机 127.0.0.1 的 80 端口上。
+$ docker run -p 127.0.0.1:80:8080/tcp ubuntu bash
+
+使用镜像nginx:latest以交互模式启动一个容器,在容器内执行/bin/bash命令。
+runoob@runoob:~$ docker run -it nginx:latest /bin/bash
+root@b8573233d675:/# 
+
+运行一个在后台执行的容器，同时，还能用控制台管理：
+docker run -i -t -d ubuntu:latest
+
+运行一个带命令在后台不断执行的容器，不直接展示容器内部信息：
+docker run -d ubuntu:latest ping www.docker.com
+
+运行一个在后台不断执行的容器，同时带有命令，程序被终止后还能重启继续跑，还能用控制台管理
+docker run -d --restart=always ubuntu:latest ping www.docker.com
+
+为容器指定一个名字
+docker run -d --name=ubuntu_server ubuntu:latest
+
+容器暴露80端口，并指定宿主机80端口与其通信(: 之前是宿主机端口，之后是容器需暴露的端口)
+docker run -d --name=ubuntu_server -p 80:80 ubuntu:latest
+
+指定容器内目录与宿主机目录共享(: 之前是宿主机文件夹，之后是容器需共享的文件夹)
+docker run -d --name=ubuntu_server -v /etc/www:/var/www ubuntu:latest
 
 ```
