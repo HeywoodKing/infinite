@@ -55,87 +55,158 @@ create table students(
 ```
 show create database test;
 ```
+
 删除数据库
 ```
 drop database test;
 ```
+
 查看创建表结构
 ```
 show create table students;
 ```
+
 查看当前选中的数据库
 ```
 select database();
 ```
+
 查看表结构
 ```
 desc students;
 ```
+
 修改表名
 ```
 alter table students rename to|as student;
 rename table students to|as student;
 ```
+
 增加列字段
 ```
 alter table students add is_delete bit default;
 alter table students add column aa bool default true;
+alter table users add id int auto_increment primary key;  #将自增字段设置为primary key
 ```
+
 增加多列字段
 ```
 alter table students add column(aa bool default true, bb varchar(256) default '');
 ```
+
 修改列字段
 ```
 alter table students modify id int auto_increment unique;
 alter table students modify column id int auto_increment unique;
+alter table fk_teacher modify column name varchar(256) binary;
 ```
+
 修改多列字段
 ```
 alter table students modify column(id int auto_increment unique,name varchar(100) not null);
 ```
+
+修改字段列名
+```
+alter table <表名> change <字段名> <字段新名称> <字段的类型>;
+alter table students change name zh_name varchar(200);
+```
+
 删除列字段
 ```
 alter table students drop aa;
 alter table students drop column aa;
 ```
+
 修改表引擎
 ```
 alter table students engine=innodb|bdb;
 ```
+
 查看外键
 ```
 show create table my_foreign1;
 ```
+
 添加表外键约束
 ```
 alter table students add constraint my_foreign1 foreign key(subid) references subjects(id);
 ```
+
+添加唯一性约束
+```
+ALTER TABLE `t_user` ADD unique(`username`);
+```
+
 结构化查看数据
 ```
 select * from students\G;
 ```
+
 插入表数据
 ```
 insert into students(name, gender, birthday) values('zhangsan', 1, '1990-7-8');
+
+
+replace into:
+插入的数据的唯一索引或者主键索引与之前的数据有重复的情况，将会删除原先的数据，然后再进行添加
+语法：replace into table( col1, col2, col3 ) values ( val1, val2, val3 ) 
+语义：向table表中col1, col2, col3列replace数据val1，val2，val3
+实例：REPLACE INTO users (id,name,age) VALUES(123, 'chao', 50);
+
+REPLACE INTO students(name, gender, birthday) VALUES ('zhangsan2', 2, '1990-7-18');
+
+CREATE TABLE `test` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(25) DEFAULT NULL COMMENT '标题',
+  `uid` int(11) DEFAULT NULL COMMENT 'uid',
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `uid` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+insert into  test(title,uid) VALUES ('你好','1');
+insert into  test(title,uid) VALUES ('国庆节','2');
+
+REPLACE INTO test(title,uid) VALUES ('这次是8天假哦','3');
+
+当uid存在时，使用replace into 语句
+REPLACE INTO test(title,uid) VALUES ('这是Uid=1的第一条数据哦','1');
+
+MySQL replace into 有三种形式：
+1. replace into tbl_name(col_name, ...) values(...)
+第一种形式类似于insert into的用法，
+
+2. replace into tbl_name(col_name, ...) select ...
+replace into tb1( name, title, mood) select rname, rtitle, rmood from tb2
+
+3. replace into tbl_name set col_name=value, ...
+第三种replace set用法类似于update set用法
+
+
 ```
+
 更新表数据
 ```
 update students set name='lili' where id=1;
 ```
+
 删除表数据
 ```
 delete from students where id=1;
 ```
+
 查询地在3到5之间的数据
 ```
 select * from subjects where id between 3 and 5;
 ```
+
 查询id为nul和不为null的数据
 ```
 select * from students where id is null;
 select * from students where id is not null;
 ```
+
 统计查询
 ```
 select count(*),sum(id),max(id),min(id),floor(avg(id)),ceil(avg(id)) from subjects;
@@ -172,14 +243,88 @@ drop index idx_students_id on students;
 ```
 set profiling=1;
 ```
+
 查看执行时间
 ```
 show profiles;
 ```
+
 修改表users自动序列值
 ```
 alter table users AUTO_INCREMENT=10000;
 ```
+
+查看innodb引擎的运行时信息
+```
+show engine innodb status\G
+```
+查看服务器状态。
+```
+show status like 'table_lock%';
+show status like '%lock%'
+```
+
+查看哪些表锁死(查询是否锁表)查看表锁定
+```
+show open tables where in_use > 0;
+```
+
+查看慢查询时间(默认10s)
+```
+show variables like "long_query_time";
+```
+
+查看慢查询配置情况
+```
+show status like "%slow_queries%";
+```
+
+查看慢查询日志路径
+```
+show variables like "%slow%";
+```
+
+查询到相对应的进程
+```
+show processlist
+show full processlist
+```
+
+查看服务器配置参数
+```
+show variables like '%timeout%';
+show variables like '%secure%';
+```
+
+查看正在锁的事务
+```
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS; 
+```
+
+查看等待锁的事务
+```
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS; 
+```
+
+```
+show open tables from database;
+```
+
+单个表锁定：
+```
+格式： LOCK TABLES tbl_name {READ | WRITE},[ tbl_name {READ | WRITE},……] 
+例子： lock tables db_a.tbl_aaa read; 　　// 锁定了db_a库中的tbl_aaa表
+解锁： unlock tables; 
+```
+
+全局表锁定：
+```
+命令： FLUSH TABLES WITH READ LOCK; 　　// 所有库所有表都被锁定只读
+解锁： unlock tables;
+```
+
+
+
 
 随机数
 ```
@@ -514,6 +659,55 @@ select {} from tb_electron_label_mapping_factory where json_contains_path(data, 
 
 ## 高级操作
 
+### mysql导出查询到的结果集
+```
+into outfile '导出的目录和文件名'
+指定导出的目录和文件名
+
+fields terminated by '字段间分隔符'
+定义字段间的分隔符
+
+optionally enclosed by '字段包围符'
+定义包围字段的字符（数值型字段无效）
+
+lines terminated by '行间分隔符' 
+定义每行的分隔符 
+
+select * from tb_electron_label_mapping_factory into outfile '/tmp/user.csv' fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+查看官方文档，secure_file_priv参数用于限制LOAD DATA, SELECT …OUTFILE, LOAD_FILE()传到哪个指定目录
+secure_file_priv 为 NULL 时，表示限制mysqld不允许导入或导出。
+secure_file_priv 为 /tmp 时，表示限制mysqld只能在/tmp目录中执行导入导出，其他目录不能执行。
+secure_file_priv 没有值时，表示不限制mysqld在任意目录的导入导出。
+
+show global variables like '%secure_file_priv%';
+查看 secure_file_priv 的值，默认为NULL，表示限制不能导入导出
+secure_file_priv 参数是只读参数，不能使用set global命令修改。
+
+解决方法
+打开my.cnf 或 my.ini，加入以下语句后重启mysql。
+secure_file_priv=''
+  
+查看secure_file_priv修改后的值
+
+mysql> show global variables like '%secure_file_priv%';
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| secure_file_priv |       |
++------------------+-------+
+1 row in set (0.00 sec)
+
+修改后再次执行，成功导出。
+
+select kw.zh_category,kw.en_category,kw.zh_sub_category,kw.en_sub_category,kw.category_id_1,kw.category_id_2,  kw.category_id_3,kw.temp_zh_sub_category,kw.temp_en_sub_category  from db_digikey_electron_base.temp_digikey_category_kwargs kw   where kw.temp_category_id_3 is null  and category_id_1 not in ('08','09','10') into outfile '/data/mysql_export_dir/category_data.csv';
+
+mysql> select * from user into outfile '/tmp/user.csv' fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+Query OK, 15 rows affected (0.00 sec)
+
+mysql> SELECT a.* from user a INTO OUTFILE 'a.csv' CHARACTER SET gbk FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
+```
+
 ### mysql导入
 #### 方法一：未连接数据库时方法
 >语法格式：mysql -h ip -u userName -p dbName < sqlFilePath (最后没有分号) 
@@ -544,6 +738,17 @@ sqlFilePath : sql脚本的路径。如我将sql脚本放在了D盘，我的sql�
 `mysql -uroot -p123456 -D chin < /var/www/chinslickingweb/chin.sql`
 
 
+导入数据：
+```
+由于mysqldump导出的是完整的SQL语句，所以用mysql客户程序很容易就能把数据导入了：
+#mysql 数据库名 < 文件名
+or:
+#show databases;
+然后选择被导入的数据库：
+#use 数据库；
+#source /tmp/xxx.sql
+```
+
 ### mysql导出
 导出某个数据库：
 ```
@@ -552,6 +757,11 @@ mysqldump -uroot -p test > ~/mysql/bak/2019_08_04.sql
 mysqldump -h 192.168.99.100 -uroot -p test > E:/mysql/2019_08_04_bak.sql
 mysqldump -h 192.168.99.100 -uroot -p test > ~/mysql/bak/2019_08_04.sql
 mysqldump -u root -p dbName > sqlFilePath
+
+从meteo数据库的sdata表中导出sensorid=11 且 fieldid=0的数据到 /home/xyx/Temp.sql 这个文件中
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/czl/Temp.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11" > /home/czl/Temp.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid in (1,2,3) " > /home/czl/Temp.sql
 ```
 
 导出多个数据库：
@@ -570,11 +780,29 @@ mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) 
 mysqldump -umagic_ro -h121.201.107.32 -pMagic_ro.mofang123 magic m_electron --where=" category_id=34 and factory='Texas Instruments'" > /home/flack.chen/ti.log
 ```
 
+导出结构不导出数据
 只导出数据库结构，不带数据：
 ```
 mysqldump -u root -p -d dbName > sqlFilePath 
 -d : 只备份结构，不备份数据。也可以使用”--no-data”代替”-d”，效果一样。
 ```
+
+导出数据不导出结构
+```
+mysqldump -t 数据库名 -uroot -p > xxx.sql
+```
+
+导出数据和表结构
+```
+mysqldump 数据库名 -uroot -p > xxx.sql
+```
+
+导出特定表的结构
+```
+mysqldump -uroot -p -B数据库名 --table 表名 > xxx.sql
+#mysqldump [OPTIONS] database [tables]
+```
+
 导出命令执行情况如下图所示： 
 ![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
 
@@ -659,6 +887,84 @@ select CONVERT(category_id, UNSIGNED) from tb_electron_category;
 
 
 字符集转换: CONVERT(xxx  USING   gb2312)
+
+
+md5
+select md5(123);
+
+
+replace:
+语法：replace(object,search,replace)
+select uuid();
+或 
+select replace(uuid(), '-', '');
+
+concat:
+使用CONCAT("'",str)或者CONCAT("\'",str)，防止数字过长时导出显示科学计数
+
+
+trim
+语法：trim([{BOTH | LEADING | TRAILING} [remstr] FROM] str)
+ 
+以下举例说明：
+mysql> SELECT TRIM(' phpernote  ');  
+-> 'phpernote'  
+
+mysql> SELECT TRIM(LEADING 'x' FROM 'xxxphpernotexxx');  
+-> 'phpernotexxx'  
+
+mysql> SELECT TRIM(BOTH 'x' FROM 'xxxphpernotexxx');  
+-> 'phpernote'  
+
+mysql> SELECT TRIM(TRAILING 'xyz' FROM 'phpernotexxyz');  
+-> 'phpernotex'  
+
+
+left
+从左开始截取字符串
+用法：left(str, length)，即：left(被截取字符串， 截取长度)
+SELECT LEFT('www.yuanrengu.com',8)
+
+right
+从右开始截取字符串
+用法：right(str, length)，即：right(被截取字符串， 截取长度)
+SELECT RIGHT('www.yuanrengu.com',6)
+
+substring
+截取特定长度的字符串
+substring(str, pos)，即：substring(被截取字符串， 从第几位开始截取)
+substring(str, pos, length)，即：substring(被截取字符串，从第几位开始截取，截取长度)
+
+1.从字符串的第9个字符开始读取直至结束
+SELECT SUBSTRING('www.yuanrengu.com', 9)
+结果为：rengu.com
+
+2.从字符串的第9个字符开始，只取3个字符
+SELECT SUBSTRING('www.yuanrengu.com', 9, 3)
+结果为：ren
+
+3.从字符串的倒数第6个字符开始读取直至结束
+SELECT SUBSTRING('www.yuanrengu.com', -6)
+结果为：gu.com
+
+4.从字符串的倒数第6个字符开始读取，只取2个字符
+SELECT SUBSTRING('www.yuanrengu.com', -6, 2)
+结果为：gu
+
+substring_index
+按关键字进行读取
+用法：substring_index(str, delim, count)，即：substring_index(被截取字符串，关键字，关键字出现的次数)
+1.截取第二个“.”之前的所有字符
+SELECT SUBSTRING_INDEX('www.yuanrengu.com', '.', 2);
+结果为：www.yuanrengu
+
+2.截取倒数第二个“.”之后的所有字符
+SELECT SUBSTRING_INDEX('www.yuanrengu.com', '.', -2);
+结果为：yuanrengu.com
+
+3.如果关键字不存在，则返回整个字符串
+SELECT SUBSTRING_INDEX('www.yuanrengu.com', 'sprite', 1);
+结果为：www.yuanrengu.com
 ```
 
 

@@ -228,3 +228,19 @@ Ubuntu卸载自带Python后无法进入桌面
 2、按提示输入用户名和密码；
 3、输入sudo apt-get install ubuntu-minimal ubuntu-standard ubuntu-desktop；
 4、等待安装结束输入：sudo reboot重新启动或输入命令：startx  即可进入桌面。
+
+
+### 查找指定目录下的文件夹建立软连接
+```
+
+find /data1/digikey_pdf2/ -type d     -exec ln -s {} /data/eddie/pdf/ \;
+find /data1/digikey_pdf3/ -type d     -exec ln -s {} /data/eddie/pdf/ \;
+find /data1/digikey_pdf4/ -type d     -exec ln -s {} /data/eddie/pdf/ \;
+find /data1/from_163/ -type d         -exec ln -s {} /data/eddie/pdf/ \;
+find /data2/no_digikey/ -type d       -exec ln -s {} /data/eddie/pdf/ \;
+find /data3/digikey_pdf5/ -type d     -exec ln -s {} /data/eddie/pdf/ \;
+find /data4/digikey_again/ -type d    -exec ln -s {} /data/eddie/pdf/ \;
+find /data4/from163-20190809/no_digikey2/ -type d  -exec ln -s {} /data/eddie/pdf/ \;
+```
+
+
