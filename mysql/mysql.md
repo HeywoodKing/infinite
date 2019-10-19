@@ -34,7 +34,12 @@ select * from mysql.user;
 ```
 修改密码
 ```
-update mysql.user set password='这里填写你要设置的密码'  where user='root';
+update mysql.user set password='这里填写你要设置的密码' where user='root';
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
+```
+更新加密规则
+```
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER;
 ```
 
 创建表
@@ -206,6 +211,16 @@ select * from subjects where id between 3 and 5;
 select * from students where id is null;
 select * from students where id is not null;
 ```
+<<<<<<< HEAD
+=======
+授权
+```
+GRANT ALL ON *.* TO 'root'@'%';
+
+刷新权限
+flush privileges;
+```
+>>>>>>> 44b9f19edbd823aa3c90af4cf4f73785df00156c
 
 统计查询
 ```
