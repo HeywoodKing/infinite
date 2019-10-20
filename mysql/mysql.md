@@ -723,7 +723,36 @@ Query OK, 15 rows affected (0.00 sec)
 mysql> SELECT a.* from user a INTO OUTFILE 'a.csv' CHARACTER SET gbk FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
 ```
 
-### mysql导入
+启动二进制日志
+```
+log-bin = path/filename #日志文件存储目录和文件名
+expire_log_days = 10    #日志自动删除时间
+max_binlog_size = 100M  # 日志文件最大大小
+```
+
+查看二进制日志
+```
+MYSQL> SHOW VARIABLES LIKE 'log_%';
+MYSQL> SHOW BINARY LOGS;
+
+# filename为二进制日志文件名。
+$> mysqlbinlog filename
+```
+
+删除二进制日志
+```
+MYSQL> RESET MASTER; #删除所有二进制日志
+MYSQL> PURGE {MASTER | BINARY} LOGS TO 'log_name';  #删除文件编号小于log_name编号的文件
+MYSQL> PURGE {MASTER | BINARY} LOGS BEFORE 'date';  #删除指定日期以前的文件
+```
+
+暂时停止二进制日志（不需要重启mysql服务）
+```
+MYSQL> SET sql_log_bin = {0|1}  #暂停或启动二进制日志。
+```
+
+
+### mysql导入(还原)
 #### 方法一：未连接数据库时方法
 >语法格式：mysql -h ip -u userName -p dbName < sqlFilePath (最后没有分号) 
 ```
@@ -734,6 +763,7 @@ dbName : 要使用的具体的某个数据库。这个不是必须的，如果sq
 sqlFilePath : sql脚本的路径。如我将sql脚本放在了D盘，我的sql脚本的名字是”test_sql.sql”。则路径为”D:\test_sql.sql”。 
 
 mysql -h 192.168.99.100 -uroot -p test2 < E:/mysql/2019_08_04_bak.sql
+mysql -h 192.168.99.100 -uroot -p test2 < /home/flack/bak/2019_08_04_bak.sql
 ```
 命令执行情况如下图所示：
 ![导入例子](https://img-blog.csdn.net/20160223105910733 "导入例子")
@@ -764,19 +794,46 @@ or:
 #source /tmp/xxx.sql
 ```
 
-### mysql导出
-导出某个数据库：
+直接复制数据库目录还原:
 ```
-mysqldump -uroot -p test > E:/mysql/bak/2019_08_04.sql
-mysqldump -uroot -p test > ~/mysql/bak/2019_08_04.sql
-mysqldump -h 192.168.99.100 -uroot -p test > E:/mysql/2019_08_04_bak.sql
-mysqldump -h 192.168.99.100 -uroot -p test > ~/mysql/bak/2019_08_04.sql
+注： 该方式必须确保原数据库和待还原的数据库主版本号一致，并且只适用于MyISAM引擎的表。
+关闭mysql服务。
+将备份的文件或目录覆盖mysql的data目录。
+启动mysql服务。
+对于linux系统，复制完文件后需要将文件的用户和组更改为mysql运行的用户和组。
+```
+
+mysqlhotcopy快速恢复
+```
+停止mysql服务，将备份数据库文件复制到存放数据的位置（mysql的data文件夹），重先启动mysql服务即可(可能需要指定数据库文件的所有者)。
+# 如果恢复的数据库已经存在，则使用DROP语句删除已经存在的数据库之后，恢复才能成功，还需要保证数据库版本兼容。
+$> cp -R /usr/backup/test /usr/local/mysql/data
+
+```
+
+使用mysqlbinlog恢复数据
+```
+$> mysqlbinlog [option] filename | mysql -u user -p password
+# filename为二进制日志文件，
+$> mysqlbinlog --stop-date="2013-03-30 15:27:47" D:\MySQL\log\binlog\binlog.000008 | mysql -u root -p password
+# 根据日志文件binlog.000008将数据恢复到2013-03-30 15:27:47以前的操作。
+```
+
+
+### mysql导出（备份）
+导出（备份）某个数据库：
+```
 mysqldump -u root -p dbName > sqlFilePath
+mysqldump -uroot -p test > E:/mysql/bak/2019_08_04.sql
+mysqldump -uroot -p test > /home/flack/bak/aaa.sql
+mysqldump -h 192.168.99.100 -uroot -p test > E:/mysql/2019_08_04_bak.sql
+mysqldump -h 192.168.99.100 -uroot -p test > /home/flack/bak/aaa.sql
+
 
 从meteo数据库的sdata表中导出sensorid=11 且 fieldid=0的数据到 /home/xyx/Temp.sql 这个文件中
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/czl/Temp.sql
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11" > /home/czl/Temp.sql
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid in (1,2,3) " > /home/czl/Temp.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11" > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
 ```
 
 导出多个数据库：
@@ -784,15 +841,24 @@ mysqldump -uroot -p123456 meteo sdata --where=" sensorid in (1,2,3) " > /home/cz
 mysqldump -u root -p --add-drop-database --databases dbName1 dbName2 … > sqlFilePath 
 –add-drop-database ： 该选项表示在创建数据库的时候先执行删除数据库操作 
 –database : 该选项后面跟着要导出的多个数据库，以空格分隔
+
+mysqldump -h localhost -u root -p --databases dbname1,dbname2 > /home/flack/bak/backdb.sql
 ```
 
 导出某个数据库的某个表：
 ```
-mysqldump -u root -p dbName tableName > sqlFilePath
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/czl/Temp.sql
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/czl/Temp.sql
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/czl/Temp.sql
+mysqldump -u root -p dbName tableName1,tableName1 > sqlFilePath
+mysqldump -h localhost -u root -p db_electron tablename1,tablename2 > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
 mysqldump -umagic_ro -h121.201.107.32 -pMagic_ro.mofang123 magic m_electron --where=" category_id=34 and factory='Texas Instruments'" > /home/flack.chen/ti.log
+
+```
+
+到处（备份）系统中所有数据库
+```
+mysqldump -h localhost -u root -p --all-databases > /home/flack/bak/backdb_all.sql
 ```
 
 导出结构不导出数据
@@ -818,8 +884,97 @@ mysqldump -uroot -p -B数据库名 --table 表名 > xxx.sql
 #mysqldump [OPTIONS] database [tables]
 ```
 
+直接复制整个数据库目录
+```
+mysql data 目录
+windowns: installpath/mysql/data
+linux: /var/lib/mysql
+
+在复制前需要先执行如下命令：
+MYSQL> LOCK TABLES;
+在复制过程中允许客户继续查询表，
+MYSQL> FLUSH TABLES;
+将激活的索引页写入硬盘。
+
+cp -R /var/lib/mysql/chf /home/flack/bak/chf
+cp -R /var/lib/mysql/king /home/flack/bak/king
+```
+
+mysqlhotcopy工具备份
+```
+备份数据库或表最快的途径，只能运行在数据库目录所在的机器上，并且只能备份MyISAM类型的表。
+要使用该备份方法必须可以访问备份的表文件。
+$> mysqlhotcopy -u root -p dbname /path/to/new_directory;
+将数据库复制到new_directory目录。
+```
+
+
 导出命令执行情况如下图所示： 
 ![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
+
+
+### 相同版本数据库之间迁移
+```
+# 将服务器www.abc.com的数据库dbname迁移到服务器www.bcd.com的相同版本数据库上。
+$> mysqldump -h www.abc.com -uroot -p password dbname | 
+$> mysqldump -h www.bcd.com -uroot -p password
+
+```
+
+### 不同版本的mysql数据库之间的迁移
+```
+备份原数据库。
+卸载原数据库。
+安装新数据库。
+在新数据库中还原备份的数据库数据。
+数据库用户访问信息需要备份mysql数据库。
+默认字符集问题，MySQL4.x中使用latin1作为默认字符集，mysql5.x使用utf8作为默认字符集。如果有中文数据需要对默认字符集进行更改。
+```
+
+### 不同数据库之间的迁移
+```
+MyODBC工具实现MySQL和SQL Server之间的迁移。
+MySQL Migration Toolkit工具。
+表的导出和导入
+```
+
+### 表的导出和导入
+```
+SELECT * from test INTO OUTFILE '/home/flack/a.csv',该方法只能导出到数据库服务器上，并且导出文件不能已存在。
+
+MYSQL> SELECT ...... INTO OUTFILE filename [OPTIONS]
+MYSQL> SELECT * FROM test.person INTO OUTFILE "C:\person0.txt";
+# 将表person里的数据导入为文本文件person0.txt。
+
+mysqldump文件导出文本文件(和INTO OUTFILE不一样的是该方法所有的选项不需要添加引号)
+
+$> mysqldump -T path -u root -p dbname [tables] [OPTIONS]
+# -T参数表明导出文本文件。path导出数据的目录。
+$> mysqldump -T C:\test person -u root -p
+# 将test表中的person表导出到文本文件。执行成功后test目录下会有两个文件，person.sql和person.txt
+
+
+mysql命令导出文本文件
+MYSQL> mysql -u root -p --execute="SELECT * FROM person;" test > C:\person3.txt;
+# 将test数据库中的person表数据导出到person3.txt文本文件中。--vartical参数可以将一行分为多行显示。
+MYSQL> mysql -u root -p --vartical --execute="SELECT * FROM person;" test > C:\person3.txt;
+# --html将表导出为html文件，--xml文件将表导出为xml文件
+
+
+LOAD DATA INFILE导入文本文件
+MYSQL> LOAD DATA INFILE 'filename.txt' INTO TABLE tablename [OPTIONS] [IGNORE number LINES];
+# [IGNORE number LINES]表示忽略行数
+MYSQL> LOAD DATA INFILE 'C:\person0.txt' INTO TABLE test.person;
+
+
+mysqlimport导入文本文件
+$> mysqlimport -u root -p dbname filename.txt [OPSTONS]
+# 导入的表名有文件名决定，导入数据之前表必须存在
+$> mysqlimport -uroot -p test C:\backup\person.txt
+# 将数据导入到test数据库的person表中。
+```
+
+
 
 跨服务器访问数据库表
 1.首先在mysql配置文件中添加federated

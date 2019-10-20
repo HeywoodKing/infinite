@@ -33,7 +33,8 @@ mv aaa /home/development
 tree
 cat a.txt
 
-
+查询MySQL安装目录
+find / -name mysql
 ```
 
 ### 查看系统内核版本

@@ -664,6 +664,8 @@ docker rm wizardly_chandrasekhar
 Error response from daemon: You cannot remove a running container bf08b7f2cd897b5964943134aa6d373e355c286db9b9885b1f60b6e8f82b2b85. Stop the container before attempting removal or force remove
 ```
 
+### docker-machine
+
 查看docker容器虚拟主机所在的IP（查看IP）
 ```
 docker-machine ip
@@ -727,6 +729,102 @@ Commands:
   version               Show the Docker Machine version or a machine docker version
   help                  Shows a list of commands or help for one command
 ```
+
+#### docker-machine创建虚拟机
+```
+docker-machine create --driver generic --generic-ip-address=192.168.1.111 default
+docker-machine create --driver generic --generic-ip-address=192.168.1.111 Ubuntu-001
+```
+
+
+
+### docker-compose
+```
+使用Compose包含三个最基本步骤：
+1、定义Dockerfile文件，该文件定义了应用环境（镜像的构建）
+2、定义docker-compose.yml文件，该文件定义了组成应用的服务
+3、运行docker-compose up命令
+
+docker-compose--help
+
+一个典型的docker-compose.yml文件内容如下：
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+    - "5000:5000"
+    volumes:
+    - .:/code
+    - logvolume01:/var/log
+    links:
+    - redis
+  redis:
+    image: redis
+volumes:
+  logvolume01: {}
+
+
+```
+
+### 官网也提供了两种方便的安装方式：
+>1、二进制安装（推荐）
+>2、PIP安装
+
+#### 二进制安装
+
+1、curl下载最新版二进制文件
+```
+curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname-s`-`uname -m` -o /usr/local/bin/docker-compose
+
+Compose项目目前是在GitHub上进行维护的，目前最新稳定版本是1.19.0。
+
+地址：https://github.com/docker/compose/releases
+```
+
+#### PIP安装（已安装pip）
+```
+pip install docker-compose
+```
+
+增加可执行权限
+```
+chmod +x /usr/local/bin/docker-compose
+```
+
+（可选）添加bash自动补全命令
+```
+curl  -L https://raw.githubusercontent.com/docker/compose/1.19.0/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+
+可以参考：https://docs.docker.com/compose/completion/
+```
+
+### 卸载docker-compose
+
+1、如果你使用二进制安装的
+```
+rm /usr/local/bin/docker-compose
+```
+2、如果你通过PIP安装的
+```
+pip uninstall docker-compose
+```
+
+测试安装是否成功
+```
+docker-compose version
+```
+
+启动所有服务
+```
+$ docker-compose up
+```
+
+关闭所有服务
+```
+$ docker-compose stop
+```
+
 
 
 ### docker安装redis
