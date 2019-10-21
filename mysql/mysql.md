@@ -211,8 +211,7 @@ select * from subjects where id between 3 and 5;
 select * from students where id is null;
 select * from students where id is not null;
 ```
-<<<<<<< HEAD
-=======
+
 授权
 ```
 GRANT ALL ON *.* TO 'root'@'%';
@@ -220,7 +219,6 @@ GRANT ALL ON *.* TO 'root'@'%';
 刷新权限
 flush privileges;
 ```
->>>>>>> 44b9f19edbd823aa3c90af4cf4f73785df00156c
 
 统计查询
 ```
@@ -721,6 +719,10 @@ mysql> select * from user into outfile '/tmp/user.csv' fields terminated by ',' 
 Query OK, 15 rows affected (0.00 sec)
 
 mysql> SELECT a.* from user a INTO OUTFILE 'a.csv' CHARACTER SET gbk FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
+into outfile 实例:
+mysql> select * from db_electron_property_base.tb_electron_category order by level asc 
+into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 ```
 
 ### mysql导入
