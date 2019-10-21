@@ -640,7 +640,6 @@ select timestampadd(hour, -8, '2008-08-08 12:00:00'); -- 2008-08-08 04:00:00
 排序
 将pony表中的d 进行排序，可d的定义为varchar，可以这样解决
 select * from pony order by (d+0)
-
 ```
 
 ### mysql json
@@ -721,8 +720,9 @@ Query OK, 15 rows affected (0.00 sec)
 mysql> SELECT a.* from user a INTO OUTFILE 'a.csv' CHARACTER SET gbk FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
 
 into outfile 实例:
-mysql> select * from db_electron_property_base.tb_electron_category order by level asc 
-into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+mysql> select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+mysql> select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 ```
 
 启动二进制日志
@@ -942,6 +942,36 @@ MySQL Migration Toolkit工具。
 
 ### 表的导出和导入
 ```
+mysql查询结果导出/输出/写入到文件
+
+方法一：
+直接执行命令：
+mysql> select count(1) from table  into outfile '/tmp/test.xls';
+
+Query OK, 31 rows affected (0.00 sec)
+在目录/tmp/下会产生文件test.xls
+遇到的问题：
+mysql> select count(1) from table   into outfile '/data/test.xls';
+报错：
+ERROR 1 (HY000): Can't create/write to file '/data/test.xls' (Errcode: 13)
+可能原因：mysql没有向/data/下写的权限 
+
+方法二：
+查询都自动写入文件：
+mysql> pager cat > /tmp/test.txt ;
+PAGER set to 'cat > /tmp/test.txt'
+之后的所有查询结果都自动写入/tmp/test.txt'，并前后覆盖
+mysql> select * from table ;
+30 rows in set (0.59 sec)
+在框口不再显示查询结果
+
+
+方法三：
+跳出mysql命令行
+[root@SHNHDX63-146 ~]# mysql -h 127.0.0.1 -u root -p XXXX -P 3306 -e "select * from table"  > /tmp/test/txt
+```
+
+```
 SELECT * from test INTO OUTFILE '/home/flack/a.csv',该方法只能导出到数据库服务器上，并且导出文件不能已存在。
 
 MYSQL> SELECT ...... INTO OUTFILE filename [OPTIONS]
@@ -1043,6 +1073,17 @@ select * from subjects
 #### 函数
 ```
 CAST,CONVERT
+CAST() 和CONVERT() 函数可用来获取一个类型的值，并产生另一个类型的值。
+这个类型 可以是以下值其中的 一个：
+BINARY[(N)]
+CHAR[(N)]
+DATE
+DATETIME
+DECIMAL
+SIGNED [INTEGER]
+TIME
+UNSIGNED [INTEGER]
+
 CAST(xxx AS 类型),CONVERT(xxx,类型)，类型必须用下列的类型：
 可用的类型：　   
   二进制,同带binary前缀的效果 : BINARY    
@@ -1059,6 +1100,13 @@ select CONVERT(category_id, UNSIGNED) from tb_electron_category;
 
 
 字符集转换: CONVERT(xxx  USING   gb2312)
+
+
+select max(cast(sex as UNSIGNED INTEGER)) from user;
+select * from user order by cast(sex as UNSIGNED INTEGER) limit 1;
+select server_id from cardserver where game_id = 1 order by CAST(server_id as SIGNED) desc limit 10;
+select server_id from cardserver where game_id = 1 order by CONVERT(server_id,SIGNED) desc limit 10;
+
 
 
 md5
