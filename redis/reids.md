@@ -478,4 +478,9 @@ Do you want to proceed with the proposed reshard plan (yes/no)? Yes
 ```
 redis-cli -h host -p port -a password
 -h 服务器地址 -p 端口号 -a 密码
+
+eg:
+redis-cli -c -h 192.168.0.61 -p 8001
+
+redis-cli -c -h 192.168.0.61 -p 8001 -a 123456
 ```

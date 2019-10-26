@@ -99,23 +99,48 @@ alter table users add id int auto_increment primary key;  #将自增字段设置
 alter table students add column(aa bool default true, bb varchar(256) default '');
 ```
 
-修改列字段
+修改列字段类型 指定为空或者非空
 ```
 alter table students modify id int auto_increment unique;
 alter table students modify column id int auto_increment unique;
+增加 binary 则表示区分大小写，默认不加是不区分大小写的
 alter table fk_teacher modify column name varchar(256) binary;
+
+alter table students modify 字段名称 字段类型 [是否允许非空];
+alter table students modify 字段名称 字段类型 [是否允许非空];
+alter table students change 字段名称 字段名称 字段类型 [是否允许非空];
+
 ```
 
-修改多列字段
+修改多列字段 指定为空或者非空
 ```
 alter table students modify column(id int auto_increment unique,name varchar(100) not null);
 ```
 
-修改字段列名
+修改字段列名（修改列名）修改某个表的字段名称及指定为空或非空
 ```
 alter table <表名> change <字段名> <字段新名称> <字段的类型>;
-alter table students change name zh_name varchar(200);
+alter table students change name zh_name varchar(200) not null;
 ```
+
+
+字段添加索引
+```
+1.添加PRIMARY KEY（主键索引） 
+mysql>ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` ) 
+2.添加UNIQUE(唯一索引) 
+mysql>ALTER TABLE `table_name` ADD UNIQUE ( 
+`column` 
+) 
+3.添加INDEX(普通索引) 
+mysql>ALTER TABLE `table_name` ADD INDEX index_name ( `column` ) 
+ALTER TABLE SIMPLE_USER ADD INDEX idx_name(NAME);
+4.添加FULLTEXT(全文索引) 
+mysql>ALTER TABLE `table_name` ADD FULLTEXT ( `column`) 
+5.添加多列索引 
+mysql>ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` )
+```
+
 
 删除列字段
 ```
@@ -146,6 +171,18 @@ ALTER TABLE `t_user` ADD unique(`username`);
 结构化查看数据
 ```
 select * from students\G;
+```
+
+得查看自己当前的数据库是否开启了自动提交事务
+```
+select @@autocommit;
+
+如果是1，设置了自动提交事物，那么运行命令：set autocommit = 0;设置为不开启自动提交
+```
+
+查看有咩有未提交的事物
+```
+select * from information_schema.innodb_trx\G;
 ```
 
 插入表数据
@@ -191,6 +228,117 @@ replace into tb1( name, title, mood) select rname, rtitle, rmood from tb2
 
 ```
 
+
+mysql 大数据量插入
+```
+load data infile 'c:/wamp/tmp/Data_OutFile.csv' replace into table data_1 character set utf8 fields terminated by ',' enclosed by '"' lines terminated by '\r\n' (name,age,description );
+
+replace into table data_1   ：指 在表data_1中插入数据时，碰到相同的数据怎么处理。replace是替换。也可以使用ignore，指不处理本条数据。
+character set utf8：  使用字符集 utf8。
+fields terminated by ','   ：  字段之间使用英文逗号隔开。
+Enclosed By '"' ：内容包含在双引号内。
+lines terminated by '\r\n'  ：每条数据以\r\n结尾。
+(name,age,description )是可选的，当不写的时候，就是所有字段。如果数据与数据库的字段不对应的时候，需要填写，以使字段对应
+
+
+INSERT语法
+
+
+
+INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
+
+[INTO] tbl_name [(col_name,...)]
+
+VALUES ({expr | DEFAULT},...),(...),...
+
+[ ON DUPLICATE KEY UPDATE col_name=expr, ... ]
+
+
+
+或：
+
+
+
+INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
+
+[INTO] tbl_name
+
+SET col_name={expr | DEFAULT}, ...
+
+[ ON DUPLICATE KEY UPDATE col_name=expr, ... ]
+
+
+
+或：
+
+
+
+INSERT [LOW_PRIORITY | HIGH_PRIORITY] [IGNORE]
+
+[INTO] tbl_name [(col_name,...)]
+
+SELECT ...
+
+[ ON DUPLICATE KEY UPDATE col_name=expr, ... ]
+
+
+DELAYED 的使用
+使用延迟插入操作DELAYED调节符应用于INSERT和REPLACE语句。当DELAYED插入操作到达的时候，服务器把数据行放入一个队列中，并立即给客户端返回一个状态信息，这样客户端就可以在数据表被真正地插入记录之前继续进行操作了。如果读取者从该数据表中读取数据，队列中的数据就会被保持着，直到没有读取者为止。
+
+接着服务器开始插入延迟数据行（delayed-row）队列中的数据行。在插入操作的同时，服务器还要检查是否有新的读取请求到达和等待。如果有，延迟数据行队列就被挂起，允许读取者继续操作。当没有读取者的时候，服务器再次开始插入延迟的数据行。这个过程一直进行，直到队列空了为止。
+
+INSERT DELAYED应该仅用于指定值清单的INSERT语句。服务器忽略用于INSERT DELAYED…SELECT语句的DELAYED。服务器忽略用于INSERT DELAYED…ON DUPLICATE UPDATE语句的DELAYED。
+
+因为在行被插入前，语句立刻返回，所以您不能使用LAST_INSERT_ID()来获取AUTO_INCREMENT值。AUTO_INCREMENT值可能由语句生成。
+
+对于SELECT语句，DELAYED行不可见，直到这些行确实被插入了为止。
+
+DELAYED在从属复制服务器中被忽略了，因为DELAYED不会在从属服务器中产生与主服务器不一样的数据。注意，目前在队列中的各行只保存在存储器中，直到它们被插入到表中为止。这意味着，如果您强行中止了mysqld(例如，使用kill -9)或者如果mysqld意外停止，则所有没有被写入磁盘的行都会丢失。
+
+
+IGNORE的使用
+IGNORE是MySQL相对于标准SQL的扩展。如果在新表中有重复关键字，或者当STRICT模式启动后出现警告，则使用IGNORE控制ALTER TABLE的运行。
+
+如果没有指定IGNORE，当重复关键字错误发生时，复制操作被放弃，返回前一步骤。
+
+如果指定了IGNORE，则对于有重复关键字的行，只使用第一行，其它有冲突的行被删除。并且，对错误值进行修正，使之尽量接近正确值。insert ignore into tb(…) value(…)这样不用校验是否存在了，有则忽略，无则添加。
+
+
+ON DUPLICATE KEY UPDATE的使用
+如果您指定了ON DUPLICATE KEY UPDATE，并且插入行后会导致在一个UNIQUE索引或PRIMARY KEY中出现重复值，则执行旧行UPDATE。例如，如果列a被定义为UNIQUE，并且包含值1，则以下两个语句具有相同的效果
+
+mysql> INSERT INTO table (a,b,c) VALUES (1,2,3)
+
+-> ON DUPLICATE KEY UPDATE cc=c+1;
+
+mysql> UPDATE table SET cc=c+1 WHERE a=1;
+
+如果行作为新记录被插入，则受影响行的值为1；如果原有的记录被更新，则受影响行的值为2。
+
+注释：如果列b也是唯一列，则INSERT与此UPDATE语句相当：
+
+mysql> UPDATE table SET cc=c+1 WHERE a=1 OR b=2 LIMIT 1;
+
+
+如果a=1 OR b=2与多个行向匹配，则只有一个行被更新。通常，您应该尽量避免对带有多个唯一关键字的表使用ON DUPLICATE KEY子句。您可以在UPDATE子句中使用VALUES(col_name)函数从INSERT…UPDATE语句的INSERT部分引用列值。换句话说，如果没有发生重复关键字冲突，则UPDATE子句中的VALUES(col_name)可以引用被插入的col_name的值。本函数特别适用于多行插入。VALUES()函数只在INSERT…UPDATE语句中有意义，其它时候会返回NULL。
+
+
+示例：
+mysql> INSERT INTO table (a,b,c) VALUES (1,2,3),(4,5,6)
+
+-> ON DUPLICATE KEY UPDATE c=VALUES(a)+VALUES(b);
+
+本语句与以下两个语句作用相同：
+mysql> INSERT INTO table (a,b,c) VALUES (1,2,3)
+-> ON DUPLICATE KEY UPDATE c=3;
+mysql> INSERT INTO table (a,b,c) VALUES (4,5,6)
+-> ON DUPLICATE KEY UPDATE c=9;
+
+当您使用ON DUPLICATE KEY UPDATE时，DELAYED选项被忽略
+```
+
+
+
 更新表数据
 ```
 update students set name='lili' where id=1;
@@ -211,8 +359,7 @@ select * from subjects where id between 3 and 5;
 select * from students where id is null;
 select * from students where id is not null;
 ```
-<<<<<<< HEAD
-=======
+
 授权
 ```
 GRANT ALL ON *.* TO 'root'@'%';
@@ -220,7 +367,6 @@ GRANT ALL ON *.* TO 'root'@'%';
 刷新权限
 flush privileges;
 ```
->>>>>>> 44b9f19edbd823aa3c90af4cf4f73785df00156c
 
 统计查询
 ```
@@ -252,16 +398,45 @@ create index idx_students_id on students(id, name(11), gender);
 删除索引
 ```
 drop index idx_students_id on students;
+drop index index_name on table_name ;
+alter table table_name drop index index_name ;
+alter table table_name drop primary key ;
 ```
+
+解除外键约束
+```
+alter table students drop foreign key FK1C81D1738DA76;
+```
+
+删除外键
+```
+alter table students drop user_id
+```
+
+修改存储引擎
+```
+alter table students engine = innodb;
+alter table students engine = myisam;
+```
+
+
 
 开启运行时间检测
 ```
 set profiling=1;
 ```
 
+<!-- innodb_flush_log_at_trx_commit -->
+
+
 查看执行时间
 ```
 show profiles;
+```
+
+查看当前表的自动增长id是多少
+```
+select auto_increment from information_schema.tables where table_schema = 'db_electron_property' and table_name = 'tb_electron_area';
 ```
 
 修改表users自动序列值
@@ -642,32 +817,123 @@ select timestampadd(hour, -8, '2008-08-08 12:00:00'); -- 2008-08-08 04:00:00
 排序
 将pony表中的d 进行排序，可d的定义为varchar，可以这样解决
 select * from pony order by (d+0)
-
 ```
 
 ### mysql json
 ```
+分类  函数  描述
+创建json  json_array  创建json数组
+  json_object 创建json对象
+  json_quote  将json转成json字符串类型
+查询json  json_contains 判断是否包含某个json值
+  json_contains_path  判断某个路径下是否包json值
+  json_extract  提取json值
+  column->path  json_extract的简洁写法，MySQL 5.7.9开始支持
+  column->>path json_unquote(column -> path)的简洁写法
+  json_keys 提取json中的键值为json数组
+  json_search 按给定字符串关键字搜索json，返回匹配的路径
+修改json  json_append 废弃，MySQL 5.7.9开始改名为json_array_append
+  json_array_append 末尾添加数组元素，如果原有值是数值或json对象，则转成数组后，再添加元素
+  json_array_insert 插入数组元素
+  json_insert 插入值（插入新值，但不替换已经存在的旧值）
+  json_merge  合并json数组或对象
+  json_remove 删除json数据
+  json_replace  替换值（只替换已经存在的旧值）
+  json_set  设置值（替换旧值，并插入不存在的新值）
+  json_unquote  去除json字符串的引号，将值转成string类型
+返回json属性  json_depth  返回json文档的最大深度
+  json_length 返回json文档的长度
+  json_type 返回json值得类型
+  json_valid  判断是否为合法json文档
+
+
+
+创建表
+CREATE TABLE t_json(id INT PRIMARY KEY, NAME VARCHAR(20) , info  JSON);
+
+插入记录
+INSERT INTO t_json(id,sname,info) VALUES(1 ,'test','{"time":"2017-01-01 13:00:00","ip":"192.168.1.1","result":"fail"}');
+INSERT INTO t_json(id,sname,info)  VALUES(2 ,'my',JSON_OBJECT("time",NOW(),'ip','192.168.1.1','result','fail'));
+
+查询IP键
+SELECT sname,JSON_EXTRACT(info,'$.ip') FROM t_json;
+查询有多少个键
+SELECT id,json_keys(info) AS "keys" FROM t_json;
+
+
 json_keys()
 
+
 json_set()
+设置值（替换旧值，并插入不存在的新值）
 update tb_electron_category_mapping_factory set data=JSON_SET(data, '$."aaa"', 1), state=%s, update_at=%s, update_uid=%s where category_id=%s
 update tb_electron_label_mapping_factory set data=JSON_SET(data, '$."100"', 1),state=%s,update_at=%s,update_uid=%s where id=%s
 
+增加键
+UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.1');
+变更值
+UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.2');
+
+
 json_insert()
+插入值（插入新值，但不替换已经存在的旧值）
+mysql> SET @j = '{ "a": 1, "b": [2, 3]}';
+mysql> SELECT JSON_INSERT(@j, '$.a', 10, '$.c', '[true, false]');
++----------------------------------------------------+
+| JSON_INSERT(@j, '$.a', 10, '$.c', '[true, false]') |
++----------------------------------------------------+
+| {"a": 1, "b": [2, 3], "c": "[true, false]"}        |
++----------------------------------------------------+
+
+
+mysql> SELECT JSON_INSERT(@j, '$.a', 10, '$.c', CAST('[true, false]' AS JSON));
++------------------------------------------------------------------+
+| JSON_INSERT(@j, '$.a', 10, '$.c', CAST('[true, false]' AS JSON)) |
++------------------------------------------------------------------+
+| {"a": 1, "b": [2, 3], "c": [true, false]}                        |
++------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+
 
 json_remove()
+删除键
+UPDATE t_json SET info = json_remove(info,'$.ip');
 update tb_electron_category_mapping_factory set data=json_remove(data, %s),update_at=%s,update_uid=%s where category_id=%s
+
 
 json_object()
 update tb_electron_factory set extra_data=json_object(1,1,2,1,"agent_mobile","","agent_area_code","","agent_email","","agent_contacts","","agent_position","","agent_address","");
 
+
 json_contains()
 select * from tb_electron_label_mapping_category where json_contains(data,'{"100":1}')
+
 
 json_contains_path()
 select {} from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$."100"')
 select {} from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$.www')
 
+
+JSON_MERGE(json_doc, json_doc[, json_doc] ...)
+
+合并两个或多个JSON文档。同义词 JSON_MERGE_PRESERVE(); 在MySQL 5.7.22中已弃用，并且在将来的版本中将被删除。
+
+mysql> SELECT JSON_MERGE('[1, 2]', '[true, false]');
++---------------------------------------+
+| JSON_MERGE('[1, 2]', '[true, false]') |
++---------------------------------------+
+| [1, 2, true, false]                   |
++---------------------------------------+
+1 row in set, 1 warning (0.00 sec)
+ 
+mysql> SHOW WARNINGS\G
+*************************** 1. row ***************************
+  Level: Warning
+   Code: 1287
+Message: 'JSON_MERGE' is deprecated and will be removed in a future release. \
+ Please use JSON_MERGE_PRESERVE/JSON_MERGE_PATCH instead
+1 row in set (0.00 sec)
 
 ```
 
@@ -721,6 +987,11 @@ mysql> select * from user into outfile '/tmp/user.csv' fields terminated by ',' 
 Query OK, 15 rows affected (0.00 sec)
 
 mysql> SELECT a.* from user a INTO OUTFILE 'a.csv' CHARACTER SET gbk FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
+into outfile 实例:
+mysql> select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+mysql> select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 ```
 
 启动二进制日志
@@ -750,6 +1021,41 @@ MYSQL> PURGE {MASTER | BINARY} LOGS BEFORE 'date';  #删除指定日期以前的
 ```
 MYSQL> SET sql_log_bin = {0|1}  #暂停或启动二进制日志。
 ```
+
+
+### msyql 1.6亿条数据的表分表
+首先创建256张分表
+```
+select md5(123) = 202cb962ac59075b964b07152d234b70
+
+create table `tb_extra_m_electron_kwargs_xx`(
+  full_code char(32) not null,
+  create_time int(10) unsigned NOT NULL,
+  PRIMARY KEY (`full_code`),
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+create table `tb_extra_m_electron_kwargs_xx`(
+  full_code char(32) not null,
+  create_time datetime(6) NOT NULL,  
+  PRIMARY KEY (full_code),
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+create table if not exists `tb_extra_m_electron_kwargs_full`(
+  full_code char(32) not null,
+  create_time datetime(6) NOT NULL,  
+  index(full_code),
+) type=merge UNION=(tb_extra_m_electron_kwargs_00,tb_extra_m_electron_kwargs_01,tb_extra_m_electron_kwargs_02.......) INSERT_METHOD=LAST;
+
+这样我们通过select * from tb_extra_m_electron_kwargs_full 就可以得到所有的 full_code 数据了。
+```
+
+
+
+
+
 
 
 ### mysql导入(还原)
@@ -940,6 +1246,36 @@ MySQL Migration Toolkit工具。
 
 ### 表的导出和导入
 ```
+mysql查询结果导出/输出/写入到文件
+
+方法一：
+直接执行命令：
+mysql> select count(1) from table  into outfile '/tmp/test.xls';
+
+Query OK, 31 rows affected (0.00 sec)
+在目录/tmp/下会产生文件test.xls
+遇到的问题：
+mysql> select count(1) from table   into outfile '/data/test.xls';
+报错：
+ERROR 1 (HY000): Can't create/write to file '/data/test.xls' (Errcode: 13)
+可能原因：mysql没有向/data/下写的权限 
+
+方法二：
+查询都自动写入文件：
+mysql> pager cat > /tmp/test.txt ;
+PAGER set to 'cat > /tmp/test.txt'
+之后的所有查询结果都自动写入/tmp/test.txt'，并前后覆盖
+mysql> select * from table ;
+30 rows in set (0.59 sec)
+在框口不再显示查询结果
+
+
+方法三：
+跳出mysql命令行
+[root@SHNHDX63-146 ~]# mysql -h 127.0.0.1 -u root -p XXXX -P 3306 -e "select * from table"  > /tmp/test/txt
+```
+
+```
 SELECT * from test INTO OUTFILE '/home/flack/a.csv',该方法只能导出到数据库服务器上，并且导出文件不能已存在。
 
 MYSQL> SELECT ...... INTO OUTFILE filename [OPTIONS]
@@ -1038,9 +1374,21 @@ select * from subjects
 ```
 
 
+
 #### 函数
 ```
 CAST,CONVERT
+CAST() 和CONVERT() 函数可用来获取一个类型的值，并产生另一个类型的值。
+这个类型 可以是以下值其中的 一个：
+BINARY[(N)]
+CHAR[(N)]
+DATE
+DATETIME
+DECIMAL
+SIGNED [INTEGER]
+TIME
+UNSIGNED [INTEGER]
+
 CAST(xxx AS 类型),CONVERT(xxx,类型)，类型必须用下列的类型：
 可用的类型：　   
   二进制,同带binary前缀的效果 : BINARY    
@@ -1057,6 +1405,13 @@ select CONVERT(category_id, UNSIGNED) from tb_electron_category;
 
 
 字符集转换: CONVERT(xxx  USING   gb2312)
+
+
+select max(cast(sex as UNSIGNED INTEGER)) from user;
+select * from user order by cast(sex as UNSIGNED INTEGER) limit 1;
+select server_id from cardserver where game_id = 1 order by CAST(server_id as SIGNED) desc limit 10;
+select server_id from cardserver where game_id = 1 order by CONVERT(server_id,SIGNED) desc limit 10;
+
 
 
 md5
