@@ -913,6 +913,8 @@ docker run -d -it --rm --name mongo-express -p 18081:8081 -e ME_CONFIG_MONGODB_S
 
 docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql
 
+docker run -p 3306:3306 --name mariadb_foxy -v $PWD/conf:/etc/mariadb/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mariadb -e MYSQL_ROOT_PASSWORD=123456 -d mariadb
+
 进入容器
 docker exec -it 62349aa31687 /bin/bash
 ```
