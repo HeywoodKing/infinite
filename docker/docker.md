@@ -98,6 +98,7 @@ systemctl enable docker
 `yum -y remove docker-engine`
 
 
+
 ## Ubuntu 18.0.4安装docker
 
 ###第一步：如果之前安装过docker，执行下面命令删除
@@ -319,6 +320,7 @@ root@1a9fbdeb5da3:/#
 ```
 
 7. 
+
 
 ###容器相关命令
 1. 新建并启动容器
@@ -737,6 +739,83 @@ docker-machine create --driver generic --generic-ip-address=192.168.1.111 Ubuntu
 ```
 
 
+#### docker集群管理之docker-machine
+1、启动Docker 守护进程
+`systemctl daemon-reload`
+
+2、Docker启动命令：
+`systemctl start docker`
+
+3、查看docker服务是否启动
+`ps -ef |grep docker`
+
+4、查看docker启动的服务：
+`docker ps`
+
+5、重启docker服务
+`systemctl restart docker`
+
+6、停止docker服务
+`systemctl stop docker`
+
+
+##### docker-machine安装
+```
+curl -L https://github.com/docker/machine/release/download/v0.3.0/docker-machine_linux-amd64 > /usr/local/bin/docker-machine
+
+chmod +x /usr/local/bin/docker-machine
+
+docker-machine -v
+```
+
+创建docker主机
+
+运行create命令需要指明驱动的名称，目前支持在本机运行virtualbox虚拟主机，Hyper-V虚拟主机，VMware虚拟主机，AWS EC2，Azure，DigitalOcean，Google等公有云主机，以及使用Openstack搭建的私有数据中心
+
+新的虚拟化（Xen，KVM）支持以及新的云平台支持可以通过开发驱动的方式支持
+
+在本机安装Virtualbox虚拟机作为Docker主机
+```
+docker-machine create --driver virtualbox foxy
+```
+
+Create Docker Machine主要包括三个Create过程
+1. 首先是Provider Create（libmachine/provider.go），此函数主要是在当前运行docker-machine命令主机上创建以machine name命名的文件夹，并将根证书，服务器证书以及用户证书拷贝到此文件夹
+2. 其次是driver create（例如drivers/virtualbox/virtualbox.go）用来创建主机
+3. 最后是运行host create（libmachine/host.go）通过SSH安装并配置Docker
+
+目前在本地环境中使用的是boot2docker镜像，云端环境使用的是Ubuntu镜像
+
+运行在Virtualbox虚拟主机上的docker machine创建过程如下
+1. Docker Machine首先生成一个自签名的Root CA
+2. 然后用这个Root CA签发客户端证书，此证书在Docker客户端连接远程Docker服务器的时候做认证使用
+3. 配置Docker主机的运行参数，参数包括Docker客户端与远程Docker服务器之间认证参数，远程Docker daemon的运行参数以及Docker Swarm的参数
+4. Docker Machine使用boot2docker作为virtualbox的镜像 – boot2docker是一个运行Docker容器的轻量级Linux系统，完全在内存中运行
+5. 创建virtualbox虚拟机
+	+ 生成ssh key – 部署过程中使用次ssh key认证实现远程操作
+	+ 创建一个VMDK文件作为虚拟机的hdd，大小可以在运行时指定参数–virtualbox-disk-size控制
+	+ 创建虚拟机,修改虚拟机参数，可通过参数–virtualbox-memory和–virtualbox-cpu-count控制内存大小和CPU个数
+	+ 配置虚拟机网络 – NIC1为NAT形式使虚拟机能够访问外网，NIC2为hostonly模式用于内部通信，子网可以通过参数–virtualbox-hostonly-cidr修改
+	+ 配置存储 – 将boot2docker iso文件挂载在虚拟dvd光驱，步骤b中创建的文件作为hdd
+7. 启动虚拟机，并设置端口映射，将本地随机端口转发到虚拟机22端口(此时还不知道虚拟机Hostonly网卡的IP地址，所以只能通过NAT网卡进行端口映射的方法访问虚拟机)
+8. 使用默认用户名docker，默认密码docker登录虚拟机将第一步生成的ssh key导入到虚拟机/home/docker/.ssh/authorized_keys。获取hostonly网卡的IP地址（通过DHCP获得）
+9. 部署虚拟机的Docker运行环境（所有命令都是通过SSH远程执行）
+	+ 配置虚拟机hostname
+	+ 安装Docker
+	+ 配置docker daemon使用TLS –tlsverify。使用此选项之后docker daemon只接受来自第1步中自签名的根证书签发的证书，docker客户端只相信第1步中自签名的更证书签发的服务器证书
+	+ 签发服务器证书
+
+自此为止一个基于virtualbox的Docker运行环境就创建好了，使用者需要将本地的docker客户端配置到远程的docker daemon
+```
+docker-machine env foxy
+```
+
+Docker Machine的其他命令都是通过drivers/virtualbox/virtualbox.go驱动实现的
+
+
+
+
+
 
 ### docker-compose
 ```
@@ -1020,3 +1099,60 @@ docker run -d --name=ubuntu_server -p 80:80 ubuntu:latest
 docker run -d --name=ubuntu_server -v /etc/www:/var/www ubuntu:latest
 
 ```
+
+```
+一、问题描述：安装过Docker Toolbox，卸载后，重新安装，无法正常使用，提示
+
+
+Running pre-create checks...
+Error with pre-create check: "Hyper-V is installed. VirtualBox won't boot a 64bits VM when Hyper-V is activated. If it's installed but deactivated, you can use --virtualbox-no-vtx-check to try anyways"
+Looks like something went wrong in step ´Checking if machine default exists´
+二、解决方法（参考：谢谢参考文献，试过有用。）
+1.以管理员方式打开cmd,输入以下命令。（第二行命令参考第一行命令返回的结果）
+
+
+C:\>bcdedit /copy {current} /d "No Hyper-V" 
+The entry was successfully copied to {ff-23-113-824e-5c5144ea}. 
+
+C:\>bcdedit /set {ff-23-113-824e-5c5144ea} hypervisorlaunchtype off 
+The operation completed successfully.
+2.重启电脑，选择No Hyper-V 系统，进入电脑。
+
+
+3.下载安装Docker Toolbox。
+
+4.打开安装目录，找到start.sh。
+
+编辑start.sh，找到下面的代码片段：
+
+
+STEP="Checking if machine $VM exists"
+if [ $VMEXISTSCODE -eq 1 ]; then
+  "${DOCKERMACHINE}" rm -f "${VM}" &> /dev/null || :
+  rm -rf ~/.docker/machine/machines/"${VM}"
+  #set proxy variables if they exists
+  if [ -n ${HTTPPROXY+x} ]; then
+    PROXYENV="$PROXYENV --engine-env HTTPPROXY=$HTTPPROXY"
+  fi
+  if [ -n ${HTTPSPROXY+x} ]; then
+    PROXYENV="$PROXYENV --engine-env HTTPSPROXY=$HTTPSPROXY"
+  fi
+  if [ -n ${NOPROXY+x} ]; then
+    PROXYENV="$PROXYENV --engine-env NOPROXY=$NOPROXY"
+  fi
+
+  "${DOCKERMACHINE}" create -d virtualbox $PROXYENV "${VM}"
+fi
+将最后第二行改为：
+
+"${DOCKERMACHINE}" create -d virtualbox --virtualbox-no-vtx-check $PROXYENV "${VM}"
+5.可以正常使用Docker Quickstart Termial了。
+
+
+6.以后要用Docker，都要进入N0 Hyper-V 。
+```
+
+
+#### docker集群管理实践
+
+

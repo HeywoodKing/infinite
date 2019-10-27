@@ -22,11 +22,18 @@ Options:
 ```
 sudo apt-get update
 sudo apt-get install nginx
+
+Ubuntu安装之后的文件结构大致为：
+1. 所有的配置文件都在/etc/nginx下，并且每个虚拟主机已经安排在了/etc/nginx/sites-available下
+2. 程序文件在/usr/sbin/nginx
+3. 日志放在了/var/log/nginx中
+4. 并已经在/etc/init.d/下创建了启动脚本nginx
+5. 默认的虚拟主机的目录设置在了/var/www/nginx-default (有的版本 默认的虚拟主机的目录设置在了/var/www, 请参考/etc/nginx/sites-available里的配置)
 ```
 
 ### 卸载Nginx
 ```
-
+sudo apt-get uninstall nginx
 ```
 
 ### 安装完成后，检查Nginx服务的状态：
@@ -43,6 +50,7 @@ sudo nginx -v
 ```
 
 ### 注：不仅仅使用systemctl可管理Nginx服务
+
 ### 启动nginx
 ```
 sudo systemctl start nginx
@@ -152,7 +160,6 @@ if ($http_user_agent ~* "Firefox|MSIE")
 none 表示空的来路，也就是直接访问，比如直接在浏览器打开一个图片
 blocked 表示被防火墙标记过的来路
 server_names 也就是域名了。0.5.33以后的版本中，可以用*.hihi123.com来表示所有的二级域名
-
 ```
 location ~ .*\.(wma|wmv|asf|mp3|mmf|zip|rar|jpg|gif|png|swf|flv)$ {
      valid_referers none blocked *.765h.com 765h.com;
@@ -229,14 +236,12 @@ NginxHttpAccessKeyModule第三方模块，实现方法如下：
 
 4. 修改nginx的conf文件，添加以下几行：
 
-复制代码
 location /download {
   accesskey             on;
   accesskey_hashmethod  md5;
   accesskey_arg         "key";
   accesskey_signature   "mypass$remote_addr";
 }
-复制代码
 
 其中：
 accesskey为模块开关；
@@ -263,3 +268,130 @@ echo $output_org_url;
 使用ngx_http_accesskey_module 模块后http://www.765h.com/download/file.zip?key=09093abeac094. 只有给定的key值正确了，才能够下载download目录下的file.zip。而且 key 值是根据用户的IP有关的，这样就可以避免被盗链了。
 
 据说Nginx HttpAccessKeyModule现在连迅雷都可以防了，可以尝试一下。
+
+
+
+
+### 配置多站点步骤
+
+1. 安装Nginx
+```
+sudo apt-get install Nginx
+```
+
+2. 创建项目文件路径
+```
+sudo mkdir -p /var/www/chfweb
+sudo mkdir -p /var/www/qshweb
+```
+3. 再将这两个文件夹给定权限和所有权
+```
+sudo chown -R www-data:www-data /var/www/chfweb
+sudo chown -R www-data:www-data /var/www/qshweb
+```
+
+4. 创建不同的配置文件
+安装完 Nginx 之后，其实 Nginx 的默认配置文件实在 /etc/nginx/sites-available/default
+但是我们要配置多站点的话，可以这样：
+```
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/chfweb
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/qshweb
+```
+
+5. 然后编辑配置文件
+```
+sudo vim /etc/nginx/sites-available/chfweb
+删除原来所有的配置内容，添加下面的配置：
+server{
+  listen 80;
+  listen [::]:80;
+
+  server_name chf.com www.chf.com;
+
+  charset utf-8;
+  client_max_body_size 75M;
+
+  # root /var/www/domain-two.com/html;
+  # index index.html index.htm index.nginx-debian.html;
+  
+  # location / {
+  #   try_files $uri $uri/ =404;
+  # }
+
+
+  location /static {
+    alias /var/www/chfweb/static;
+  }
+
+  location /media {
+    alias /var/www/chfweb/uploads;
+  }
+
+  location / {
+    uwsgi_pass 127.0.0.1:8020;
+    include /etc/nginx/uwsgi_params;
+  }
+}
+
+
+sudo vim /etc/nginx/sites-available/qshweb
+删除原来所有的配置内容，添加下面的配置：
+server{
+  listen 80;
+  listen [::]:80;
+
+  server_name qsh.com www.qsh.com;
+
+  charset utf-8;
+  client_max_body_size 75M;
+
+  # root /var/www/domain-two.com/html;
+  # index index.html index.htm index.nginx-debian.html;
+
+  # location / {
+  #   try_files $uri $uri/ =404;
+  # }
+
+
+  location /static {
+    alias /var/www/chfweb/static;
+  }
+
+  location /media {
+    alias /var/www/chfweb/uploads;
+  }
+
+  location / {
+    uwsgi_pass 127.0.0.1:8020;
+    include /etc/nginx/uwsgi_params;
+  }
+}
+
+
+```
+
+6. 最后我们需要将原来 Nginx 的 default 配置删除或将default内容注释
+```
+sudo rm etc/nginx/sites-available/default
+```
+
+7. 建立软链接
+有了 chf.com 和 qsh.com 的配置之后，我们需要把这两个配置告知 Nginx 
+```
+sudo ln -s /etc/nginx/sites-available/chfweb /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/qshweb /etc/nginx/sites-enabled/
+```
+
+8. 执行上面的命令之后，我们再使用 nginx -t 检测 Nginx 的配置文件是否有错
+```
+sudo nginx -t
+```
+
+9. 如果你没有看到报错，就可以直接重启 Nginx 服务了
+```
+sudo service nginx start
+sudo service nginx restart
+sudo service nginx stop
+```
+
+10. 到此就大功告成啦！访问你的域名试试咯！
