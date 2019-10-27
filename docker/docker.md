@@ -128,11 +128,11 @@ sub   rsa4096 2017-02-22 [S]
 ```
 说明 Ok，继续
 
-###第四步：设定稳定仓储库，这一步我被 坑了好久，具体参考
+###第四步：设定稳定仓储库，这一步我被坑了好久，具体参考
 
 docker配置仓储库时出错：无法安全地用该源进行更新，所以默认禁用该源
 也可以不设置，不设置默认使用官方的，具体是：deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
-同样可以用阿里 的镜像：设置命令如下：
+同样可以用阿里的镜像：设置命令如下：
 sudo add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
 其中的lsb_release -cs相当于一个函数，直接获取Ubuntu下的最新版本
 
@@ -143,7 +143,7 @@ sudo add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/l
 sudo apt-get -y install docker-ce
 也可以指定想安装 的docker版本，方法 如下：
 
-执行如下命令命令查看有哪些版本，
+执行如下命令查看有哪些版本，
 apt-cache madison docker-ce
 输出如下：
 ```
@@ -761,10 +761,18 @@ docker-machine create --driver generic --generic-ip-address=192.168.1.111 Ubuntu
 
 ##### docker-machine安装
 ```
-curl -L https://github.com/docker/machine/release/download/v0.3.0/docker-machine_linux-amd64 > /usr/local/bin/docker-machine
+$base=https://github.com/docker/machine/releases/download/v0.16.0 &&
+  curl -L $base/docker-machine-$(uname -s)-$(uname -m) > /tmp/docker-machine &&
+  sudo mv /tmp/docker-machine /usr/local/bin/docker-machine &&
+  chmod +x /usr/local/bin/docker-machine
 
+curl -L https://github.com/docker/machine/releases/download/v0.16.0/docker-machine-$(uname -s)-$(uname -m) > /tmp/docker-machine
+sudo mv /tmp/docker-machine /usr/local/bin/docker-machine
 chmod +x /usr/local/bin/docker-machine
 
+
+curl -L https://github.com/docker/machine/releases/download/v0.16.0/docker-machine_linux-amd64 > /usr/local/bin/docker-machine
+chmod +x /usr/local/bin/docker-machine
 docker-machine -v
 ```
 
