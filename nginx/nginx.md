@@ -354,11 +354,11 @@ server{
 
 
   location /static {
-    alias /var/www/chfweb/static;
+    alias /var/www/qshweb/static;
   }
 
   location /media {
-    alias /var/www/chfweb/uploads;
+    alias /var/www/qshweb/uploads;
   }
 
   location / {
