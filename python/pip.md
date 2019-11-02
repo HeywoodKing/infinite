@@ -14,6 +14,9 @@ pip install --upgrade pip
 ## 安装包
 ```
 pip install SomePackage
+
+安装使用清华源
+pip install package_name -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## 卸载包 

@@ -91,7 +91,7 @@ rename table students to|as student;
 ```
 alter table students add is_delete bit default;
 alter table students add column aa bool default true;
-alter table users add id int auto_increment primary key;  #将自增字段设置为primary key
+alter table students add id int auto_increment primary key;  #将自增字段设置为primary key
 ```
 
 增加多列字段
@@ -123,24 +123,17 @@ alter table <表名> change <字段名> <字段新名称> <字段的类型>;
 alter table students change name zh_name varchar(200) not null;
 ```
 
-
-字段添加索引
+修改字符顺序
 ```
-1.添加PRIMARY KEY（主键索引） 
-mysql>ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` ) 
-2.添加UNIQUE(唯一索引) 
-mysql>ALTER TABLE `table_name` ADD UNIQUE ( 
-`column` 
-) 
-3.添加INDEX(普通索引) 
-mysql>ALTER TABLE `table_name` ADD INDEX index_name ( `column` ) 
-ALTER TABLE SIMPLE_USER ADD INDEX idx_name(NAME);
-4.添加FULLTEXT(全文索引) 
-mysql>ALTER TABLE `table_name` ADD FULLTEXT ( `column`) 
-5.添加多列索引 
-mysql>ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` )
-```
+ALTER TABLE 表名 MODIFY 字段名1 数据类型 FIRST ｜ AFTER 字段名2;
+alter table student modify id int(10) unsigned auto_increment first;
+如果要把name放到id之后呢？这样写就可以了（first 换成 after即可）：
+alter table student modify name varchar(10) after id;
+alter table 表名  change 字段名 新字段名 字段类型 默认值 after 字段名(跳到哪个字段之后)
+alter table students  change name new_name varchar(50) default null AFTER z5
 
+alter table tb_electron_factory_online modify extra_data json default null AFTER source_type;
+```
 
 删除列字段
 ```
@@ -155,12 +148,12 @@ alter table students engine=innodb|bdb;
 
 查看外键
 ```
-show create table my_foreign1;
+show create table students;
 ```
 
 添加表外键约束
 ```
-alter table students add constraint my_foreign1 foreign key(subid) references subjects(id);
+alter table students add constraint students foreign key(subid) references subjects(id);
 ```
 
 添加唯一性约束
@@ -175,15 +168,86 @@ select * from students\G;
 
 得查看自己当前的数据库是否开启了自动提交事务
 ```
+show variables like '%autocommit%'
 select @@autocommit;
 
 如果是1，设置了自动提交事物，那么运行命令：set autocommit = 0;设置为不开启自动提交
 ```
 
-查看有咩有未提交的事物
+查看有木有未提交的事物
 ```
 select * from information_schema.innodb_trx\G;
 ```
+
+查询事务情况
+```
+SELECT * FROM information_schema.INNODB_TRX\G
+```
+
+查看表锁信息
+```
+SELECT * FROM information_schema.INNODB_LOCKS;
+SELECT * FROM information_schema.INNODB_LOCK_waits;
+```
+
+desc innodb_locks;
++————-+———————+——+—–+———+——-+
+| Field       | Type                | Null | Key | Default | Extra |
++————-+———————+——+—–+———+——-+
+| lock_id     | varchar(81)         | NO   |     |         |       |#锁ID
+| lock_trx_id | varchar(18)         | NO   |     |         |       |#拥有锁的事务ID
+| lock_mode   | varchar(32)         | NO   |     |         |       |#锁模式
+| lock_type   | varchar(32)         | NO   |     |         |       |#锁类型
+| lock_table  | varchar(1024)       | NO   |     |         |       |#被锁的表
+| lock_index  | varchar(1024)       | YES  |     | NULL    |       |#被锁的索引
+| lock_space  | bigint(21) unsigned | YES  |     | NULL    |       |#被锁的表空间号
+| lock_page   | bigint(21) unsigned | YES  |     | NULL    |       |#被锁的页号
+| lock_rec    | bigint(21) unsigned | YES  |     | NULL    |       |#被锁的记录号
+| lock_data   | varchar(8192)       | YES  |     | NULL    |       |#被锁的数据
++————-+———————+——+—–+———+——-+
+10 rows in set (0.00 sec)
+
+desc innodb_lock_waits;
++——————-+————-+——+—–+———+——-+
+| Field             | Type        | Null | Key | Default | Extra |
++——————-+————-+——+—–+———+——-+
+| requesting_trx_id | varchar(18) | NO   |     |         |       |#请求锁的事务ID
+| requested_lock_id | varchar(81) | NO   |     |         |       |#请求锁的锁ID
+| blocking_trx_id   | varchar(18) | NO   |     |         |       |#当前拥有锁的事务ID
+| blocking_lock_id  | varchar(81) | NO   |     |         |       |#当前拥有锁的锁ID
++——————-+————-+——+—–+———+——-+
+4 rows in set (0.00 sec)
+   
+desc innodb_trx ;
++—————————-+———————+——+—–+———————+——-+
+| Field                      | Type                | Null | Key | Default             | Extra |
++—————————-+———————+——+—–+———————+——-+
+| trx_id                     | varchar(18)         | NO   |     |                     |       |#事务ID
+| trx_state                  | varchar(13)         | NO   |     |                     |       |#事务状态：
+| trx_started                | datetime            | NO   |     | 0000-00-00 00:00:00 |       |#事务开始时间；
+| trx_requested_lock_id      | varchar(81)         | YES  |     | NULL                |       |#innodb_locks.lock_id
+| trx_wait_started           | datetime            | YES  |     | NULL                |       |#事务开始等待的时间
+| trx_weight                 | bigint(21) unsigned | NO   |     | 0                   |       |#
+| trx_mysql_thread_id        | bigint(21) unsigned | NO   |     | 0                   |       |#事务线程ID
+| trx_query                  | varchar(1024)       | YES  |     | NULL                |       |#具体SQL语句
+| trx_operation_state        | varchar(64)         | YES  |     | NULL                |       |#事务当前操作状态
+| trx_tables_in_use          | bigint(21) unsigned | NO   |     | 0                   |       |#事务中有多少个表被使用
+| trx_tables_locked          | bigint(21) unsigned | NO   |     | 0                   |       |#事务拥有多少个锁
+| trx_lock_structs           | bigint(21) unsigned | NO   |     | 0                   |       |#
+| trx_lock_memory_bytes      | bigint(21) unsigned | NO   |     | 0                   |       |#事务锁住的内存大小（B）
+| trx_rows_locked            | bigint(21) unsigned | NO   |     | 0                   |       |#事务锁住的行数
+| trx_rows_modified          | bigint(21) unsigned | NO   |     | 0                   |       |#事务更改的行数
+| trx_concurrency_tickets    | bigint(21) unsigned | NO   |     | 0                   |       |#事务并发票数
+| trx_isolation_level        | varchar(16)         | NO   |     |                     |       |#事务隔离级别
+| trx_unique_checks          | int(1)              | NO   |     | 0                   |       |#是否唯一性检查
+| trx_foreign_key_checks     | int(1)              | NO   |     | 0                   |       |#是否外键检查
+| trx_last_foreign_key_error | varchar(256)        | YES  |     | NULL                |       |#最后的外键错误
+| trx_adaptive_hash_latched  | int(1)              | NO   |     | 0                   |       |#
+| trx_adaptive_hash_timeout  | bigint(21) unsigned | NO   |     | 0                   |       |#
++—————————-+———————+——+—–+———————+——-+
+22 rows in set (0.01 sec)
+
+
 
 插入表数据
 ```
@@ -194,7 +258,7 @@ replace into:
 插入的数据的唯一索引或者主键索引与之前的数据有重复的情况，将会删除原先的数据，然后再进行添加
 语法：replace into table( col1, col2, col3 ) values ( val1, val2, val3 ) 
 语义：向table表中col1, col2, col3列replace数据val1，val2，val3
-实例：REPLACE INTO users (id,name,age) VALUES(123, 'chao', 50);
+实例：REPLACE INTO students (id,name,age) VALUES(123, 'chao', 50);
 
 REPLACE INTO students(name, gender, birthday) VALUES ('zhangsan2', 2, '1990-7-18');
 
@@ -242,9 +306,6 @@ lines terminated by '\r\n'  ：每条数据以\r\n结尾。
 
 
 INSERT语法
-
-
-
 INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
 
 [INTO] tbl_name [(col_name,...)]
@@ -253,12 +314,7 @@ VALUES ({expr | DEFAULT},...),(...),...
 
 [ ON DUPLICATE KEY UPDATE col_name=expr, ... ]
 
-
-
 或：
-
-
-
 INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
 
 [INTO] tbl_name
@@ -267,12 +323,7 @@ SET col_name={expr | DEFAULT}, ...
 
 [ ON DUPLICATE KEY UPDATE col_name=expr, ... ]
 
-
-
 或：
-
-
-
 INSERT [LOW_PRIORITY | HIGH_PRIORITY] [IGNORE]
 
 [INTO] tbl_name [(col_name,...)]
@@ -342,6 +393,26 @@ mysql> INSERT INTO table (a,b,c) VALUES (4,5,6)
 更新表数据
 ```
 update students set name='lili' where id=1;
+
+
+UPDATE feifei.student s, feifei.temp t
+SET s.name = t.name,
+    s.sex = t.sex,
+    s.age = t.age
+WHERE s.student_id = t.student_id;
+
+
+update db_electron_property_base.tb_electron_factory b, db_electron_property.tb_electron_factory a 
+  set b.zh_name = a.zh_name,b.en_name = a.en_name,b.zh_link = a.link,b.en_link = a.link,b.zh_info = a.info,
+  b.en_info = a.info,b.logo = a.logo,b.temp_zh_name = a.temp_zh_name,b.temp_en_name = a.temp_en_name
+where b.id = a.id and b.id=11096;
+
+
+UPDATE feifei.student s
+INNER JOIN feifei.temp t ON t.student_id=s.student_id
+SET s.name=t.name,
+    s.age=t.age,
+    s.sex=t.sex;
 ```
 
 删除表数据
@@ -391,16 +462,69 @@ select * from students order by birthday asc,gender desc;
 show index from students;
 show view from students;
 ```
+
 创建索引
 ```
+索引的方式有：BTREE、RTREE、HASH、FULLTEXT、SPATIAL
 create index idx_students_id on students(id, name(11), gender);
+
+create index idx_name using BTREE on students(name);
+
+create view v_clouse_lg as 
+select * from students
+inner join
+select * from subjects
 ```
+
+
+字段添加索引
+```
+1.添加PRIMARY KEY（主键索引） 
+ALTER TABLE `students` ADD PRIMARY KEY ( `column` ) 
+
+2.添加UNIQUE(唯一索引) 
+mysql>ALTER TABLE `students` ADD UNIQUE ( 
+`column` 
+) 
+
+3.添加INDEX(普通索引) 
+ALTER TABLE `students` ADD INDEX index_name ( `column` ) 
+ALTER TABLE students ADD INDEX idx_name(NAME);
+
+4.添加FULLTEXT(全文索引) 
+ALTER TABLE `students` ADD FULLTEXT ( `column`) 
+
+5.添加多列索引 
+ALTER TABLE `students` ADD INDEX index_name ( `column1`, `column2`, `column3` )
+```
+
+修改索引名
+```
+对于MySQL 5.7及以上版本,可以执行以下命令
+alter table students rename index old_index_name to new_index_name; 
+
+对于MySQL 5.7以前的版本，可以执行下面两个命令：
+ALTER TABLE tbl_name DROP INDEX old_index_name
+ALTER TABLE tbl_name ADD INDEX new_index_name(column_name)
+```
+
+添加主键约束(添加主键唯一性约束)
+```
+alter table students add primarykey(id);
+```
+
+
 删除索引
 ```
 drop index idx_students_id on students;
-drop index index_name on table_name ;
-alter table table_name drop index index_name ;
-alter table table_name drop primary key ;
+drop index index_name on students ;
+alter table students drop index index_name ;
+alter table students drop primary key;
+```
+
+删除主键
+```
+alter table students drop primary key;
 ```
 
 解除外键约束
@@ -420,7 +544,6 @@ alter table students engine = myisam;
 ```
 
 
-
 开启运行时间检测
 ```
 set profiling=1;
@@ -436,18 +559,19 @@ show profiles;
 
 查看当前表的自动增长id是多少
 ```
-select auto_increment from information_schema.tables where table_schema = 'db_electron_property' and table_name = 'tb_electron_area';
+select auto_increment from information_schema.tables where table_schema = 'db_electron_property' and students = 'tb_electron_area';
 ```
 
-修改表users自动序列值
+修改表students自动序列值
 ```
-alter table users AUTO_INCREMENT=10000;
+alter table students AUTO_INCREMENT=10000;
 ```
 
 查看innodb引擎的运行时信息
 ```
 show engine innodb status\G
 ```
+
 查看服务器状态。
 ```
 show status like 'table_lock%';
@@ -523,7 +647,7 @@ show open tables from database;
 
 获取某库某表当前自增id的值
 ```
-SELECT auto_increment FROM information_schema.tables where table_schema="db_electron" and table_name="tb_electron";
+SELECT auto_increment FROM information_schema.tables where table_schema="db_electron" and students="tb_electron";
 ```
 
 更新分类id
@@ -849,16 +973,16 @@ select * from pony order by (d+0)
 
 
 创建表
-CREATE TABLE t_json(id INT PRIMARY KEY, NAME VARCHAR(20) , info  JSON);
+CREATE TABLE teacher_json(id INT PRIMARY KEY, NAME VARCHAR(20) , info  JSON);
 
 插入记录
-INSERT INTO t_json(id,sname,info) VALUES(1 ,'test','{"time":"2017-01-01 13:00:00","ip":"192.168.1.1","result":"fail"}');
-INSERT INTO t_json(id,sname,info)  VALUES(2 ,'my',JSON_OBJECT("time",NOW(),'ip','192.168.1.1','result','fail'));
+INSERT INTO teacher_json(id,sname,info) VALUES(1 ,'test','{"time":"2017-01-01 13:00:00","ip":"192.168.1.1","result":"fail"}');
+INSERT INTO teacher_json(id,sname,info)  VALUES(2 ,'my',JSON_OBJECT("time",NOW(),'ip','192.168.1.1','result','fail'));
 
 查询IP键
-SELECT sname,JSON_EXTRACT(info,'$.ip') FROM t_json;
+SELECT sname,JSON_EXTRACT(info,'$.ip') FROM teacher_json;
 查询有多少个键
-SELECT id,json_keys(info) AS "keys" FROM t_json;
+SELECT id,json_keys(info) AS "keys" FROM teacher_json;
 
 
 json_keys()
@@ -870,9 +994,9 @@ update tb_electron_category_mapping_factory set data=JSON_SET(data, '$."aaa"', 1
 update tb_electron_label_mapping_factory set data=JSON_SET(data, '$."100"', 1),state=%s,update_at=%s,update_uid=%s where id=%s
 
 增加键
-UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.1');
+UPDATE teacher_json SET info = json_set(info,'$.ip','192.168.1.1');
 变更值
-UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.2');
+UPDATE teacher_json SET info = json_set(info,'$.ip','192.168.1.2');
 
 
 json_insert()
@@ -898,8 +1022,8 @@ mysql> SELECT JSON_INSERT(@j, '$.a', 10, '$.c', CAST('[true, false]' AS JSON));
 
 json_remove()
 删除键
-UPDATE t_json SET info = json_remove(info,'$.ip');
-update tb_electron_category_mapping_factory set data=json_remove(data, %s),update_at=%s,update_uid=%s where category_id=%s
+UPDATE teacher_json SET info = json_remove(info,'$.ip');
+update tb_electron_category_mapping_factory set data=json_remove(data, '$.ip'),update_at=%s,update_uid=%s where category_id=%s
 
 
 json_object()
@@ -911,8 +1035,8 @@ select * from tb_electron_label_mapping_category where json_contains(data,'{"100
 
 
 json_contains_path()
-select {} from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$."100"')
-select {} from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$.www')
+select * from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$."100"')
+select * from tb_electron_label_mapping_factory where json_contains_path(data, 'one', '$.www')
 
 
 JSON_MERGE(json_doc, json_doc[, json_doc] ...)
@@ -993,6 +1117,19 @@ mysql> select * from db_electron_property_base.tb_electron_category order by lev
 
 mysql> select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 ```
+
+
+### mysql导入数据
+```
+导入文件到相应表students
+load data infile '/data/students.txt' into table students;
+
+load data infile  '/data/mysql_export_dir/tb_electron_category.txt' into  table tb_electron_category  character  set utf8mb4;" 
+
+load data infile "/data/mysql/e.sql" into table e fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+```
+
+
 
 启动二进制日志
 ```
@@ -1153,8 +1290,8 @@ mysqldump -h localhost -u root -p --databases dbname1,dbname2 > /home/flack/bak/
 
 导出某个数据库的某个表：
 ```
-mysqldump -u root -p dbName tableName1,tableName1 > sqlFilePath
-mysqldump -h localhost -u root -p db_electron tablename1,tablename2 > /home/flack/bak/aaa.sql
+mysqldump -u root -p dbName students1,students2 > sqlFilePath
+mysqldump -h localhost -u root -p db_electron students1,students2 > /home/flack/bak/aaa.sql
 mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
 mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/flack/bak/aaa.sql
 mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
@@ -1327,7 +1464,7 @@ show engines;
 4.创建映射表结构
 在mysql中创建远程服务器数据库中的需要映射的表，映射表名称可以随意命名，但是数据结构必要一样
 ```
-CREATE TABLE `hn_user` (
+CREATE TABLE `user_link` (
   `id` varchar(32) NOT NULL,
   `name` varchar(20) DEFAULT NULL,
   `phone` varchar(11) DEFAULT NULL,
@@ -1365,13 +1502,6 @@ set null
 no action
 ```
 
-创建索引
-```
-create view v_clouse_lg as 
-select * from students
-inner join
-select * from subjects
-```
 
 
 
@@ -1658,8 +1788,8 @@ and pintopin in (select a.pintopin from ((select pintopin,count(*) from m_electr
 
 
 SELECT model_name,factory
-FROM m_electron AS t1 JOIN (SELECT ROUND(RAND() * ((SELECT MAX(id) FROM m_electron)-(SELECT MIN(id) FROM m_electron))+(SELECT MIN(id) FROM m_electron)) AS id) AS t2
-WHERE t1.id >= t2.id
+FROM m_electron AS students JOIN (SELECT ROUND(RAND() * ((SELECT MAX(id) FROM m_electron)-(SELECT MIN(id) FROM m_electron))+(SELECT MIN(id) FROM m_electron)) AS id) AS t2
+WHERE students.id >= t2.id
 and factory in 
 (
 'Analog Devices Inc.',
@@ -1678,7 +1808,7 @@ and factory in
 'Molex',
 'TE Connectivity AMP Connectors'
 ) 
-and t1.pintopin in (select a.pintopin from ((select pintopin,count(*) from m_electron group by pintopin having  count(*) > 1)) a)
-ORDER BY t1.id LIMIT 50;
+and students.pintopin in (select a.pintopin from ((select pintopin,count(*) from m_electron group by pintopin having  count(*) > 1)) a)
+ORDER BY students.id LIMIT 50;
 ```
 

@@ -330,10 +330,311 @@ Project 2 Bot
 
 
 
+### scrapyd
+#### 安装
+```
+pip3 install scrapyd -i https://pypi.tuna.tsinghua.edu.cn/simple
+sudo mkdir /etc/scrapyd
+sudo vim /etc/scrapyd/scrapyd.conf
+```
+
+优先以下路径搜索配置文件解析
+```
+/etc/scrapyd/scrapyd.conf (Unix)
+c:\scrapyd\scrapyd.conf (Windows)
+/etc/scrapyd/conf.d/* (in alphabetical order, Unix)
+scrapyd.conf
+~/.scrapyd.conf (users home directory)
+```
+
+#### 添加以下配置文件内容
+```
+[scrapyd]
+eggs_dir    = eggs
+logs_dir    = logs
+items_dir   =
+jobs_to_keep = 5
+dbs_dir     = dbs
+max_proc    = 0
+max_proc_per_cpu = 10
+finished_to_keep = 100
+poll_interval = 5.0
+bind_address = 0.0.0.0
+http_port   = 6800
+debug       = off
+runner      = scrapyd.runner
+application = scrapyd.app.application
+launcher    = scrapyd.launcher.Launcher
+webroot     = scrapyd.website.Root
+
+[services]
+schedule.json     = scrapyd.webservice.Schedule
+cancel.json       = scrapyd.webservice.Cancel
+addversion.json   = scrapyd.webservice.AddVersion
+listprojects.json = scrapyd.webservice.ListProjects
+listversions.json = scrapyd.webservice.ListVersions
+listspiders.json  = scrapyd.webservice.ListSpiders
+delproject.json   = scrapyd.webservice.DeleteProject
+delversion.json   = scrapyd.webservice.DeleteVersion
+listjobs.json     = scrapyd.webservice.ListJobs
+daemonstatus.json = scrapyd.webservice.DaemonStatus
+```
+保存并退出
+启动服务
+```
+scrapyd
+```
+
+Example using curl:
+```
+curl http://localhost:6800/schedule.json -d project=default -d spider=somespider
+```
+
+### centos7 安装scrapyd
+Centos7安装Python3.7
+```
+说明
+全部操作都在root用户下执行
+
+1.安装编译相关工具
+yum -y groupinstall "Development tools"
+yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel
+yum install libffi-devel -y
+
+2.下载安装包解压
+cd #回到用户目录
+wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz
+tar -xvJf  Python-3.7.0.tar.xz
+
+3.编译安装
+mkdir /usr/local/python3 #创建编译安装目录
+cd Python-3.7.0
+./configure --prefix=/usr/local/python3
+make && make install
+
+或者
+
+编译安装Python3，默认的安装目录是 /usr/local 如果你要改成其他目录可以在编译(make)前使用 configure 命令后面追加参数 “–prefix=/alternative/path” 来完成修改。
+$ tar xf Python-3.7.1.tgz
+$ cd Python-3.7.1
+$ ./configure
+$ make
+$ sudo make install
+
+至此你已经在你的CentOS系统中成功安装了python3、pip3、setuptools
+
+
+4.创建软连接
+ln -s /usr/local/python3/bin/python3 /usr/local/bin/python3
+ln -s /usr/local/python3/bin/pip3 /usr/local/bin/pip3
+
+5.验证是否成功
+python3 -V
+pip3 -V
+```
+
+### centos7设置python3为默认环境
+```
+sudo yum install yum-utils
+使用yum-builddep为Python3构建环境,安装缺失的软件依赖,使用下面的命令会自动处理.
+sudo yum-builddep python
+完成后下载Python3的源码包（笔者以Python3.5为例），Python源码包目录： https://www.python.org/ftp/python/ ，截至发博当日Python3的最新版本为 3.7.0
+$ curl -O https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
+
+查看python版本
+$ python3 -V
+
+如果你要使用Python3作为python的默认版本，你需要修改一下 bashrc 文件，增加一行alias参数
+alias python='/usr/local/bin/python3.7'
+
+由于CentOS 7建议不要动/etc/bashrc文件，而是把用户自定义的配置放入/etc/profile.d/目录中，具体方法为
+vi /etc/profile.d/python.sh
+
+输入alias参数 alias python="/usr/local/bin/python3.7"，保存退出
+如果非root用户创建的文件需要注意设置权限
+chmod 755 /etc/profile.d/python.sh
+
+重启会话使配置生效
+source /etc/profile.d/python.sh
+```
+
+### centos7安装scrapyd
+```
+pip3 install scrapyd -i https://pypi.tuna.tsinghua.edu.cn/simple
+sudo mkdir /etc/scrapyd
+sudo vim /etc/scrapyd/scrapyd.conf
+
+[scrapyd]
+eggs_dir    = eggs
+logs_dir    = logs
+items_dir   =
+jobs_to_keep = 5
+dbs_dir     = dbs
+max_proc    = 0
+max_proc_per_cpu = 10
+finished_to_keep = 100
+poll_interval = 5.0
+bind_address = 0.0.0.0
+http_port   = 6800
+debug       = off
+runner      = scrapyd.runner
+application = scrapyd.app.application
+launcher    = scrapyd.launcher.Launcher
+webroot     = scrapyd.website.Root
+
+[services]
+schedule.json     = scrapyd.webservice.Schedule
+cancel.json       = scrapyd.webservice.Cancel
+addversion.json   = scrapyd.webservice.AddVersion
+listprojects.json = scrapyd.webservice.ListProjects
+listversions.json = scrapyd.webservice.ListVersions
+listspiders.json  = scrapyd.webservice.ListSpiders
+delproject.json   = scrapyd.webservice.DeleteProject
+delversion.json   = scrapyd.webservice.DeleteVersion
+listjobs.json     = scrapyd.webservice.ListJobs
+daemonstatus.json = scrapyd.webservice.DaemonStatus
+```
+保存并退出
+
+我的python3路径：  /usr/local/python3
+```
+<!-- ln -s /usr/local/python3/bin/scrapy  /usr/bin/scrapy -->
+ln -s /usr/local/python3/bin/scrapyd  /usr/bin/scrapyd
+```
+
+#### scrapyd 常用命令
+```
+查看状态：
+scrapyd-deploy -l
+
+启动爬虫：
+curl http://localhost:6800/schedule.json -d project=PROJECT_NAME -d spider=SPIDER_NAME
+
+停止爬虫：
+curl http://localhost:6800/cancel.json -d project=PROJECT_NAME -d job=JOB_ID
+
+删除项目：
+curl http://localhost:6800/delproject.json -d project=PROJECT_NAME
+
+列出部署过的项目：
+curl http://localhost:6800/listprojects.json
+
+列出某个项目内的爬虫：
+curl http://localhost:6800/listspiders.json?project=PROJECT_NAME
+
+列出某个项目的job：
+curl http://localhost:6800/listjobs.json?project=PROJECT_NAME
+
+1、获取状态
+http://127.0.0.1:6800/daemonstatus.json
+
+2、获取项目列表
+http://127.0.0.1:6800/listprojects.json
+
+3、获取项目下已发布的爬虫列表
+http://127.0.0.1:6800/listspiders.json?project=myproject
+
+4、获取项目下已发布的爬虫版本列表
+http://127.0.0.1:6800/listversions.json?project=myproject
+
+5、获取爬虫运行状态
+http://127.0.0.1:6800/listjobs.json?project=myproject
+
+6、启动服务器上某一爬虫（必须是已发布到服务器的爬虫）
+http://localhost:6800/schedule.json （post方式，data={"project":myproject,"spider":myspider}）
+
+7、删除某一版本爬虫
+http://127.0.0.1:6800/delversion.json （post方式，data={"project":myproject,"version":myversion}）
+
+8、删除某一工程，包括该工程下的各版本爬虫
+http://127.0.0.1:6800/delproject.json（post方式，data={"project":myproject}）
+
+
+重启scrapyd的方法
+
+（1）ps aux|grep scrapyd：找到scrapyd的pid
+
+（2） kill -9 pid 或者kill pid
+
+（3）screen -S scrapyd 新建一个进程
+
+（4） 在进程里启动scrapyd
+/usr/bin/python /usr/local/bin/scrapyd
+
+（5）ctrl+A+D退出进程
+
+（6）改工程的scrapy.cfg文件，如果url有#号，把url前的#去掉
+
+（7）可以scrapyd-deploy工程了
+
+
+screen参考：
+https://www.ibm.com/developerworks/cn/linux/l-cn-screen/
+http://man.linuxde.net/screen
+
+杀死screen会话 screen -X -S pid quit 其中pid为screen进程号
+screen -ls 列出现有screen会话列表
+screen -r pid 恢复到某个screen会话
+Ctrl+a +d 保留会话离开当前窗口
+
+```
+
+
+### gerapy
+Gerapy 是一款分布式爬虫管理框架，支持 Python 3，基于 Scrapy、Scrapyd、Scrapyd-Client、Scrapy-Redis、Scrapyd-API、Scrapy-Splash、Jinjia2、Django、Vue.js 开发，Gerapy 可以帮助我们：
+
+更方便地控制爬虫运行
+更直观地查看爬虫状态
+更实时地查看爬取结果
+更简单地实现项目部署
+更统一地实现主机管理
+更轻松地编写爬虫代码
+安装非常简单，只需要运行 pip3 命令即可：
+
+$ pip3 install gerapy
+安装完成之后我们就可以使用 gerapy 命令了，输入 gerapy 便可以获取它的基本使用方法
+
+```
+gerapy
+Usage:
+gerapy init [--folder=<folder>]
+gerapy migrate
+gerapy createsuperuser
+gerapy runserver [<host:port>]
+gerapy makemigrations
+```
+
+如果出现上述结果，就证明 Gerapy 安装成功了
+
+```
+初始化
+接下来我们来开始使用 Gerapy，首先利用如下命令进行一下初始化，在任意路径下均可执行如下命令：
+
+gerapy init
+执行完毕之后，本地便会生成一个名字为 gerapy 的文件夹，接着进入该文件夹，可以看到有一个 projects 文件夹，我们后面会用到。
+
+紧接着执行数据库初始化命令：
+
+cd gerapy
+gerapy migrate
+这样它就会在 gerapy 目录下生成一个 SQLite 数据库，同时建立数据库表。
+
+接着我们只需要再运行命令启动服务就好了：
+
+gerapy runserver
+这样我们就可以看到 Gerapy 已经在 8000 端口上运行了。
+```
+
+
+
 ### 疑难杂症
 windows系统编码错误时解决方法：
 ```
 import sys,io
 sys.stdout=io.TextIOWrapper(sys.stdout.buffer,encoding='gb18030')
 ```
+
+
+
+
 

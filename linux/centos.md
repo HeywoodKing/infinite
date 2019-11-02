@@ -345,6 +345,13 @@ NO2. 同时修改多个文件的权限
 NO3. 修改一个目录的权限，包括其子目录及文件
 [root@rehat root]# chmod 700 -R test
 
+用 root 账号执行chmod命令：
+chmod -R 777 dirPath              
+参数 -R 表示递归，dirPath及其之内的所有文件夹、文件都被改变了权限
+eg:
+chmod -R 777 /home/user1/workspace/git
+
+
 改变文件或文件夹拥有者的CentOS常用命令
 
 chown 该命令只有 root 才能使用
