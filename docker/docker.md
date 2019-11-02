@@ -917,6 +917,8 @@ $ docker-compose stop
 ### docker安装redis
 ```
 docker run -p 6379:6379 -v $PWD/data:/data --name redis_foxy -d redis:latest redis-server --appendonly yes
+root@centos7 /]# docker run --name myredis -p 6379:6379 -v /docker/redis/data:/data -v /docker/redis/conf/redis.conf:/etc/redis/redis.conf -d redis redis-server /etc/redis/redis.conf
+
 
 连接redis
 -h 服务器地址 -p 端口号 -a 密码
