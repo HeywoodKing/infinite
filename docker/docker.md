@@ -160,6 +160,12 @@ docker-ce | 18.03.1~ce~3-0~ubuntu | http://mirrors.aliyun.com/docker-ce/linux/ub
 命令即可。
 
 ###安装完成 后执行docker -v命令，
+
+启动docker
+```
+sudo systemctl start docker
+```
+
 如果正常输出说明安装成功，下面继续填坑吧。
 ```
 查看当前系统docker信息：docker info
@@ -771,7 +777,7 @@ sudo mv /tmp/docker-machine /usr/local/bin/docker-machine
 chmod +x /usr/local/bin/docker-machine
 
 
-curl -L https://github.com/docker/machine/releases/download/v0.16.0/docker-machine_linux-amd64 > /usr/local/bin/docker-machine
+curl -L https://github.com/docker/machine/releases/download/v0.16.0/docker-machine-linux-amd64 > /usr/local/bin/docker-machine
 chmod +x /usr/local/bin/docker-machine
 docker-machine -v
 ```
@@ -916,14 +922,98 @@ $ docker-compose stop
 
 ### docker安装redis
 ```
-docker run -p 6379:6379 -v $PWD/data:/data --name redis_foxy -d redis:latest redis-server --appendonly yes
-root@centos7 /]# docker run --name myredis -p 6379:6379 -v /docker/redis/data:/data -v /docker/redis/conf/redis.conf:/etc/redis/redis.conf -d redis redis-server /etc/redis/redis.conf
+docker run -p 6379:6379 --name redis_foxy -v $PWD/data:/data -d redis:latest redis-server --appendonly yes
+
+docker run -p 6379:6379 --name redis_foxy -v $PWD/conf/redis.conf:/etc/redis/redis.conf -v $PWD/data:/data -d redis:latest redis-server /etc/redis/redis.conf --appendonly yes
+
+docker run -p 6379:6379 --name redis_foxy -v D:\docker\redis\redis.conf:/etc/redis/redis.conf -v D:\docker\redis\data:/data -d redis:3.2 redis-server /etc/redis/redis.conf --appendonly yes
+
+命令说明：
+-p 6379:6379 : 将容器的6379端口映射到主机的6379端口
+--name redis : 容器名字
+-v D:\docker\redis\redis.conf:/etc/redis/redis.conf : 将主机中配置文件挂载到容器中
+-v D:\docker\redis\data:/data : 将主机中data挂载到容器的/data
+redis-server --appendonly yes : 在容器执行redis-server启动命令，并打开redis持久化配置
+redis-server /etc/redis/redis.conf : 容器中以配置文件方式启动redis
 
 
 连接redis
 -h 服务器地址 -p 端口号 -a 密码
 redis-cli -h host -p port -a password
 ```
+
+### docker搭建redis集群
+1. 安装redis ruby
+```
+docker pull redis
+docker pull ruby
+```
+2. 创建redis容器
++ 创建redis配置文件（redis-cluster.tmpl）
+在路径/home/flack/redis-cluster下创建一个文件redis-cluster.tmpl,
+```
+mkdir /home/flack/redis-cluster/
+vim /home/flack/redis-cluster/redis-cluster.tmpl
+```
+并把以下内容复制过去
+```
+port ${PORT}
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+cluster-announce-ip 39.10X.XX.XX //自己服务器IP
+cluster-announce-port ${PORT}
+cluster-announce-bus-port 1${PORT}
+appendonly yes
+```
++ 创建自定义network
+```
+docker network create redis-net
+```
++ 在/home/flack/redis-cluster下生成conf和data目标，并生成配置信息
+共生成6个文件夹，从7000到7005，每个文件夹下包含data和conf文件夹，同时conf里面有redis.conf配置文件
+```
+for port in `seq 7000 7005`; do \
+  mkdir -p ./${port}/conf \
+  && PORT=${port} envsubst < ./redis-cluster.tmpl > ./${port}/conf/redis.conf \
+  && mkdir -p ./${port}/data; \
+done
+```
++ 创建6个redis容器
+```
+for port in `seq 7000 7005`; do \
+  docker run -d -ti -p ${port}:${port} -p 1${port}:1${port} \
+  -v /home/flack/redis-cluster/${port}/conf/redis.conf:/usr/local/etc/redis/redis.conf \
+  -v /home/flack/redis-cluster/${port}/data:/data \
+  --restart always --name redis_${port}_foxy --net redis-net \
+  --sysctl net.core.somaxconn=1024 redis redis-server /usr/local/etc/redis/redis.conf; \
+done
+```
+3. 集群
+通过启动ruby来实现集群
+```
+echo yes | docker run -i --rm --net redis-net ruby sh -c '\
+  gem install redis \
+  && wget http://download.redis.io/redis-stable/src/redis-trib.rb \
+  && ruby redis-trib.rb create --replicas 1 \
+  '"$(for port in `seq 7000 7005`; do \
+    echo -n "$(docker inspect --format '{{ (index .NetworkSettings.Networks "redis-net").IPAddress }}' "redis_${port}_foxy")":${port} ' ' ; \
+  done)"
+
+
+echo yes | docker run -i --rm --net redis-net ruby sh -c '\
+  gem install redis \
+  && ruby redis-cli --cluster create  \
+  '"$(for port in `seq 7000 7005`; do \
+    echo -n "$(docker inspect --format '{{ (index .NetworkSettings.Networks "redis-net").IPAddress }}' "redis_${port}_foxy")":${port} ' ' ; \
+  done)" --cluster-replicas 1
+```
+
+```
+redis-cli --cluster SUBCOMMAND [ARGUMENTS] [OPTIONS]
+redis-cli --cluster create 172.18.0.2:7000 172.18.0.3:7001 172.18.0.4:7002 172.18.0.5:7003 172.18.0.6:7004 172.18.0.7:7005 --cluster-replicas 1
+```
+
 
 ### docker安装es
 ```
