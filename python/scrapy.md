@@ -496,10 +496,21 @@ daemonstatus.json = scrapyd.webservice.DaemonStatus
 ```
 保存并退出
 
-我的python3路径：  /usr/local/python3
+我的python3路径：
+/usr/local/python3
 ```
 <!-- ln -s /usr/local/python3/bin/scrapy  /usr/bin/scrapy -->
 ln -s /usr/local/python3/bin/scrapyd  /usr/bin/scrapyd
+
+启动scrapyd
+scrapyd
+
+如果报 int  xxx not has attribute "object"
+卸载scrapyd重新安装，
+
+如果报Twisted xxx
+重新安装twisted或者更新twisted
+pip3 install --upgrade twisted -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 #### scrapyd 常用命令
