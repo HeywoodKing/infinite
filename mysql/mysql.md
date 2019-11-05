@@ -491,6 +491,8 @@ mysql>ALTER TABLE `students` ADD UNIQUE (
 ALTER TABLE `students` ADD INDEX index_name ( `column` ) 
 ALTER TABLE students ADD INDEX idx_name(NAME);
 
+ALTER TABLE students ADD key idx_name(NAME) using btree;
+
 4.添加FULLTEXT(全文索引) 
 ALTER TABLE `students` ADD FULLTEXT ( `column`) 
 
