@@ -714,4 +714,42 @@ sort 的参数 -nr 表示要以数字排序法进行反向排序。
   -x 显示包括没有终端控制的进程状况 。 
 
 
+### centos7-修改默认python为3
+```
+$ sudo yum install yum-utils
+使用yum-builddep为Python3构建环境,安装缺失的软件依赖,使用下面的命令会自动处理.
+$ sudo yum-builddep python
 
+完成后下载Python3的源码包（笔者以Python3.5为例），Python源码包目录： https://www.python.org/ftp/python/ ，截至发博当日Python3的最新版本为 3.7.0
+$ curl -O https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
+
+最后一步，编译安装Python3，默认的安装目录是 /usr/local 如果你要改成其他目录可以在编译(make)前使用 configure 命令后面追加参数 “–prefix=/alternative/path” 来完成修改。
+$ tar xf Python-3.7.1.tgz
+$ cd Python-3.7.1
+$ ./configure
+$ make
+$ sudo make install
+
+至此你已经在你的CentOS系统中成功安装了python3、pip3、setuptools，查看python版本
+$ python3 -V
+
+如果你要使用Python3作为python的默认版本，你需要修改一下 bashrc 文件，增加一行alias参数
+alias python='/usr/local/bin/python3.7'
+
+由于CentOS 7建议不要动/etc/bashrc文件，而是把用户自定义的配置放入/etc/profile.d/目录中，具体方法为
+vi /etc/profile.d/python.sh
+
+输入alias参数 alias python="/usr/local/bin/python3.7"，保存退出
+如果非root用户创建的文件需要注意设置权限
+chmod 755 /etc/profile.d/python.sh
+
+重启会话使配置生效
+source /etc/profile.d/python.sh
+```
+
+linux 路径映射
+```
+/data/eddie/new_pdf：本机路径
+//192.168.1.62/new_pdf：远程路径
+mount -v -t cifs //192.168.1.62/new_pdf /data/eddie/new_pdf -o 'username=icmofang,password=icmofang,vers=1.0'
+```

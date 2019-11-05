@@ -646,6 +646,11 @@ sys.stdout=io.TextIOWrapper(sys.stdout.buffer,encoding='gb18030')
 ```
 
 
+scrapyd 'int' object has no attribute 'splitlines' 
+```
+
+```
+
 
 
 
