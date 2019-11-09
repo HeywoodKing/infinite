@@ -986,6 +986,118 @@ git pull
 
 
 
+### 从仓库拉取项目 从本地推送已存在的项目到仓库
+```
+Command line instructions
+
+Git global setup
+git config --global user.name "flack.chen"
+git config --global user.email "flack.chen@icmofang.com"
+
+Create a new repository
+git clone http://gitlab/icmofang/moli_cleaning_tools.git
+cd moli_cleaning_tools
+touch README.md
+git add README.md
+git commit -m "add README"
+git push -u origin master
+
+Existing folder
+cd existing_folder
+git init
+git remote add origin http://gitlab/icmofang/moli_cleaning_tools.git
+git add .
+git commit -m "Initial commit"
+git push -u origin master
+
+Existing Git repository
+cd existing_repo
+git remote rename origin old-origin
+git remote add origin http://gitlab/icmofang/moli_cleaning_tools.git
+git push -u origin --all
+git push -u origin --tags
+```
+
+
+指令						功能
+```
+git branch				查看分支（*指向的为当前的分支）
+git branch<name>		创建分支
+git checkout<name>		切换分支
+git checkout -b <name>	创建加切换分支
+git merge <name>		合并某分支到当前分支
+git branch -d<name>		删除分支
+```
+
+
+
+```
+-- git设置用户名和邮箱名
+git config --global  user.name "Username"
+git config --global  user.email "Username@example.com"
+
+-- 创建git管理配置文件
+进入目录，执行git init
+
+-- 查看当前修改，可以看到哪些文件变化了（增加了？修改了？删除了？）
+git status
+
+-- 添加要管理的文件
+git add [文件名]
+
+-- 接受现有的文件结构，存储一版
+git commit -m "Started project"   （-m 表示增加提交注释）
+
+-- 查看存储日志
+git log
+git log --pretty=oneline   //只看第一行记录号，不看注释
+
+-- 重新检出文件
+git checkout .     //检出最新的一般，等同于把当前修改全部撤销了
+git checkout 5d6cec    // git log的第一行有编号，直接检出该编号时的文件结构
+
+-- 添加远程主机
+git remote add origin https://github.com/gunzigun/gitlearn.git
+
+-- 将库上的文件检出到本地
+git pull --rebase origin[之前添加的远程主机] master
+
+-- 将本地文件上传到库上
+git push origin[之前添加的远程主机] master
+
+-- git pull 的常用选项解释
+①git pull = git fetch + git merge
+A<-B<-C<-D<-M
+	   <-E<-M
+小明在C处，改成了D，已经提交了，但是小李，也重C处，改成了E，这样子提交会冲突
+git merge会把D，E版本合并成M版本，并提交上去，很容易错误
+②git pull --rebase = git fetch + git rebase
+A<-B<-C<-D
+		  <-E（小李不产生E版本，自行合并解决冲突）<-R（以R版本提交，还是线性提交记录）
+-------------------------------------------------------------------------------------------------
+在rebase的过程中，有时也会有conflict，这时Git会停止rebase并让用户去解决冲突，解决完冲突后，用git add命令去更新这些内容，然后不用执行git-commit,直接执行git rebase --continue,这样git会继续apply余下的补丁。
+
+-- 不配置远程主机，也可以check out下来
+git pull --rebase origin[之前添加的远程主机] master
+git push origin[之前添加的远程主机] master
+
+-- 不删除物理文件，仅将该文件从缓存中删除
+git rm --cached “文件路径”
+
+-- 删除某条提交记录，然后强制更新到库上
+git rebase -i 21a254a2b7^
+git push origin master -f
+
+-- 只下载github库上的某个目录
+git init
+git config core.sparseCheckout true
+echo "面试题1" >> .git/info/sparse-checkout
+git pull https://github.com/gunzigun/CodingInterviews.git master
+```
+
+
+
+
 ====================================================================================
 git中文显示乱码问题：
 git 默认中文文件名是 \xxx\xxx 等八进制形式，是因为 对0x80以上的字符进行quote
@@ -1231,3 +1343,7 @@ The key's randomart image is:
 【8】ssh -T git@github.com回车
 
 提示：嗨---！您已成功通过身份验证，但GitHub不提供shell访问权限。
+
+
+
+

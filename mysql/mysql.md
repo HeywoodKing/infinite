@@ -1107,17 +1107,19 @@ mysql> show global variables like '%secure_file_priv%';
 
 修改后再次执行，成功导出。
 
+into outfile 实例:
 select kw.zh_category,kw.en_category,kw.zh_sub_category,kw.en_sub_category,kw.category_id_1,kw.category_id_2,  kw.category_id_3,kw.temp_zh_sub_category,kw.temp_en_sub_category  from db_digikey_electron_base.temp_digikey_category_kwargs kw   where kw.temp_category_id_3 is null  and category_id_1 not in ('08','09','10') into outfile '/data/mysql_export_dir/category_data.csv';
 
-mysql> select * from user into outfile '/tmp/user.csv' fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
-Query OK, 15 rows affected (0.00 sec)
+select * from user into outfile '/tmp/user.csv' fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 
-mysql> SELECT a.* from user a INTO OUTFILE 'a.csv' CHARACTER SET gbk FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
 
-into outfile 实例:
-mysql> select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+SELECT a.* from user a INTO OUTFILE 'a.csv' CHARACTER SET gbk FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n';
 
-mysql> select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+
+select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 ```
 
 
@@ -1622,7 +1624,34 @@ SELECT SUBSTRING_INDEX('www.yuanrengu.com', '.', -2);
 3.如果关键字不存在，则返回整个字符串
 SELECT SUBSTRING_INDEX('www.yuanrengu.com', 'sprite', 1);
 结果为：www.yuanrengu.com
+
+
+
+
+
+
+常用的字符串函数：
+
+函数                                说明
+CONCAT(s1,s2，...)                  返回连接参数产生的字符串，一个或多个待拼接的内容，任意一个为NULL则返回值为NULL。
+CONCAT_WS(x,s1,s2,...)              返回多个字符串拼接之后的字符串，每个字符串之间有一个x。
+SUBSTRING(s,n,len)、MID(s,n,len)     两个函数作用相同，从字符串s中返回一个第n个字符开始、长度为len的字符串。
+LEFT(s,n)、RIGHT(s,n)                前者返回字符串s从最左边开始的n个字符，后者返回字符串s从最右边开始的n个字符。
+INSERT(s1,x,len,s2)                 返回字符串s1，其子字符串起始于位置x，被字符串s2取代len个字符。
+REPLACE(s,s1,s2)                    返回一个字符串，用字符串s2替代字符串s中所有的字符串s1。
+LOCATE(str1,str)、POSITION(str1 IN str)、INSTR(str,str1)  三个函数作用相同，返回子字符串str1在字符串str中的开始位置（从第几个字符开始）。
+FIELD(s,s1,s2,...)                  返回第一个与字符串s匹配的字符串的位置。
+
+
+
 ```
+
+
+
+
+
+
+
 
 
 
