@@ -91,15 +91,96 @@ http://192.168.1.169:9200/_cat/indices?v
 
 ### curl 使用
 ```
-查看索引
+查看是否健康
+curl 192.168.1.169:9200/_cat/health?v
+
+查看索引(列出所有索引及存储大小)
 curl 192.168.1.169:9200/_cat/indices?v
 curl -XGET 192.168.1.169:9200/_cat/indices?v
+
+查看节点
+curl 192.168.1.169:9200/_cat/nodes?v
+
+查询创建的index的mapping是什么
+curl 192.168.1.169:9200/new_electron/_mapping
+
+插入数据
+curl -POST IP:9200/索引名称/索引类型 -d '{
+  "title": "test title 001",
+  "description": "this is a random desc ",
+  "price": 22.6,
+  "onSale": "true",
+  "type": 2,
+  "createDate": "2018-01-12"
+}'
+
+查询数据
+curl -XPOST http://127.0.0.1:9209/electron_with_kwargs_00/_search
+
+检索全部
+curl -XPOST http://127.0.0.1:9209/electron_with_kwargs_00/_search?pretty
+curl -XPOST 127.0.0.1:9209/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match_all\": {} }}"
+
+match_all & 只返回前两个文档
+curl -XPOST 127.0.0.1:9209/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match_all\": {} }, \"size\" : 2}"
+
+
+match_all & 返回第11到第20的10个文档信息 & 降序排序
+curl -XPOST 127.0.0.1:9200/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match_all\": {} }, \"from\" : 10, \"size\" : 10,\"sort\" : {\"timestamp\" : {\"order\" : \"desc\" }}}"
+
+
+只返回title和description两个字段
+curl -XPOST 127.0.0.1:9200/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match_all\": {} }, \"_source\": [\"title\", \"description\"]}"
+
+
+查询 name=student60
+curl -XPOST 127.0.0.1:9200/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match\": {\"name\": \"student60\" } }}"
+
+查询 name=test
+curl -XPOST IP:9200/索引名称/_search?pretty -d "{\"query\": {\"match\": {\"title\": \"test\" } }}"
+
+返回 title=005 or name=007
+curl -XPOST IP:9200/索引名称/_search?pretty -d "{\"query\": {\"match\": {\"title\": \"005 007\" } }}"
+
+返回 title=007 or title=005
+curl -XPOST IP:9200/索引名称/_search?pretty -d "{\"query\": {\"bool\": {\"should\": [{\"match\": {\"title\": \"007\" }},{\"match\": {\"title\": \"005\" }}]}}}"
+
+返回 不匹配title=007 & title=005
+curl -XPOST IP:9200/索引名称/_search?pretty -d "{\"query\": {\"bool\": {\"must_not\": [{\"match\": {\"title\": \"007\" }},{\"match\": {\"title\": \"005\" }}]}}}"
+
+返回 type=2 & title!=005
+curl -XPOST IP:9200/索引名称/_search?pretty -d "{\"query\": {\"bool\": {\"must\": [{\"match\": {\"type\": 2 }}],\"must_not\": [{\"match\": {\"title\": \"005\" }}]}}}"
+
+搜索商品名称中包含yagao的商品，而且按照售价降序排序
+http://121.201.107.56:9209/electron_with_kwargs_00/_search?q=name:yagao&sort=price:desc
+
+统计electron_with_kwargs_00数量
+http://121.201.107.56:9209/electron_with_kwargs_00/_count
+
+
+返回 短语匹配 title=title 007
+curl -XPOST IP:9200/索引名称/_search?pretty -d "{\"query\": {\"match_phrase\": {\"title\": \"title 007\" } }}"
+
+布尔值(bool)查询 返回 title=title & title=007
+curl -XPOST IP:9200/索引名称/_search?pretty -d "{\"query\": {\"bool\": {\"must\": [{\"match\": {\"title\": \"title\" }},{\"match\": {\"title\": \"007\" }}]}}}"
+
+
+
 
 bulk 1000个文档到bank索引中了
 curl -XPOST 127.0.0.1:9200/bank/account/_bulk?pretty --data-binary @accounts.json
 
 删除索引bank:
 curl -XDELETE http://127.0.0.1:9200/bank
+
+
+不指定索引
+curl -XPOST http://127.0.0.1:9200/_analyze
+
+
+指定索引及分析器
+curl -XPOST http://127.0.0.1:9200/electron_with_kwargs_00/_analyze
+
 
 
 搜索数据API

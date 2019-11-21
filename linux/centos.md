@@ -107,92 +107,261 @@ for((i=1;i<=10000000000;i++)) ; do
 done
 ```
 执行/root/start.sh & 运行脚本
-
 ```
 查看磁盘空间
 df -h
 查看指定目录的大小
-du -sh
+du -sh .
+du -sh /boot
+
+查看整个硬盘的使用状况，硬盘空间
+du [-abcDhHklmsSx] [-L <符号连接>] [--block-size] [--exclude=<目录或文件>] [--max-depth=<目录层数>] [目录或文件]
+选项介绍:
+-a: 显示目录中个别文件的大小;
+-b: 显示目录或文件大小时，以byte为单位;
+-c: 除了显示个别目录或文件的大小外，同时也显示所有目录或文件的总和;
+-D: 显示指定符号连接的源文件大小;
+-h: 以K，M，G为单位，提高信息的可读性;
+-H: 与-h参数相同，但是K，M，G是以1000为换算单位;
+-k: 以1024 bytes为单位;
+-l: 重复计算硬链接文件;
+-L<符号连接>: 显示选项中所指定符号链接(软链接)的源文件大小;
+-m: 以1MB为单位;
+-s: 显示总计大小;
+-S: 显示个别目录的大小时，并不含其子目录的大小;
+-x: 以一开始处理时的文件系统为准，若遇上其它不同的文件系统目录则略过;
+–exclude=<目录或文件>: 略过指定的目录或文件;
+–max-depth=<目录层数>: 超过指定层数的目录后，予以忽略;
+eg:
+df -hv
 
 排序文件夹和文件
 du -s * | sort -nr | head
-```
+
+查看当前文件夹下面各个文件的大小
+ll -lh
+
+查看某文件夹占用总的空间大小
+du -h --max-depth=1 /usr/local/
+
+查看linux文件目录的大小和文件夹包含的文件数
+
+du -sh xmldb/ 统计总数大小
+du -sm * | sort -n 统计当前目录大小 并安大小 排序
+du -sk * | sort -n
+du -sk * | grep guojf 看一个人的大小
+du -m | cut -d "/" -f 2 看第二个/ 字符前的文字
+查看此文件夹有多少文件 /*/*/* 有多少文件
+du xmldb/
+du xmldb/*/*/* |wc -l
+40752
+
+解释：
+wc [-lmw]
+参数说明：
+-l :多少行
+-m:多少字符
+-w:多少字
 
 ```
+
 快速删除大量小文件方法
+```
 mkdir /tmp/empty
 rsync --delete-before -d /tmp/empty/ /the/folder/you/want/delete/
 ```
 
+一、命令介绍
 ```
-查看某目录下的文件数量
+   find 命令用于按照指定条件来查找文件。
+
+  一些比较常用参数如下表
+
+
+| 参数 |  作用 |
+| ---- | ---- |
+| -name | 匹配名称 |
+
+| -perm
+
+匹配权限mode为完全匹配( –mode包含即可)
+
+| -user
+
+匹配所有者
+
+| -group
+
+匹配所有组
+
+| -mtime –n +n
+
+匹配修改内容时间（-n n天以内 +n n天之前）
+
+| -atime –n +n
+
+匹配访问内容时间（-n n天以内 +n n天之前）
+
+| -ctime –n +n
+
+匹配修改文件权限时间(-n n天以内 +n n天之前)
+
+| -nouser
+
+匹配无所有者文件
+
+| -nogroup
+
+匹配无所有组文件
+
+| -newer file1 !file2
+
+匹配比file1新 比file2旧的文件
+
+| --type b/d/c/p/l/f
+
+匹配文件类型（参数依次块设备、目录、字符设备、管道、链接文件、文本文件）
+
+| -size
+
+匹配文件的大小（+为超过设定值大小的文件，-为小于设定值大小的文件）
+
+| -prune
+
+忽略某个目录
+
+| -exec…………{}\;
+
+ 后面可跟用于进一步处理搜索结果的命令
+```
+
+查找当前目录下文件名为 591014.txt 的文件
+```
+find . -type f -name "591014.txt" -exec ls {} \;
+```
+
+查找当前目录下文件名为 591014.txt 的文件
+```
+sudo find ./ -name "591014.txt" -exec ls {} \;
+```
+
+查看某目录下的文件数量(非链接文件数量)
+```
 find /data/digikey/800/ -type f | wc -l
+```
+
+查看某目录下的文件数量(链接文件数量)
+```
+find /data/digikey/800/ -type l | wc -l
+```
 
 统计文件大小为0的文件数量
+```
 find /data/digikey/800/ -type f -size 0 | wc -l
+```
 
 查找大于100M的文件
+```
 find /data/digikey/800/ -size +100M -exec ls -lh {} \
+```
 
 删除文件
+```
 rm -rf 文件名
 rm -f /opt/log/big.log
+```
 
 删除文件大小为0k的文件
+```
 find /data/digikey/800 -name "*" -type f -size 0c | xargs -n 1 rm -f
+```
+
 查找0字节文件并删除
+```
 find /data/digikey/800 -type f -size 0 -exec rm -rf {} \
+```
 
 删除大于50M的文件,不带-type f 会将目录页删除，如果当前路径位于该目录下会提示该目录不能删除的提示
+```
 find /data/digikey/800 -size +50M -exec rm {} \;
+```
 
 删除文件大小大于1k的文件
+```
 find /data/digikey/800/ -type f -size +1c -exec rm -f {} \;
+```
 
 查找某段时间内（365为天数）的文件并删除
+```
 find /data/digikey/800 -ctime +365 -exec rm -rf {} \
+```
 
 删除10天前的所有该目录下的文件
+```
 find /data/digikey/800 -mtime +10 -name "*.*" -exec rm -Rf {} ;
+```
 
 删除文件大小为1k大小的文件
+```
 find /data/digikey/800 -name "*" -type f -size 1024c | xargs -n 1 rm -f
+```
 
 删除文件占用空间为1k大小的文件
+```
 find /data/digikey/800 -name "*" -type f -size 1k | xargs -n 1 rm -f
+```
 
 查询所有的空文件夹
+```
 find -type d -empty
+```
 
 删除/data/digikey/800文件夹下的所有.pdf的文件
+```
 find /data/digikey/800 -name "*.pdf" | xargs rm -f
+```
 
 列出搜索到的文件
+```
 find /data/digikey/800 -name "shufa.txt" -exec ls {}
+```
 
 批量删除搜索到的文件
+```
 find /data/digikey/800 -name "shufa.txt" -exec rm -f {}
+```
+
 批量删除搜索到的文件包含名称ssss所有的文件，如果要连同目录一起删除，加-r参数
+```
 find /data/digikey/800 -name "*ssss*" | xargs rm -f
+```
 
 批量删除搜索到的文件(删除前有提示)
+```
 find /data/digikey/800 -name "shufa.txt" -ok rm -rf {}
+```
 
 删除目录下面所有 test 文件夹下面的文件
+```
 find /data/digikey/800 -name "test" -type d -exec rm -rf {}
+```
 
 删除文件夹下面的所有的.svn文件
+```
 find /data/digikey/800 -name '.svn' -exec rm -rf {}
+```
 
 删除某个文件夹下及该文件夹下所有子文件夹中的某种文件
+```
 find /data/digikey/800 -type f -iname "*_w*.jpg" -exec rm -rf {} \
+```
 
 注:
+```
 1.{}和前面之间有一个空格 
 2.find . -name 之间也有空格 
 3.exec 是一个后续的命令,{}内的内容代表前面查找出来的文件
 ```
-
 ```
 清空文本文件内容
 echo "" > /data/aaa.log
@@ -205,11 +374,10 @@ flase > /opt/log/big.log
 
 ```
 sudo su -
-
 sudo ln -s /data1/digikey_pdf/ pdf
 ```
 
-
+```
 一：使用CentOS常用命令查看cpu
 more /proc/cpuinfo | grep “model name”
 grep “model name” /proc/cpuinfo
@@ -462,31 +630,262 @@ poweroff 关机
 
 二十二、开机自启动设置
 编辑rc.local文件
-#vim /etc/rc.d/rc.local
+vim /etc/rc.d/rc.local
+du -sh # 查看指定目录的大小
+du -sh ./* 当前目录下各子目录的大小
+uptime # 查看系统运行时间、用户数、负载
+cat /proc/loadavg # 查看系统负载
+iptables -L # 查看防火墙设置
+route -n # 查看路由表
+netstat -lntp # 查看所有监听端口
+netstat -antp # 查看所有已经建立的连接
+netstat -s # 查看网络统计信息
+w # 查看活动用户
+id # 查看指定用户信息
+last # 查看用户登录日志
+cut -d: -f1 /etc/passwd # 查看系统所有用户
+cut -d: -f1 /etc/group # 查看系统所有组
+crontab -l # 查看当前用户的计划任务
+chkconfig --list # 列出所有系统服务
+chkconfig --list | grep on # 列出所有启动的系统服务
+```
 
-# du -sh # 查看指定目录的大小
+查看磁盘io
+```
+如果 iostat 没有，要 yum install sysstat安装这个包
+iostat -c 1 10
+iostat还可以用来获取cpu部分状态值：
+iostat -x 1 10
+iostat -d -x -k 1
 
-# uptime # 查看系统运行时间、用户数、负载
+如果%util接近100%,表明I/O请求太多,I/O系统已经满负荷，磁盘可能存在瓶颈,一般%util大于70%,I/O压力就比较大，读取速度有较多的wait
 
-# cat /proc/loadavg # 查看系统负载
+rrqm/s:每秒进行merge的读操作数目。即delta(rmerge)/s 
+wrqm/s:每秒进行merge的写操作数目。即delta(wmerge)/s 
+r/s:每秒完成的读I/O设备次数。即delta(rio)/s 
+w/s:每秒完成的写I/0设备次数。即delta(wio)/s 
+rsec/s:每秒读扇区数。即delta(rsect)/s 
+wsec/s:每秒写扇区数。即delta(wsect)/s 
+rKB/s:每秒读K字节数。是rsec/s的一半，因为每扇区大小为512字节 
 
-# iptables -L # 查看防火墙设置
-# route -n # 查看路由表
-# netstat -lntp # 查看所有监听端口
-# netstat -antp # 查看所有已经建立的连接
-# netstat -s # 查看网络统计信息
+wKB/s:每秒写K字节数。是wsec/s的一半 
+avgrq-sz:平均每次设备I/O操作的数据大小(扇区)。即delta(rsect+wsect)/delta(rio+wio) 
+avgqu-sz:平均I/O队列长度。即delta(aveq)/s/1000(因为aveq的单位为毫秒) 
+await:平均每次设备I/O操作的等待时间(毫秒)。即delta(ruse+wuse)/delta(rio+wio) 
+svctm:平均每次设备I/O操作的服务时间(毫秒)。即delta(use)/delta(rio+wio) 
+%util:一秒中有百分之多少的时间用于I/O操作,或者说一秒中有多少时间I/O队列是非空的
 
-# w # 查看活动用户
-# id # 查看指定用户信息
-# last # 查看用户登录日志
-# cut -d: -f1 /etc/passwd # 查看系统所有用户
-# cut -d: -f1 /etc/group # 查看系统所有组
-# crontab -l # 查看当前用户的计划任务
-# chkconfig –list # 列出所有系统服务
-# chkconfig –list | grep on # 列出所有启动的系统服务
+ostat -d -k 1 |grep sda10
+
+top
+显示更新十次后退出;
+top -n 10
+
+使用者将不能利用交谈式指令来对行程下命令:
+top -s
+
+将更新显示二次的结果输入到名称为top.log的档案里:
+top -n 2 -b < top.log
+使用方式：top [-] [d delay] [q] [c] [S] [s] [i] [n] [b]
+
+说明：即时显示process的动态
+d :改变显示的更新速度，或是在交谈式指令列( interactive command)按s
+q :没有任何延迟的显示速度，如果使用者是有superuser的权限，则top将会以最高的优先序执行
+c :切换显示模式，共有两种模式，一是只显示执行档的名称，另一种是显示完整的路径与名称S :累积模式，会将己完成或消失的子行程( dead child process )的CPU time累积起来
+s :安全模式，将交谈式指令取消,避免潜在的危机
+i :不显示任何闲置(idle)或无用(zombie)的行程
+n :更新的次数，完成后将会退出top
+b :批次档模式，搭配"n"参数一起使用，可以用来将top的结果输出到档案内
+
+第一行：
+ — 当前系统时间
+ days — 系统已经运行了N天N小时N分钟（在这期间没有重启过）
+2 users — 当前有2个用户登录系统
+load average: 1.17, 1.86, 1.59 — load average后面的三个数分别是1分钟、5分钟、15分钟的负载情况。
+load average数据是每隔5秒钟检查一次活跃的进程数，然后按特定算法计算出的数值。如果这个数除以逻辑CPU的数量，结果高于5的时候就表明系统在超负荷运转了。
+
+第二行：
+Tasks — 任务（进程），系统现在共有164个进程，其中处于运行中的有2个，162个在休眠（sleep），stoped状态的有0个，zombie状态（僵尸）的有0个。
+
+第三行：cpu状态
+us — 用户空间占用CPU的百分比。
+sy — 内核空间占用CPU的百分比。
+ni — 改变过优先级的进程占用CPU的百分比
+id — 空闲CPU百分比
+wa — IO等待占用CPU的百分比
+hi — 硬中断（Hardware IRQ）占用CPU的百分比
+si — 软中断（Software Interrupts）占用CPU的百分比
+
+第四行：内存状态
+total — 物理内存总量
+used — 使用中的内存总量
+free — 空闲内存总量
+buffers — 缓存的内存量
+
+第五行：swap交换分区
+total — 交换区总量
+used — 使用的交换区总量
+free — 空闲交换区总量
+cached — 缓冲的交换区总量
+
+第七行以下：各进程（任务）的状态监控
+PID — 进程id
+USER — 进程所有者
+PR — 进程优先级
+NI — nice值。负值表示高优先级，正值表示低优先级
+VIRT — 进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES
+RES — 进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA
+SHR — 共享内存大小，单位kb
+S — 进程状态。D=不可中断的睡眠状态 R=运行 S=睡眠 T=跟踪/停止 Z=僵尸进程
+%CPU — 上次更新到现在的CPU时间占用百分比
+%MEM — 进程使用的物理内存百分比
+TIME+ — 进程使用的CPU时间总计，单位1/100秒
+COMMAND — 进程名称（命令名/命令行）
+
+敲击键盘“b”（打开/关闭加亮效果）;
+敲击键盘“x”（打开/关闭排序列的加亮效果）
+
+
+iotop                                           使用io高的进程的工具
+
+mpstat
+要查看cpu波动情况的，尤其是多核机器上。该命令可间隔2秒钟采样一次CPU的使用情况，每个核的情况都会显示出来
+mpstat -P ALL 2 5
+
+proc
+查看cpu的配置信息(它能显示诸如CPU核心数，时钟频率、CPU型号等信息)
+cat /proc/cpuinfo
+
+查看进程状态
+cat /proc/进程id/status
+
+查看经常地址空间信息
+cat /proc/进程id/maps
+
+查看内存
+cat /proc/meminfo
+
+Procs（进程）：
+r: 运行队列中进程数量
+b: 等待IO的进程数量
+Memory（内存）：
+swpd: 使用虚拟内存大小
+free: 可用内存大小
+buff: 用作缓冲的内存大小
+cache: 用作缓存的内存大小
+
+Swap：
+si: 每秒从交换区写到内存的大小
+so: 每秒写入交换区的内存大小
+IO：（现在的Linux版本块的大小为1024bytes）
+bi: 每秒读取的块数
+bo: 每秒写入的块数
+
+系统：
+in: 每秒中断数，包括时钟中断。
+cs: 每秒上下文切换数。
+
+CPU（以百分比表示）：
+us: 用户进程执行时间(user time)
+sy: 系统进程执行时间(system time)
+id: 空闲时间(包括IO等待时间)
+wa: 等待IO时间
+
+
+vmstat
+每N秒输出一条结果
+vmstat 2
+
+r表示运行队列的大小，
+b表示由于IO等待而block的线程数量，
+in表示中断的数量，
+cs表示上下文切换的数量，
+us表示用户CPU时间，
+sys表示系统CPU时间，
+wa表示由于IO等待而是CPU处于idle状态的时间，
+id表示CPU处于idle状态的总时间。
+
+pmap 进程id
+可以显示一个或多个进程所使用的内存数量。你可以使用这个工具来了解服务器上的某个进程分配了多少内存，输出进程内存的状况，可以用来分析线程堆栈
+pmap 进程id -d选项
+
+监控进程线程数
+ps -eLf | grep 进程 | wc -l
+
+
+lsblk 　　　　                                   查看分区和磁盘
+df -h 　　                                      查看空间使用情况
+fdisk -l 　　                                   分区工具查看分区信息
+cfdisk /dev/sda  　　                           查看分区
+blkid 　                                        查看硬盘label（别名）
+du -sh ./* 　　                                 统计当前目录各文件夹大小
+free -h 　                                    　查看内存大小
+cat /proc/cpuinfo| grep "cpu cores"| uniq  　　 查看cpu核心数
+cat /proc/cpuinfo| grep "physical id"|uniq| wc -l   查看物理cpu个数
+cat /proc/cpuinfo| grep "processor"| wc -l          查看逻辑cpu的个数
+
+cat  /etc/redhat-release            查看系统版本
+getconf LONG_BIT                    查看系统位数
+
+查看消耗内存最多的前40个进程
+ps auxw|head -1;
+ps auxw|sort -rn -k4|head -40
 
 
 
+
+#时区/时间设置
+yum install -y ntpdate
+timedatectl set-timezone Asia/Shanghai
+ntpdate time.windows.com
+
+#空闲超时设置
+echo TMOUT=300 >> /etc/profile
+
+#禁用Telnetd
+systemctl disable telnetd.service
+
+#删除潜在危险文件
+find / -name .netrc |xargs rm -rf
+find / -name .rhosts |xargs rm -rf
+find / -name hosts.equiv |xargs rm -rf
+
+#口令期限，缺省用户创建权限设置
+sed -i 's/PASS_MAX_DAYS\t99999/PASS_MAX_DAYS\t90/' /etc/login.defs
+sed -i 's/PASS_MIN_LEN\t5/PASS_MIN_LEN\t8/' /etc/login.defs
+sed -i 's/PASS_WARN_AGE\t7/PASS_WARN_AGE\t10/' /etc/login.defs
+sed -i 's/UMASK 077/UMASK 027/' /etc/login.defs
+
+#密码复杂度设置，root用户不受限制，此项最好人工设定(不同的安装或云主机文件不一样)
+sed -i '/password required pam_deny.so/a\password requisite pam_cracklib.so retry=3 minlen=8 minclass=3 dictpath=/usr/share/cracklib/pw_dict' /etc/pam.d/system-auth
+
+#创建普通用户、授权wheel组用户可以su -、禁用root远程登入
+useradd -G wheel yunwei
+echo 'Hdhxt@8978' |passwd --stdin yunwei
+sed -i 's/#auth\t\trequired\tpam_wheel.so use_uid/auth\t\trequired\tpam_wheel.so group=wheel/' /etc/pam.d/su
+echo "SU_WHEEL_ONLY yes" >> /etc/login.defs
+sed -i 's/#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+service sshd restart
+
+#账号信息文件权限
+chmod 644 /etc/passwd
+chmod 400 /etc/shadow
+chmod 644 /etc/group
+
+#关闭SELINUX，设置firewalld
+sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
+firewall-cmd --permanent --zone=public --add-port=80/tcp
+firewall-cmd --permanent --zone=public --add-port=443/tcp
+firewall-cmd --permanent --zone=public --add-rich-rule="rule family="ipv4" source address="192.168.126.0/24" service name="ssh" accept"
+firewall-cmd --reload
+
+#（备选） - 用户可以使用sudo,如果用户可以使用sudo则代表其具有sudo su - 的root权限
+#sed -i '/root\tALL=(ALL)[[:space:]]\tALL/a\yunwei ALL=(ALL) NOPASSWD: ALL' /etc/sudoers
+```
+
+
+
+```
 关键字: linux 查进程、杀进程、起进程
 1.查进程
     ps命令查找与进程相关的PID号：
@@ -517,8 +916,8 @@ ps -ef|grep java|grep -v grep 显示出所有的java进程，去处掉当前的g
 3.进入到进程的执行文件所在的路径下，执行文件 ./文件名
 
 附：
-
 这是本人花了两天时间整理得来的，一些最常用的地球人都知道的命令就省去啦！最后提供pdf手册下载 
+
 
 1. 更改档案拥有者 
 命令 : chown [-cfhvR] [--help] [--version] user[:group] file... 
@@ -712,7 +1111,29 @@ sort 的参数 -nr 表示要以数字排序法进行反向排序。
           -e 显示当前运行的每一个进程信息 
           -f 显示一个完整的列表 
   -x 显示包括没有终端控制的进程状况 。 
+```
 
+
+
+### centos7安装mongodb
+```
+curl -O https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.2.12.tgz
+解压 放到 /usr/local/ 目录下
+
+tar -zxvf mongodb-linux-x86_64-3.2.12.tgz
+mv  mongodb-linux-x86_64-3.2.12/ /usr/local/mongodb
+
+sudo systemctl start mongod.service
+sudo systemctl stop mongod.service
+sudo systemctl restart mongod.service
+sudo systemctl status mongod.service
+```
+
+
+### centos7安装python3
+```
+
+```
 
 ### centos7-修改默认python为3
 ```
@@ -753,3 +1174,35 @@ linux 路径映射
 //192.168.1.62/new_pdf：远程路径
 mount -v -t cifs //192.168.1.62/new_pdf /data/eddie/new_pdf -o 'username=icmofang,password=icmofang,vers=1.0'
 ```
+
+### centos7 安装 pyhanlp
+```
+pip3 install pyhanlp -i https://pypi.tuna.tsinghua.edu.cn/simple
+安装出错：
+centos下gcc编译出现gcc: error trying to exec ‘cc1plus’: execvp: No such file or directory
+原因是在你的fedora/centos中没有安装g++。（或许你像我一样装的是最小linux系统，很多东西都缺）
+解决办法：
+1、切换root用户，或有权限的用户使用sudo
+2、执行以下在线安装代码：
+<!-- yum install gcc -->
+yum install gcc-c++
+
+然后再运行
+pip3 install pyhanlp -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+
+```
+JPype1 (0.7.0)
+
+networkx (2.4)
+nltk (3.4.5)
+numpy (1.17.4)
+pyhanlp (0.1.54)
+requests (2.22.0)
+scipy (1.3.2)
+sklearn (0.0)
+```
+
+
+

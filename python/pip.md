@@ -49,6 +49,60 @@ pip freeze or pip list
 pip list -o
 ```
 
+内存检测工具
+
+对于python代码的内存占用问题，对于代码进行内存监控十分必要。这里笔者这里推荐两个小工具来检测python代码的内存占用
+```
+pip install memory_profiler
+
+memory_profiler是利用python的装饰器工作的，所以我们需要在进行测试的函数上添加装饰器。
+
+from hashlib import sha1
+import sys
+
+@profile
+def my_func():
+    sha1Obj = sha1()
+    with open(sys.argv[1], 'rb') as f:
+        while True:
+            buf = f.read(10 * 1024 * 1024)
+            if buf:
+                sha1Obj.update(buf)
+            else:
+                break
+
+    print(sha1Obj.hexdigest())
+
+
+if __name__ == '__main__':
+    my_func()
+
+之后在运行代码时加上** -m memory_profiler**
+就可以了解函数每一步代码的内存占用了
+
+guppy
+依样画葫芦，仍然是通过pip先安装guppy
+
+pip install guppy
+之后可以在代码之中利用guppy直接打印出对应各种python类型（list、tuple、dict等）分别创建了多少对象，占用了多少内存。
+
+from guppy import hpy
+import sys
+
+
+def my_func():
+    mem = hpy()
+    with open(sys.argv[1], 'rb') as f:
+        while True:
+            buf = f.read(10 * 1024 * 1024)
+            if buf:
+                print(mem.heap())
+            else:
+                break
+
+通过上述两种工具guppy与memory_profiler可以很好地来监控python代码运行时的内存占用问题
+```
+
 ### 通过pip发布python程序
 #### pypi
 
@@ -91,12 +145,10 @@ Python 的老规矩，example-pkg/example-pkg 目录下当然要有一个 __init
  /example-pkg 目录下要有一个叫 setup.py 的文件，如果下载过 Python 代码包，应该都知道这个文件，需要通过这个文件进行 Python 代码的编译（可能会有依赖的其他代码包或者依赖的 C 文件）和安装。
 LICENSE 文件：这个文件就是用来保存代码所使用的开源许可证。
 README.md：这个是软件通信的管理了，帮助文档。
-```
 
 对于 setup.py 文件，还有必要好好说说，先贴个例子，下面这个例子中，主要是实现了从 /example-pkg/example-pkg/init.py 文件中读取 version 参数，来配置当前软件的版本，并指定了代码包名（name）、作者（author）、邮箱（author_email）、描述信息（long_description、long_description_content_type）、依赖（install_requires），以及哪些文件不会被打包到程序中（exclude_package_data）。
 
 另外需要提醒大家一点，给程序起名字不要带下划线（_），python import 代码包时是不支持下划线，出现这种情况就比较尴尬了，代码装上了，还是用不了。
-
 ```
 #!/usr/bin/env python
 
@@ -159,9 +211,9 @@ Uploading distributions to https://upload.pypi.org/legacy/
 Enter your username: <your pypi.org username>
 Enter your password: <your pypi.org password>
 Uploading example-pkg-0.0.1-py3-none-any.whl
-100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 45.0k/45.0k [00:01<00:00, 24.0kB/s]
+100%|45.0k/45.0k [00:01<00:00, 24.0kB/s]
 Uploading example-pkg-0.0.1.tar.gz
-100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 43.8k/43.8k [00:00<00:00, 46.2kB/s]
+100%|43.8k/43.8k [00:00<00:00, 46.2kB/s]
 ```
 上传完毕！不过这里有一点需要注意，上传新版本后，很可能 pip search 还没法查到版本的更新，这是正常的，我理解是
  pip search 命令依赖于缓存，所以不会立刻生效。
