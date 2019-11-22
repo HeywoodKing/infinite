@@ -557,3 +557,56 @@ pipenv run python main.py
 这应该会输出类似的：
 Your IP is 8.8.8.8
 ```
+
+### ubuntu安装pipenv
+```
+pip3 install --user pipenv -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+pipenv install
+pipenv：未找到命令
+出现以上问题，需要进行一下操作
+vim ~/.profile # 在底部添加以下语句
+
+PYTHON_BIN_PATH="$(python3 -m site --user-base)/bin"
+PATH="$PATH:$PYTHON_BIN_PATH"
+保存退出
+
+执行
+source ~/.profile
+liuf2@liuf2-virtual-machine:pip3
+Traceback (most recent call last):
+  File "/usr/bin/pip3", line 9, in <module>
+    from pip import main
+ImportError: cannot import name 'main'
+以上问题
+sudo vim /usr/bin/pip3
+将这一段代码
+from pip import main
+if __name__ == '__main__':
+    sys.exit(main())
+
+修改为：
+from pip import __main__
+if __name__ == '__main__':
+    sys.exit(__main__._main())
+
+保存退出
+
+测试
+pip3 --version
+
+
+卸载pip3
+sudo python3 -m pip uninstall pip3
+
+
+安装pip3
+sudo apt install python3-pip
+
+升级pip3
+python3 -m pip install --upgrade pip
+
+
+```
+
+

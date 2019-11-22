@@ -376,3 +376,5 @@ sudo apt remove 软件名
 sudo apt update
 ```
 
+
+
