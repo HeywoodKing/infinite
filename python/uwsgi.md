@@ -1339,18 +1339,25 @@ harakiri = 60
 
 1. 当uwsgi无法访问时候
 首先查看进程是否在运行
+```
 netstat -tpln
-
-2. 再确认进程有情况下，试着重启，uwsgi --reload xxx.ini
-
+```
+2. 再确认进程有情况下，试着重启
+```
+uwsgi --reload xxx.ini
+```
 3. 如果步骤2没有解决问题，则组要重新配置xxx.ini
+```
 uwsgi --ini xxx.ini
-
+```
 提示如下错误：probably another instance of uWSGI is running on the same address (:8024)，说明该端口被占用，结束掉占用该端口的进程
+```
 sudo fuser -k 8024/tcp
-
+```
 4. 重新启动uwsgi
+```
 uwsgi --ini xxx.ini
+```
 
 
 
