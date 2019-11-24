@@ -77,7 +77,41 @@ Pipfile 文件是 TOML 格式而不是 requirements.txt 这样的纯文本。
 提供版本锁支持，存为 Pipfile.lock。
 click是Flask作者 Armin Ronacher 写的命令行库，现在Flask已经集成了它。
 
-# Linux
+
+### windows修改创建的虚拟环境存放路径
+
+修改pipenv虚拟环境安装位置
+在系统变量中创建 WORKON_HOME 变量
+值填写 存放位置
+```
+WORKON_HOME
+D:\workspace\virtualbox_env
+
+以后所有的虚拟环境都会放在这个目录里
+要想把虚拟环境放入项目文件夹
+值填写：PIPENV_VENV_IN_PROJECT
+```
+
+### linux修改创建的虚拟环境存放路径
+运行python -m site --user-base指令来查看自身电脑的用户基础目录的路径
+
+然后，我们需要将/home/flack/.local/bin添加到 PATH 中。为了一劳永逸，我们可以通过 修改 ~/.profile 永久地设置 PATH。（python3对应需要添加/home/flack/./local/lib/python3.6/bin）
+通过命令：$ gedit ~/.profile打开prfile文件，然后在最后一行添加字符的用户基础目录路径
+```
+export PATH=$PATH:/home/flack/.local/bin
+```
+添加成功后保存并退出profile文件。
+最后注意此时系统并没有自动的更新PATH，所以我们需要运行$ source ~/.profile来手动更新：
+此时，可以在命令行中键入$ pipenv来测试是否配置成功
+
+
+```
+来查看python3 的路径
+python3 -m site --user-base
+
+```
+
+
 ### 首先要安装pip才能运行以下命令
 `pip install pipenv`
 
@@ -560,7 +594,11 @@ Your IP is 8.8.8.8
 
 ### ubuntu安装pipenv
 ```
-pip3 install --user pipenv -i https://pypi.tuna.tsinghua.edu.cn/simple
+全局安装
+sudo pip3 install -H -U pipenv -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+当前用户安装
+sudo pip3 install --user pipenv -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 pipenv install
 pipenv：未找到命令
