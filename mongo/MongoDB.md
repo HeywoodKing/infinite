@@ -554,6 +554,43 @@ db.getCollection('NoDigikey').find({status:{$gt:1},data_sheet:{$regex:/^https:\/
 )
 ```
 
+### 创建索引
+```
+MongoDB 创建索引的语法
+1.为普通字段添加索引，并且为索引命名
+db.集合名.createIndex( {"字段名": 1 },{"name":'idx_字段名'})
+
+说明： 
+（1）索引命名规范：idx_<构成索引的字段名>。如果字段名字过长，可采用字段缩写。
+（2）字段值后面的 1 代表升序；如是 -1 代表 降序。
+
+2.为内嵌字段添加索引
+db.集合名.createIndex({"字段名.内嵌字段名":1},{"name":'idx_字段名_内嵌字段名'})
+
+
+3.通过后台创建索引
+db.集合名.createIndex({"字段名":1},{"name":'idx_字段名',background:true})
+
+
+4:组合索引
+db.集合名.createIndex({"字段名1":-1,"字段名2":1},{"name":'idx_字段名1_字段名2',background:true})
+
+
+5.设置TTL 索引
+db.集合名.createIndex( { "字段名": 1 },{ "name":'idx_字段名',expireAfterSeconds: 定义的时间,background:true} )
+说明 ：expireAfterSeconds为过期时间（单位秒）  
+
+6.createIndex() 接收可选参数汇总
+Parameter Typ Description
+background  Boolean 建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 "background" 可选参数。 "background" 默认值为false。
+unique  Boolean 建立的索引是否唯一。指定为true创建唯一索引。默认值为false.
+name  string  索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。
+sparse  Boolean 对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 false.
+expireAfterSeconds  integer 指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。
+weights document  索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。
+default_language  string  对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语
+```
+
 
 ## 高级用法
 
@@ -1038,26 +1075,152 @@ db.digikey_param_zh.aggregate([
 
 ### mongodb性能监控
 ```
-mongostat --port 端口号
+mongostat --host 192.168.1.169:27017
+mongostat --host 192.168.1.169 --port 27017
+
+Usage:
+  mongostat <options> <polling interval in seconds>
+
+Monitor basic MongoDB server statistics.
+
+See http://docs.mongodb.org/manual/reference/program/mongostat/ for more information.
+
+general options:
+      --help                                      print usage
+      --version                                   print the tool version and exit
+
+verbosity options:
+  -v, --verbose=<level>                           more detailed log output (include multiple times for more verbosity, e.g.
+                                                  -vvvvv, or specify a numeric value, e.g. --verbose=N)
+      --quiet                                     hide all log output
+
+connection options:
+  -h, --host=<hostname>                           mongodb host(s) to connect to (use commas to delimit hosts)
+      --port=<port>                               server port (can also use --host hostname:port)
+
+authentication options:
+  -u, --username=<username>                       username for authentication
+  -p, --password=<password>                       password for authentication
+      --authenticationDatabase=<database-name>    database that holds the user's credentials
+      --authenticationMechanism=<mechanism>       authentication mechanism to use
+
+uri options:
+      --uri=mongodb-uri                           mongodb uri connection string
+
+stat options:
+  -o=<field>[,<field>]*                           fields to show. For custom fields, use dot-syntax to index into
+                                                  serverStatus output, and optional methods .diff() and .rate() e.g.
+                                                  metrics.record.moves.diff()
+  -O=<field>[,<field>]*                           like -o, but preloaded with default fields. Specified fields inserted after
+                                                  default output
+      --humanReadable=                            print sizes and time in human readable format (e.g. 1K 234M 2G). To use the
+                                                  more precise machine readable format, use --humanReadable=false (default:
+                                                  true)
+      --noheaders                                 don't output column names
+  -n, --rowcount=<count>                          number of stats lines to print (0 for indefinite)
+      --discover                                  discover nodes and display stats for all
+      --http                                      use HTTP instead of raw db connection
+      --all                                       all optional fields
+      --json                                      output as JSON rather than a formatted table
+      --useDeprecatedJsonKeys                     use old key names; only valid with the json output option.
+  -i, --interactive                               display stats in a non-scrolling interface
 
 可以实时监控
-·inserts/s 每秒插入次数
+·inserts/s 每秒插入次数,如果是slave，则数值前有*,则表示复制集操作
 ·query/s 每秒查询次数
 ·update/s 每秒更新次数
 ·delete/s 每秒删除次数
-·getmore/s 每秒执行getmore次数
-·command/s 每秒的命令数，比以上插入、查找、更新、删除的综合还多，还统计了别的命令
+·getmore/s 每秒执行getmore次数,每秒查询cursor(游标)时的getmore操作数
+·command/s 每秒的命令数，比以上插入、查找、更新、删除的综合还多，还统计了别的命令(每秒执行的命令数，在主从系统中会显示两个值(例如 3|0),分表代表 本地|复制 命令)
+dirty: 仅仅针对WiredTiger引擎，官网解释是脏数据字节的缓存百分比
+used:仅仅针对WiredTiger引擎，官网解释是正在使用中的缓存百分比
 ·flushs/s 每秒执行fsync将数据写入硬盘的次数。
+(For WiredTiger引擎：指checkpoint的触发次数在一个轮询间隔期间 For MMAPv1 引擎：每秒执行fsync将数据写入硬盘的次数)
+一般都是0，间断性会是1， 通过计算两个1之间的间隔时间，可以大致了解多长时间flush一次。flush开销是很大的，如果频繁的flush，可能就要找找原因了
+
 ·mapped/s 所有的被mmap的数据量，单位是MB，
-·vsize 虚拟内存使用量，单位MB
-·res 物理内存使用量，单位MB
+·vsize 虚拟内存使用量，单位MB(最后一次调用的总数据)
+·res 物理内存使用量，单位MB(最后一次调用的总数据)
+这个和你用top看到的一样, vsize一般不会有大的变动， res会慢慢的上升，如果res经常突然下降，去查查是否有别的程序狂吃内存。
+
 ·faults/s 每秒访问失败数（只有Linux有），数据被交换出物理内存，放到swap。不要超过100，否则就是机器内存太小，造成频繁swap写入。此时要升级内存或者扩展
 ·locked % 被锁的时间百分比，尽量控制在50%以下吧
 ·idx miss % 索引不命中所占百分比。如果太高的话就要考虑索引是不是少了
-·q t|r|w Mongodb接收到太多的命令而数据库被锁住无法执行完成，它会将命令加入队列。这一栏显示了总共、读、写3个队列的长度，都为0的话表示mongo毫无压力。高并发时，一般队列值会升高。
-·conn 当前连接数
+
+
 ·time 时间戳
+·q t|r|w Mongodb接收到太多的命令而数据库被锁住无法执行完成，它会将命令加入队列。这一栏显示了总共、读、写3个队列的长度，都为0的话表示mongo毫无压力。高并发时，一般队列值会升高。
+qr: 客户端等待从MongoDB实例读数据的队列长度
+qw：客户端等待从MongoDB实例写入数据的队列长度
+qrw: 客户端等待从MongoDB实例读数据和写数据的队列长度
+
+ar: 执行读操作的活跃客户端数量
+aw: 执行写操作的活客户端数量
+arw: 执行读操作和写操作的活跃客户端数量
+如果这两个数值很大，那么就是DB被堵住了，DB的处理速度不及请求速度。看看是否有开销很大的慢查询。如果查询一切正常，确实是负载很大，就需要加机器了
+
+netIn:MongoDB实例的网络进流量
+netOut：MongoDB实例的网络出流量
+此两项字段表名网络带宽压力，一般情况下，不会成为瓶颈
+
+·conn 当前连接数
+conn: 打开连接的总数，是qr,qw,ar,aw的总和
+MongoDB为每一个连接创建一个线程，线程的创建与释放也会有开销，所以尽量要适当配置连接数的启动参数，maxIncomingConnections，阿里工程师建议在5000以下，基本满足多数场景
 
 这些状态我们基本上可以不看conn，一般都不会变，因为是连接池过来的连接数都是固定的。基本上看看qr|qw ，ar|aw如果一直0说明很健康，如果几十的话那就说明mongo处理起来很慢了，有可能有慢查询，锁表排队等现象。
+
+
+查看mongodb最大连接数
+db.serverStatus().connections
+
+```
+
+### mongotop
+```
+mongotop --host 192.168.1.169:27017
+mongotop --host 192.168.1.169 --port 27017
+
+Usage:
+  mongotop <options> <polling interval in seconds>
+
+Monitor basic usage statistics for each collection.
+
+See http://docs.mongodb.org/manual/reference/program/mongotop/ for more information.
+
+general options:
+      --help                                      print usage
+      --version                                   print the tool version and exit
+
+verbosity options:
+  -v, --verbose=<level>                           more detailed log output (include multiple times for more verbosity, e.g.
+                                                  -vvvvv, or specify a numeric value, e.g. --verbose=N)
+      --quiet                                     hide all log output
+
+connection options:
+  -h, --host=<hostname>                           mongodb host(s) to connect to (use commas to delimit hosts)
+      --port=<port>                               server port (can also use --host hostname:port)
+
+authentication options:
+  -u, --username=<username>                       username for authentication
+  -p, --password=<password>                       password for authentication
+      --authenticationDatabase=<database-name>    database that holds the user's credentials
+      --authenticationMechanism=<mechanism>       authentication mechanism to use
+
+uri options:
+      --uri=mongodb-uri                           mongodb uri connection string
+
+output options:
+      --locks                                     report on use of per-database locks
+  -n, --rowcount=<count>                          number of stats lines to print (0 for indefinite)
+      --json                                      format output as JSON
+
+
+ns：包含数据库命名空间，后者结合了数据库名称和集合。
+db：包含数据库的名称。名为 . 的数据库针对全局锁定，而非特定数据库。
+total：mongod在这个命令空间上花费的总时间。
+read：在这个命令空间上mongod执行读操作花费的时间。
+write：在这个命名空间上mongod进行写操作花费的时间。
+时间: 当前状态的db时间
+
 ```
 

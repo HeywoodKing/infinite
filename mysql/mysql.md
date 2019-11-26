@@ -1181,6 +1181,8 @@ select * from user into outfile '/data/mysql_export_dir/user.csv' fields termina
 select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 
 select * from db_electron_cleaning.tb_extra_category_params into outfile '/data/mysql_export_dir/tb_extra_category_params.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+select id,model_name,images,source_web,data_sheet from tb_electron where factory_id is null limit 100000 into outfile '/data/mysql_export_dir/tb_electron_no_factory.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 ```
 
 
