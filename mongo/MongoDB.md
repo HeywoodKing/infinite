@@ -593,7 +593,6 @@ default_language  string  对于文本索引，该参数决定了停用词及词
 
 
 ## 高级用法
-
 ### 导出文档
 ```
 mongoexport -h 192.168.1.141 --port 27018 -d configs -c NoDigikey --type=csv -q "{$and: [{link_status: {$ne: null}}, {link_status:{$gt: 200}}, {link_status:{$ne: 429}}, {link_status:{$ne: 908}}]}" -f _id,id,model_name,data_sheet,status,link_status -o D:/Flack/Work/nodigikey.csv
