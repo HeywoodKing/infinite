@@ -616,6 +616,7 @@ ${f##.} 等，后面再补充
 ```
 netstat -an
 netstat -nap |grep 3306 | grep 185
+netstat -ntulp | grep 10983
 ```
 
 + 有关重启
@@ -1159,7 +1160,99 @@ sudo systemctl status mongod.service
 
 ### centos7安装python3
 ```
+编译安装 Python 3
+Cent OS 预装了一个 Python 2，并且系统很多组件都依赖于 Python 2 ，笔者在安装和使用 Python 3 时就因为这些依赖情况遇到了很多问题，最后总结下来，正确的安装和使用 Python 3 的过程如下：
 
+远程连接云服务器实例，在本示例中将使用 root 用户通过编译安装方式全局安装 Python 3，你也可以选择单独为某个用户安装 Python 3 ，步骤上大同小异，详细编译安装文档参考 Using Python on Unix platforms 。
+使用 Yum 安装编译安装 Python 3 时依赖的包：
+
+$ yum -y groupinstall "Development tools"
+$ yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel
+下载 Python 3.6.7 版本的安装包，其它版本的请自行去 Download Python | Python.org 获取链接：
+
+$ wget https://www.python.org/ftp/python/3.6.7/Python-3.6.7.tgz
+在当前用户目录解压下载的 Python 安装包：
+
+$ tar -zxvf Python-3.6.7.tgz
+进入已解压的 Python 安装文件根目录：
+
+$ cd Python-3.6.7
+通过编译配置指定 Python 的安装位置：
+
+$ ./configure --prefix=/usr/local/python3
+使用 make 命令开始编译安装 Python：
+
+$ make && make install
+为了和系统自带的 python 和 pip 命令区分开来，给刚刚安装的 Python 建立软链接，并为其设置命令别名。分别取名为 python3 、pip3 ：
+
+$ ln -s /usr/local/python3/bin/python3.6 /usr/bin/python3
+$ ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
+测试 Python 3 是否正确安装，输入 python3 命令：
+
+$ python3
+Python 3.6.7 (default, Feb  4 2019, 19:05:27)
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-36)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+测试 Pip 3 是否正确安装，输入 pip3 命令：
+
+$ pip3 -V
+pip 10.0.0 from /usr/local/python3/lib/python3.6/site-packages/pip (python 3.6)
+更新 Pip ：
+
+$ pip3 install --upgrade pip
+7. 使用 Pipenv 管理 Python 虚拟环境
+Pipenv 是 Pipfile 主要倡导者、requests 作者 Kenneth Reitz 写的一个命令行工具，主要包含了 Pipfile、pip、click、requests 和 virtualenv ，使用 Pipenv 可以方便的管理 Python 虚拟环境、管理依赖文件。Pipfile 和 Pipenv本来都是Kenneth Reitz 的个人项目，后来贡献给了 pypa 组织。Pipfile 是社区拟定的依赖管理文件，用于替代过于简陋的 requirements.txt 文件。
+
+执行下面命令，安装 Pipenv ：
+
+$ pip3 install pipenv
+执行下面命令，为 Pipenv 可执行文件设置软链接，之后可以通过 pipenv 命令来使用 Pipenv ：
+
+$ ln -s /usr/local/python3/bin/pipenv /usr/bin/pipenv
+切换到一个拥有 root 权限的用户，这里以 admin 用户为例：
+
+$ su admin
+在用户目录下为你的项目创建一个目录，并进入项目目录，项目名称以 FlaskApp 为例：
+
+$ cd ~
+$ mkdir FlaskApp
+$ cd FlaskApp
+执行下面命令，为项目创建 Python 虚拟环境，默认将虚拟环境保存在 ~/.local/share/virtualenvs：
+
+$ pipenv install
+如果想把虚拟环境保存至项目根目录，需要设置环境变量 PIPENV_VENV_IN_PROJECT=1 ，再执行创建命令：
+
+$ export PIPENV_VENV_IN_PROJECT=1
+$ pipenv install
+虚拟环境创建完成后，执行下面命令为虚拟环境安装 Flask 包：
+
+$ pipenv install flask
+在项目根目录编写一个简单的 Flask Demo 进行测试：
+
+# 新建并打开一个名为 app.py 的文件
+$ vim app.py
+输入下面的代码并保存：
+
+from flask import Flask
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def hello_flask():
+    return 'Hello Flask!'
+使用 pipenv run 调用虚拟环境中的 Python 执行 flask run 命令可以运行编写的代码：
+
+$ pipenv run flask run
+也可以使用 pipenv shell 命令进入虚拟环境，然后再在虚拟环境执行 flask run 命令运行程序：
+
+$ pipenv shell
+(venv)$ flask run
+Flask 默认运行的地址和端口为 http://127.0.0.1:5000 ，云服务器实例不包含桌面环境的话，你很难去浏览这个页面。你可以设置 flask 运行的地址和端口，然后尝试从外网访问该页面。先执行下面命令，让 flask 允许外网访问，并且监听 80 端口：
+
+$ pipenv run flask run --host 0.0.0.0 --port 80
+然后你可以通过你的服务器公网 IP 或 域名 直接访问到该页面。
 ```
 
 ### centos7-修改默认python为3

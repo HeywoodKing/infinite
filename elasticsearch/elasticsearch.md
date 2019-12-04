@@ -86,6 +86,16 @@ cd elasticsearch-6.3.2/bin
 ```
 查看索引
 http://192.168.1.169:9200/_cat/indices?v
+
+查看指定索引的文档数量
+http://110.43.50.188:9201/category_with_kwargs/_count
+http://110.43.50.188:9201/electron_with_kwargs_00/_count
+
+模糊查看前缀为xx的索引数量
+http://110.43.50.188:9201/electron_with_kwargs_*/_count
+
+查询某个索引的文档记录
+http://110.43.50.188:9201/electron_with_kwargs_00/_search
 ```
 
 
@@ -315,3 +325,19 @@ POST /bank/_search?pretty
 根据state分组，降序统计top 10 state
 
 ```
+
+
+
+
+### 疑难杂症
+
+#### 问题：表xxx，TransportError(429, 'circuit_breaking_exception', '[parent] Data too large, data for [<http_request>] would be [1037526858/989.4mb], which is larger than the limit of [986932838/941.2mb], real usage: [1036345280/988.3mb], new bytes reserved: [1181578/1.1mb]')
+解决方法：
+需要增加es ES_HEAP_SIZE大小，默认为1g，将堆内存大小调整到4g
+
+
+#### ConnectionTimeout caused by - ReadTimeoutError(HTTPConnectionPool(host='110.43.50.188', port=9201): Read timed out.)
+```
+
+```
+

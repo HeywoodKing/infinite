@@ -7,6 +7,43 @@
 2. linux(ubuntu18.04)
 
 
+安装与初始化
+在 Download MySQL Yum Repository 页面获取 MySQL 8 Community Yum 仓库文件的链接，例如：
+
+https://repo.mysql.com//mysql80-community-release-el7-2.noarch.rpm
+通过 SSH 远程连接服务器实例，执行下面命令切换到其它拥有 root 权限的用户，阿里云服务器实例默认有一个拥有 root 权限的 admin 用户，这里以切换到 admin 用户为例子：
+
+$ su admin
+执行下面命令，下载 MySQL 8 Community Yum 仓库文件：
+
+$ wget https://repo.mysql.com//mysql80-community-release-el7-2.noarch.rpm
+执行下面命令，安装 MySQL 8 Community Yum 仓库文件：
+
+$ sudo yum localinstall mysql80-community-release-el7-2.noarch.rpm
+执行下面命令，检查 MySQL 8 Community Yum 仓库文件是否正确安装 ：
+
+$ yum repolist enabled | grep "mysql.*-community.*"
+执行下面命令，安装 MySQL 8 Community ：
+
+$ sudo yum install mysql-community-server
+使用 service 命令管理 MySQL 服务：
+
+$ sudo service mysqld start          # 启动 MySQL 服务
+$ sudo service mysqld stop           # 停止 MySQL 服务
+$ sudo service mysqld restart        # 重启 MySQL 服务
+$ sudo service mysqld status         # 查看 MySQL 服务状态
+使用 systemctl 命令管理 MySQL 服务：
+
+$ sudo systemctl start mysqld   # 启动 MySQL 服务
+$ sudo systemctl stop mysqld    # 停止 MySQL 服务
+$ sudo systemctl restart mysqld # 重启 MySQL 服务
+$ sudo systemctl status mysqld  # 查看 MySQL 服务状态
+$ sudo systemctl enable mysqld  # 设置 MySQL 服务开机自启动
+$ sudo systemctl disable mysqld # 关闭 MySQL 服务开机自启动
+首次启动 MySQL 服务，会自动初始化数据目录、生成 SSL 证书和密钥文件、创建超级用户 ' root'@'localhost' ，超级用户的密码被设置并存储在错误日志文件中。可以使用以下命令查询临时密码：
+
+$ sudo grep 'temporary password' /var/log/mysqld.log
+现在你可以用你查询到的临时密码连接数据库服务器了。
 
 
 ### 基本操作
@@ -215,6 +252,44 @@ SELECT * FROM information_schema.INNODB_LOCKS;
 查看等待锁的事务
 SELECT * FROM information_schema.INNODB_LOCK_waits;
 ```
+
+创建存储过程
+```
+创建更新auto_increment存储过程
+drop procedure pro_update_auto_increment_to_max;
+
+DELIMITER $$
+create procedure pro_update_auto_increment_to_max(in inout_table_name VARCHAR(200), in field_id VARCHAR(20))
+begin
+  # 拼接赋值 INTO 必须要用全局变量不然语句会报错
+  set @auto_id = concat("select max(", field_id, ") + 1 as max_id into @max_id from ", inout_table_name);
+  # 预处理需要执行的动态SQL，其中 ex_auto_id 是一个变量
+  PREPARE ex_auto_id FROM @auto_id;
+  # 执行SQL语句
+  EXECUTE ex_auto_id;
+  # 释放掉预处理段
+  deallocate prepare ex_auto_id;
+
+  set @alter_id = concat("alter table ", inout_table_name, " AUTO_INCREMENT=", @max_id);
+  PREPARE ex_alter_id FROM @alter_id;
+  EXECUTE ex_alter_id;
+  # 释放掉预处理段
+  deallocate prepare ex_alter_id;
+
+  -- set @result = concat("select concat(", inout_table_name, "' 表的 auto_increment=@max_id 更新完成!')");
+  set @result = concat("select concat('", inout_table_name, " 表的 auto_increment=',@max_id,' 更新完成！')");
+  PREPARE ex_result FROM @result;
+  EXECUTE ex_result;
+  # 释放掉预处理段
+  deallocate prepare ex_result;
+
+end $$
+
+DELIMITER ;
+
+call pro_update_auto_increment_to_max('db_electron_property_online.tb_electron_area', 'id');
+```
+
 
 desc information_schema.INNODB_LOCKS;
 +————-+———————+——+—–+———+——-+
@@ -545,7 +620,7 @@ alter table students drop primary key;
 alter table students drop foreign key FK1C81D1738DA76;
 ```
 
-删除外键
+删除外键（删除约束，删除外键约束）
 ```
 alter table students drop user_id
 ```
@@ -573,7 +648,7 @@ show profiles;
 查看当前表的自动增长id是多少
 ```
 select auto_increment from information_schema.tables 
-where table_schema = 'db_electron_property' and students = 'tb_electron_area';
+where table_schema = 'db_electron_property' and table_name = 'tb_electron_area';
 ```
 
 修改表students自动序列值
@@ -627,6 +702,11 @@ show full processlist
 ```
 show variables like '%timeout%';
 show variables like '%secure%';
+```
+
+查看所有变量
+```
+show session variables;
 ```
 
 查看服务器字符集
@@ -1013,6 +1093,94 @@ WHERE table_schema NOT IN ('information_schema' , 'performance_schema', 'sys', '
 ORDER BY data_length DESC;
 ```
 
+
+查看各个表数据量
+```
+select table_name,table_rows from information_schema.tables where table_schema = 'magic_online' and table_rows > 0 order by table_rows desc;
+select table_name,table_rows from information_schema.tables where table_schema = 'magic_online' order by table_rows desc;
+
++------------------------------------+------------+
+| table_name                         | table_rows |
++------------------------------------+------------+
+| m_electron                         |   13484200 |
+| m_electron_category                |        701 |
+| auditing_product_video             |          0 |
+| merchant_product_scheme            |          0 |
++------------------------------------+------------+
+```
+
+查看所有表信息
+```
+SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'db_electron_property_base'
+```
+
+查询数据库表数量
+```
+查询MySQL服务中数据库表数据量
+SELECT COUNT(*) TABLES, table_schema FROM information_schema.TABLES    GROUP BY table_schema;
+
+查询指定数据库表数量
+SELECT COUNT(*) TABLES, table_schema FROM information_schema.TABLES   WHERE table_schema = 'szdb'
+```
+
+查询数据库字段
+```
+#查询一个表中有多少字段
+SELECT COUNT(*) FROM information_schema. COLUMNS WHERE table_schema = 'szdb' AND table_name = 'SystemLog';
+
+#查询一个数据库中有多少字段
+SELECT COUNT(column_name) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'szdb';
+
+#查询数据库中所以表、字段、字段类型、注释等信息
+SELECT TABLE_NAME, column_name, DATA_TYPE, column_comment FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'szdb' ;
+```
+
+查询数据库中持久化的数据量
+
+MySQL中有一个名为 information_schema 的数据库，在该库中有一个 TABLES 表，这个表主要字段分别：TABLE_SCHEMA : 数据库名，TABLE_NAME：表名，ENGINE：所使用的存储引擎，TABLES_ROWS：记录数，DATA_LENGTH：数据大小，INDEX_LENGTH：索引大小
+use information_schema；统计数据主要使用的就是这张表了
+```
+#统计数据库中每个表保存的数据量
+use information_schema;
+SELECT TABLE_NAME, (DATA_LENGTH/1024/1024) as DataM ,(INDEX_LENGTH/1024/1024) as IndexM,((DATA_LENGTH+INDEX_LENGTH)/1024/1024) as AllM,TABLE_ROWS FROM TABLES WHERE TABLE_SCHEMA = 'szdb'
+
+#查询每张表数量
+select table_name,table_rows from tables where TABLE_SCHEMA = 'szdb' order by table_rows desc;
+
+#数据库总数量
+SELECT sum(table_rows) from tables where TABLE_SCHEMA = 'szdb' order by table_rows desc;
+```
+
+
+修改数据库名
+```
+select concat('rename table sysbench_testdata.',table_name,' to wenyz.',table_name,';') from information_schema.tables where table_schema='sysbench_testdata';
+
+select concat('rename table magic.',table_name,' to magic_backup.',table_name,';') from information_schema.tables where table_schema='magic' into outfile '/data/mysql_export_dir/rename_database.sql' ;
+
+
+修改数据库名 shell 脚本
+old_db_name = 'magic'
+new_db_name = 'magic_backup'
+
+mysql -h192.168.1.163 -uroot -pmofang123 -e "create database if not exists $new_db_name default character set utf8"
+
+list_table = $(mysql -h192.168.1.163 -uroot -pmofang123 -Nse "select table_name from information_schema.TABLES where table_schema='$old_db_name'")
+
+for table in $list_table
+do
+  mysql -h192.168.1.163 -uroot -pmofang123 -e "rename table $old_db_name.$table to $new_db_name.$table"
+done
+
+问题：脚本执行报错/bin/bash^M: bad interpreter: No such file or directory
+解决方案：
+将脚本上传到linux系统之后，使用vi 或 vim 编辑器打开，在命令模式下输入
+:set ff回车
+查看当前脚本格式，显示为:set ff=dos，将其修改为unix格式
+还是在命令模式下输入:set ff=unix回车
+:wq保存退出
+重新执行脚本就可以了
+```
 
 
 随机数
@@ -1454,6 +1622,339 @@ update tb_user set data=json_merge_preserve(data,'{"60":1}') where factory_id = 
 JSON_MERGE_PATCH()
 会将原有值覆盖
 update tb_user set data=json_merge_patch(data,'{"60":1}') where factory_id = 8202;
+
+
+
+json_array 创建json数组
+json_object 创建json对象
+json_quote 将json转成json字符串类型
+查询json 
+json_contains 判断是否包含某个json值
+json_contains_path 判断某个路径下是否包json值
+json_extract 提取json值
+column->path json_extract的简洁写法，MySQL 5.7.9开始支持
+column->>path json_unquote(column -> path)的简洁写法
+json_keys 提取json中的键值为json数组
+json_search 按给定字符串关键字搜索json，返回匹配的路径
+修改json 
+json_append 废弃，MySQL 5.7.9开始改名为json_array_append
+json_array_append 末尾添加数组元素，如果原有值是数值或json对 象，则转成数组后，再添加元素
+json_array_insert 插入数组元素
+json_insert 插入值（插入新值，但不替换已经存在的旧值）
+json_merge 合并json数组或对象
+json_remove 删除json数据
+json_replace 替换值（只替换已经存在的旧值）
+json_set 设置值（替换旧值，并插入不存在的新值）
+json_unquote 去除json字符串的引号，将值转成string类型
+返回json属性 
+json_depth 返回json文档的最大深度
+json_length 返回json文档的长度
+json_type 返回json值得类型
+json_valid 判断是否为合法json文档
+
+
+
+一,对记录的操作
+1.创建有json字段的表
+
+-- 创建表
+CREATE TABLE t_json(id INT PRIMARY KEY, sname VARCHAR(20) , info  JSON);
+ 
+
+2.插入记录
+
+-- 插入含有json数组的记录
+INSERT INTO t_json(id,sname,info) VALUES( 1, 'name1', JSON_ARRAY(1, "abc", NULL, TRUE, CURTIME()));
+
+-- 插入含有json对象的记录
+INSERT INTO t_json(id,sname,info) VALUES( 2, 'name2', JSON_OBJECT("age", 20, "time", now()));
+INSERT INTO t_json(id,sname,info) VALUES( 3, 'name3', '{"age":20, "time":"2018-07-14 10:52:00"}');
+ 
+
+3.查询记录
+
+-- 查询记录
+SELECT sname,JSON_EXTRACT(info,'$.age') FROM t_json;
+SELECT sname,info->'$.age' FROM t_json;
+-- 查询key
+SELECT id,json_keys(info) FROM t_json;
+ 
+
+4.修改记录
+
+复制代码
+-- 增加键
+UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.1') WHERE id = 2;
+
+-- 变更值
+UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.2') WHERE id = 2;
+
+-- 删除键
+UPDATE t_json SET info = json_remove(info,'$.ip') WHERE id = 2;
+复制代码
+ 
+
+二,创建json值函数
+1.JSON_ARRAY 生成json数组
+
+-- JSON_ARRAY(val1,val2,val3...)
+-- 生成一个包含指定元素的json数组。
+SELECT JSON_ARRAY(1, "abc", NULL, TRUE, CURTIME()); -- [1, "abc", null, true, "10:37:08.000000"]
+ 
+
+2.JSON_OBJECT 生成json对象
+
+-- JSON_OBJECT(key1,val1,key2,val2...)
+-- 生成一个包含指定K-V对的json object。如果有key为NULL或参数个数为奇数，则抛错。
+SELECT JSON_OBJECT('age', 20, 'time', now()); -- {"id": 87, "name": "carrot"}
+ 
+
+3.JSON_QUOTE 加"号
+
+-- JSON_QUOTE(json_val)
+-- 将json_val用"号括起来。
+SELECT JSON_QUOTE('[1,2,3]'); -- "[1,2,3]" 
+ 
+
+三,搜索json值函数
+1.JSON_CONTAINS 指定数据是否存在
+
+set @j = '{"a": 1, "b": 2, "c": {"d": 4}}';
+-- JSON_CONTAINS(json_doc, val[, path])
+-- 查询json文档是否在指定path包含指定的数据，包含则返回1，否则返回0。如果有参数为NULL或path不存在，则返回NULL。
+SELECT JSON_CONTAINS(@j, '4', '$.c.d'); -- 1
+ 
+
+2.JSON_CONTAINS_PATH 指定路径是否存在
+
+-- JSON_CONTAINS_PATH(json_doc, one_or_all, path[, path] ...)
+-- 查询是否存在指定路径，存在则返回1，否则返回0。如果有参数为NULL，则返回NULL。
+-- one_or_all只能取值"one"或"all"，one表示只要有一个存在即可；all表示所有的都存在才行。
+SELECT JSON_CONTAINS_PATH(@j, 'one', '$.a', '$.e'); -- 1
+SELECT JSON_CONTAINS_PATH(@j, 'all', '$.a', '$.c.d'); -- 1
+ 
+
+3.JSON_EXTRACT 查找所有指定数据
+
+-- JSON_EXTRACT(json_doc, path[, path] ...)
+-- 从json文档里抽取数据。如果有参数有NULL或path不存在，则返回NULL。如果抽取出多个path，则返回的数据封闭在一个json array里。
+set @j2 = '[10, 20, [30, 40]]';
+SELECT JSON_EXTRACT('[10, 20, [30, 40]]', '$[1]'); -- 20
+SELECT JSON_EXTRACT('[10, 20, [30, 40]]', '$[1]', '$[0]'); -- [20, 10]
+SELECT JSON_EXTRACT('[10, 20, [30, 40]]', '$[2][*]'); -- [30, 40]
+ 
+
+4.JSON_KEYS 查找所有指定键值
+
+-- JSON_KEYS(json_doc[, path])
+-- 获取json文档在指定路径下的所有键值，返回一个json array。如果有参数为NULL或path不存在，则返回NULL。
+SELECT JSON_KEYS('{"a": 1, "b": {"c": 30}}'); -- ["a", "b"]
+SELECT JSON_KEYS('{"a": 1, "b": {"c": 30}}', '$.b'); -- ["c"]
+SELECT id,json_keys(info) FROM t_json;
+ 
+
+5.JSON_SEARCH 查找所有指定值的位置
+
+复制代码
+-- JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])
+-- 查询包含指定字符串的paths，并作为一个json array返回。如果有参数为NUL或path不存在，则返回NULL。
+-- one_or_all："one"表示查询到一个即返回；"all"表示查询所有。
+-- search_str：要查询的字符串。 可以用LIKE里的'%'或‘_’匹配。
+-- path：在指定path下查。
+SET @j3 = '["abc", [{"k": "10"}, "def"], {"x":"abc"}, {"y":"bcd"}]';
+SELECT JSON_SEARCH(@j3, 'one', 'abc'); -- "$[0]"
+SELECT JSON_SEARCH(@j3, 'all', 'abc'); -- ["$[0]", "$[2].x"]
+SELECT JSON_SEARCH(@j3, 'all', 'abc', NULL, '$[2]'); -- "$[2].x"
+SELECT JSON_SEARCH(@j3, 'all', '10'); -- "$[1][0].k"
+SELECT JSON_SEARCH(@j3, 'all', '%b%'); -- ["$[0]", "$[2].x", "$[3].y"]
+SELECT JSON_SEARCH(@j3, 'all', '%b%', NULL, '$[2]'); -- "$[2].x"
+复制代码
+ 
+
+四,修改json值函数
+1.JSON_ARRAY_APPEND  指定位置追加数组元素
+
+复制代码
+-- JSON_ARRAY_APPEND(json_doc, path, val[, path, val] ...)
+-- 在指定path的json array尾部追加val。如果指定path是一个json object，则将其封装成一个json array再追加。如果有参数为NULL，则返回NULL。
+SET @j4 = '["a", ["b", "c"], "d"]';
+-- SELECT JSON_ARRAY_APPEND(@j4, '$[1][0]', 3); -- ["a", [["b", 3], "c"], "d"]
+SET @j5 = '{"a": 1, "b": [2, 3], "c": 4}';
+SELECT JSON_ARRAY_APPEND(@j5, '$.b', 'x'); -- {"a": 1, "b": [2, 3, "x"], "c": 4} 
+SELECT JSON_ARRAY_APPEND(@j5, '$.c', 'y'); -- {"a": 1, "b": [2, 3], "c": [4, "y"]}
+SELECT JSON_ARRAY_APPEND(@j5, '$', 'z'); -- [{"a": 1, "b": [2, 3], "c": 4}, "z"]
+复制代码
+ 
+
+2.JSON_ARRAY_INSERT 指定位置插入数组元素
+
+复制代码
+-- JSON_ARRAY_INSERT(json_doc, path, val[, path, val] ...)
+-- 在path指定的json array元素插入val，原位置及以右的元素顺次右移。如果path指定的数据非json array元素，则略过此val；如果指定的元素下标超过json array的长度，则插入尾部。
+SET @j6 = '["a", {"b": [1, 2]}, [3, 4]]';
+SELECT JSON_ARRAY_INSERT(@j6, '$[1]', 'x'); -- ["a", "x", {"b": [1, 2]}, [3, 4]]
+SELECT JSON_ARRAY_INSERT(@j6, '$[100]', 'x'); -- ["a", {"b": [1, 2]}, [3, 4], "x"]
+SELECT JSON_ARRAY_INSERT(@j6, '$[1].b[0]', 'x'); -- ["a", {"b": ["x", 1, 2]}, [3, 4]]
+SELECT JSON_ARRAY_INSERT(@j6, '$[0]', 'x', '$[3][1]', 'y'); -- ["x", "a", {"b": [1, 2]}, [3, "y", 4]]
+复制代码
+ 
+
+3.JSON_INSERT 指定位置插入
+
+-- JSON_INSERT(json_doc, path, val[, path, val] ...)
+-- 在指定path下插入数据，如果path已存在，则忽略此val（不存在才插入）。
+SET @j7 = '{ "a": 1, "b": [2, 3]}';
+SELECT JSON_INSERT(@j7, '$.a', 10, '$.c', '[true, false]'); -- {"a": 1, "b": [2, 3], "c": "[true, false]"}
+ 
+
+4.JSON_REPLACE 指定位置替换
+
+-- JSON_REPLACE(json_doc, path, val[, path, val] ...)
+-- 替换指定路径的数据，如果某个路径不存在则略过（存在才替换）。如果有参数为NULL，则返回NULL。
+SELECT JSON_REPLACE(@j7, '$.a', 10, '$.c', '[true, false]'); -- {"a": 10, "b": [2, 3]}
+ 
+
+5.JSON_SET 指定位置设置
+
+-- JSON_SET(json_doc, path, val[, path, val] ...)
+-- 设置指定路径的数据（不管是否存在）。如果有参数为NULL，则返回NULL。
+SELECT JSON_SET(@j7, '$.a', 10, '$.c', '[true, false]'); -- {"a": 10, "b": [2, 3], "c": "[true, false]"}
+ 
+
+6.JSON_MERGE 合并
+
+复制代码
+-- JSON_MERGE(json_doc, json_doc[, json_doc] ...)
+-- merge多个json文档。规则如下：
+-- 如果都是json array，则结果自动merge为一个json array；
+-- 如果都是json object，则结果自动merge为一个json object；
+-- 如果有多种类型，则将非json array的元素封装成json array再按照规则一进行mege。
+SELECT JSON_MERGE('[1, 2]', '[true, false]'); -- [1, 2, true, false]
+SELECT JSON_MERGE('{"name": "x"}', '{"id": 47}'); -- {"id": 47, "name": "x"}
+SELECT JSON_MERGE('1', 'true'); -- [1, true]
+SELECT JSON_MERGE('[1, 2]', '{"id": 47}'); -- [1, 2, {"id": 47}]
+复制代码
+ 
+
+7.JSON_REMOVE 指定位置移除
+
+-- JSON_REMOVE(json_doc, path[, path] ...)
+-- 移除指定路径的数据，如果某个路径不存在则略过此路径。如果有参数为NULL，则返回NULL。
+SET @j8 = '["a", ["b", "c"], "d"]';
+SELECT JSON_REMOVE(@j8, '$[1]'); -- ["a", "d"]
+ 
+
+8.JSON_UNQUOTE 去"号
+
+-- JSON_UNQUOTE(val)
+-- 去掉val的引号。如果val为NULL，则返回NULL。
+SELECT JSON_UNQUOTE("\"123\""); -- 123
+ 
+
+五,返回json值属性的函数
+1.JSON_DEPTH 深度
+
+-- JSON_DEPTH(json_doc)
+-- 获取json文档的深度。如果参数为NULL，则返回NULL。
+-- 空的json array、json object或标量的深度为1。
+SELECT JSON_DEPTH('{}'), JSON_DEPTH('[]'), JSON_DEPTH('true'); -- 1 1 1
+SELECT JSON_DEPTH('[10, 20]'), JSON_DEPTH('[[], {}]'); -- 2 2
+SELECT JSON_DEPTH('[10, {"a": 20}]'); -- 3
+ 
+
+2.JSON_LENGTH 长度
+
+复制代码
+-- JSON_LENGTH(json_doc[, path])
+-- 获取指定路径下的长度。如果参数为NULL，则返回NULL。　
+-- 长度的计算规则：
+-- 标量的长度为1；
+-- json array的长度为元素的个数；
+-- json object的长度为key的个数。
+SELECT JSON_LENGTH('[1, 2, {"a": 3}]'); -- 3
+SELECT JSON_LENGTH('{"a": 1, "b": {"c": 30}}'); -- 2
+SELECT JSON_LENGTH('{"a": 1, "b": {"c": 30}}', '$.b'); -- 1
+复制代码
+ 
+
+3.JSON_TYPE 类型
+
+-- JSON_TYPE(json_val)
+-- 获取json文档的具体类型。如果参数为NULL，则返回NULL。
+select JSON_TYPE('[1,2]'); -- ARRAY
+ 
+
+4.JSON_VALID 是否有效json格式
+
+-- JSON_VALID(val)
+-- 判断val是否为有效的json格式，是为1，不是为0。如果参数为NUL，则返回NULL。
+SELECT JSON_VALID('{"a": 1}'); -- 1
+SELECT JSON_VALID('hello'), JSON_VALID('"hello"'); -- 1
+ 
+
+附录:
+
+复制代码
+JSON_ARRAY 生成json数组
+JSON_OBJECT 生成json对象
+JSON_QUOTE 加"号
+JSON_CONTAINS 指定数据是否存在
+JSON_CONTAINS_PATH 指定路径是否存在
+JSON_EXTRACT 查找所有指定数据
+JSON_KEYS 查找所有指定键值
+JSON_SEARCH 查找所有指定值的位置
+JSON_ARRAY_APPEND  指定位置追加数组元素
+JSON_ARRAY_INSERT 指定位置插入数组元素
+JSON_INSERT 指定位置插入
+JSON_REPLACE 指定位置替换
+JSON_SET 指定位置设置
+JSON_MERGE 合并
+JSON_REMOVE 指定位置移除
+JSON_UNQUOTE 去"号
+JSON_DEPTH 深度
+JSON_LENGTH 长度
+JSON_TYPE 类型
+JSON_VALID 是否有效json格式
+复制代码
+ 
+
+函数名 描述
+JSON_APPEND()（废弃的5.7.9） JSON文件追加数据
+JSON_ARRAY()  创建JSON数组
+JSON_ARRAY_APPEND() JSON文件追加数据
+JSON_ARRAY_INSERT() 插入JSON数组
+->  在评估路径返回JSON列值；相当于json_extract()。
+JSON_CONTAINS() 是否包含特定对象的JSON文档路径
+JSON_CONTAINS_PATH()  无论是JSON文件包含任何数据路径
+JSON_DEPTH()  JSON文档的最大深度
+JSON_EXTRACT()  从JSON文档返回数据
+->> 在评估路径和结束引语结果返回JSON列值；相当于json_unquote（json_extract()）。
+JSON_INSERT() 将数据插入到JSON文档
+JSON_KEYS() 从JSON文件密钥数组
+JSON_LENGTH() 在JSON文档中的元素数
+JSON_MERGE()（废弃的5.7.22） 合并的JSON文件，保存重复键。不json_merge_preserve()的同义词
+JSON_MERGE_PATCH()  合并的JSON文件，免去重复键的值
+JSON_MERGE_PRESERVE() 合并的JSON文件，保存重复键
+JSON_OBJECT() 创建JSON对象
+JSON_PRETTY() 版画在人类可读的格式JSON文档，每个数组元素或对象成员打印在新的行中，缩进两个空格就其母。
+JSON_QUOTE()  引用JSON文档
+JSON_REMOVE() 从JSON文件中删除数据
+JSON_REPLACE()  在JSON文件的值替换
+JSON_SEARCH() 在JSON文件价值路径
+JSON_SET()  将数据插入到JSON文档
+JSON_STORAGE_SIZE() 用于一个JSON文件的二进制表示形式存储空间；一个JSON柱，空间时使用的文档插入到任何部分更新之前，
+JSON_TYPE() JSON值类型
+JSON_UNQUOTE()  JSON值而言
+JSON_VALID()  JSON值是否是有效的
+  
+
+mysql官方文档:https://dev.mysql.com/doc/refman/5.7/en/json-utility-functions.html
+
+参考:https://www.cnblogs.com/waterystone/p/5626098.html
+
+
+eg:
+select cast(json_extract(json_keys(extra_data),'$[0]') as unsigned) as country_id from tb_electron_factory limit 1;
 ```
 
 
@@ -2607,7 +3108,54 @@ alter database db_electron_property_base character set utf8;
 ```
 
 
+### Cannot delete or update a parent row: a foreign key constraint fails
+```
+先设置外键约束检查关闭
+set foreign_key_checks = 0;
 
+删除数据，表或者视图
+drop table m_electron;
+
+开启外键约束检查，以保持表结构完整性
+set foreign_key_checks = 1;
+```
+
+
+### TypeError: object of type ‘builtin_function_or_method’ has no len()
+```
+出现这个错误，最常见的是引入的函数需要后面加()
+如， s.strip()
+```
+
+###ERROR 1270 (HY000): Illegal mix of collations (utf8_general_ci,COERCIBLE), (latin1_swedish_ci,IMPLICIT), (utf8_general_ci,COERCIBLE) for operation 'concat'
+```
+
+```
+
+### mysql Lock wait timeout exceeded; try restarting transaction
+```
+问题场景 
+问题出现环境： 
+1、在同一事务内先后对同一条数据进行插入和更新操作； 
+2、多台服务器操作同一数据库； 
+3、瞬时出现高并发现象；
+
+原因分析 
+在高并发的情况下，Spring事物造成数据库死锁，后续操作超时抛出异常。 
+Mysql数据库采用InnoDB模式，默认参数:innodb_lock_wait_timeout设置锁等待的时间是50s，一旦数据库锁超过这个时间就会报错。
+
+解决方案 
+1. 运行以下命令，查找提交事务的数据，杀掉线程即可解决
+
+select * from information_schema.innodb_trx
+ 
+kill thread_id;
+ 2. 增加锁等待时间，即增大下面配置项参数值，单位为秒（s）
+
+innodb_lock_wait_timeout=500
+3、优化存储过程,事务避免过长时间的等待。
+
+```
 
 
 ```
