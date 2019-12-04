@@ -1,45 +1,114 @@
 ## mysql
 
 ### 安装mysql
+1. windows安装
+[下载MySQL]( "下载MySQL") 安装即可
+
+2. linux(ubuntu18.04)
+
+
+安装与初始化
+在 Download MySQL Yum Repository 页面获取 MySQL 8 Community Yum 仓库文件的链接，例如：
+
+https://repo.mysql.com//mysql80-community-release-el7-2.noarch.rpm
+通过 SSH 远程连接服务器实例，执行下面命令切换到其它拥有 root 权限的用户，阿里云服务器实例默认有一个拥有 root 权限的 admin 用户，这里以切换到 admin 用户为例子：
+
+$ su admin
+执行下面命令，下载 MySQL 8 Community Yum 仓库文件：
+
+$ wget https://repo.mysql.com//mysql80-community-release-el7-2.noarch.rpm
+执行下面命令，安装 MySQL 8 Community Yum 仓库文件：
+
+$ sudo yum localinstall mysql80-community-release-el7-2.noarch.rpm
+执行下面命令，检查 MySQL 8 Community Yum 仓库文件是否正确安装 ：
+
+$ yum repolist enabled | grep "mysql.*-community.*"
+执行下面命令，安装 MySQL 8 Community ：
+
+$ sudo yum install mysql-community-server
+使用 service 命令管理 MySQL 服务：
+
+$ sudo service mysqld start          # 启动 MySQL 服务
+$ sudo service mysqld stop           # 停止 MySQL 服务
+$ sudo service mysqld restart        # 重启 MySQL 服务
+$ sudo service mysqld status         # 查看 MySQL 服务状态
+使用 systemctl 命令管理 MySQL 服务：
+
+$ sudo systemctl start mysqld   # 启动 MySQL 服务
+$ sudo systemctl stop mysqld    # 停止 MySQL 服务
+$ sudo systemctl restart mysqld # 重启 MySQL 服务
+$ sudo systemctl status mysqld  # 查看 MySQL 服务状态
+$ sudo systemctl enable mysqld  # 设置 MySQL 服务开机自启动
+$ sudo systemctl disable mysqld # 关闭 MySQL 服务开机自启动
+首次启动 MySQL 服务，会自动初始化数据目录、生成 SSL 证书和密钥文件、创建超级用户 ' root'@'localhost' ，超级用户的密码被设置并存储在错误日志文件中。可以使用以下命令查询临时密码：
+
+$ sudo grep 'temporary password' /var/log/mysqld.log
+现在你可以用你查询到的临时密码连接数据库服务器了。
 
 
 ### 基本操作
-#### MySQL数据库远程访问
+
+MySQL数据库本地和远程访问
 ```
+本地访问
 mysql -u root -p123456
+mysql -h 127.0.0.1 -u root -p123456
+
+远程访问
 mysql -h 192.168.10.38 -u root -p123456
 mysql -h 192.168.10.38 -u root -p
 mysql -h 30.158.59.78 -uroot -pabc123
 mysql -h tom.xicp.net -uroot -pabc123
-```
-```
+
+查看所有数据库
 show databases;
+
+查看所有支持的引擎
 show engines;
+MySQL [(none)]> show engines;
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+| MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+| MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+| BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+| PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+| MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+| ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+| InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| FEDERATED          | YES     | Federated MySQL storage engine                                 | NO           | NO   | NO         |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+
+使用某个数据库
 use mysql;
+查看选中数据库下的所有表
 show tables;
 ```
 
-创建数据库：
+创建数据库
 ```
 create database test charset=utf8;
+create database test default character set utf8;
 create database test DEFAULT CHARACTER SET gbk COLLATE gbk_chinese_ci;
 create database test DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-use test;
-show tables;
 ```
-即可查看到用户和密码
+
+查看到用户和密码
 ```
 select host,user,password from mysql.user;
 select * from mysql.user;
 ```
+
 修改密码
 ```
-update mysql.user set password='这里填写你要设置的密码' where user='root';
+update mysql.user set password='123456' where user='root';
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
 ```
-更新加密规则
+
+修改root用户密码永不过期
 ```
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER;
+ALTER USER 'root'@'localhost' IDENTIFIED BY '123456' PASSWORD EXPIRE NEVER;
 ```
 
 创建表
@@ -52,7 +121,8 @@ create table students(
     remark varchar(300) comment '备注',
     --primary key (id),
     --unique key id(id),
-    --foreign key(subid) references subjects(id)
+    --foreign key(subid) references subjects(id),
+    KEY `students_name` (`name`) USING BTREE
 ) engine=InnoDB default charset=utf8;
 ```
 
@@ -68,6 +138,9 @@ drop database test;
 
 查看创建表结构
 ```
+查看创建表结构
+show create table students;
+查看外键
 show create table students;
 ```
 
@@ -92,34 +165,26 @@ rename table students to|as student;
 alter table students add is_delete bit default;
 alter table students add column aa bool default true;
 alter table students add id int auto_increment primary key;  #将自增字段设置为primary key
-```
 
 增加多列字段
-```
 alter table students add column(aa bool default true, bb varchar(256) default '');
 ```
 
-修改列字段类型 指定为空或者非空
+修改列字段
 ```
+修改列字段类型 指定为空或者非空
+alter table students modify 字段名称 字段类型 [是否允许非空];
 alter table students modify id int auto_increment unique;
 alter table students modify column id int auto_increment unique;
+
 增加 binary 则表示区分大小写，默认不加是不区分大小写的
 alter table fk_teacher modify column name varchar(256) binary;
 
-alter table students modify 字段名称 字段类型 [是否允许非空];
-alter table students modify 字段名称 字段类型 [是否允许非空];
-alter table students change 字段名称 字段名称 字段类型 [是否允许非空];
-
-```
-
 修改多列字段 指定为空或者非空
-```
 alter table students modify column(id int auto_increment unique,name varchar(100) not null);
-```
 
 修改字段列名（修改列名）修改某个表的字段名称及指定为空或非空
-```
-alter table <表名> change <字段名> <字段新名称> <字段的类型>;
+alter table students change 字段名称 字段名称 字段类型 [是否允许非空];
 alter table students change name zh_name varchar(200) not null;
 ```
 
@@ -127,12 +192,13 @@ alter table students change name zh_name varchar(200) not null;
 ```
 ALTER TABLE 表名 MODIFY 字段名1 数据类型 FIRST ｜ AFTER 字段名2;
 alter table student modify id int(10) unsigned auto_increment first;
+
 如果要把name放到id之后呢？这样写就可以了（first 换成 after即可）：
 alter table student modify name varchar(10) after id;
+alter table tb_electron_factory_online modify extra_data json default null AFTER source_type;
+
 alter table 表名  change 字段名 新字段名 字段类型 默认值 after 字段名(跳到哪个字段之后)
 alter table students  change name new_name varchar(50) default null AFTER z5
-
-alter table tb_electron_factory_online modify extra_data json default null AFTER source_type;
 ```
 
 删除列字段
@@ -144,11 +210,6 @@ alter table students drop column aa;
 修改表引擎
 ```
 alter table students engine=innodb|bdb;
-```
-
-查看外键
-```
-show create table students;
 ```
 
 添加表外键约束
@@ -166,7 +227,7 @@ ALTER TABLE `t_user` ADD unique(`username`);
 select * from students\G;
 ```
 
-得查看自己当前的数据库是否开启了自动提交事务
+查看自己当前的数据库是否开启了自动提交事务
 ```
 show variables like '%autocommit%'
 select @@autocommit;
@@ -186,11 +247,51 @@ SELECT * FROM information_schema.INNODB_TRX\G
 
 查看表锁信息
 ```
+查看正在锁的事务
 SELECT * FROM information_schema.INNODB_LOCKS;
+查看等待锁的事务
 SELECT * FROM information_schema.INNODB_LOCK_waits;
 ```
 
-desc innodb_locks;
+创建存储过程
+```
+创建更新auto_increment存储过程
+drop procedure pro_update_auto_increment_to_max;
+
+DELIMITER $$
+create procedure pro_update_auto_increment_to_max(in inout_table_name VARCHAR(200), in field_id VARCHAR(20))
+begin
+  # 拼接赋值 INTO 必须要用全局变量不然语句会报错
+  set @auto_id = concat("select max(", field_id, ") + 1 as max_id into @max_id from ", inout_table_name);
+  # 预处理需要执行的动态SQL，其中 ex_auto_id 是一个变量
+  PREPARE ex_auto_id FROM @auto_id;
+  # 执行SQL语句
+  EXECUTE ex_auto_id;
+  # 释放掉预处理段
+  deallocate prepare ex_auto_id;
+
+  set @alter_id = concat("alter table ", inout_table_name, " AUTO_INCREMENT=", @max_id);
+  PREPARE ex_alter_id FROM @alter_id;
+  EXECUTE ex_alter_id;
+  # 释放掉预处理段
+  deallocate prepare ex_alter_id;
+
+  -- set @result = concat("select concat(", inout_table_name, "' 表的 auto_increment=@max_id 更新完成!')");
+  set @result = concat("select concat('", inout_table_name, " 表的 auto_increment=',@max_id,' 更新完成！')");
+  PREPARE ex_result FROM @result;
+  EXECUTE ex_result;
+  # 释放掉预处理段
+  deallocate prepare ex_result;
+
+end $$
+
+DELIMITER ;
+
+call pro_update_auto_increment_to_max('db_electron_property_online.tb_electron_area', 'id');
+```
+
+
+desc information_schema.INNODB_LOCKS;
 +————-+———————+——+—–+———+——-+
 | Field       | Type                | Null | Key | Default | Extra |
 +————-+———————+——+—–+———+——-+
@@ -205,9 +306,9 @@ desc innodb_locks;
 | lock_rec    | bigint(21) unsigned | YES  |     | NULL    |       |#被锁的记录号
 | lock_data   | varchar(8192)       | YES  |     | NULL    |       |#被锁的数据
 +————-+———————+——+—–+———+——-+
-10 rows in set (0.00 sec)
 
-desc innodb_lock_waits;
+
+desc information_schema.INNODB_LOCK_waits;
 +——————-+————-+——+—–+———+——-+
 | Field             | Type        | Null | Key | Default | Extra |
 +——————-+————-+——+—–+———+——-+
@@ -216,9 +317,9 @@ desc innodb_lock_waits;
 | blocking_trx_id   | varchar(18) | NO   |     |         |       |#当前拥有锁的事务ID
 | blocking_lock_id  | varchar(81) | NO   |     |         |       |#当前拥有锁的锁ID
 +——————-+————-+——+—–+———+——-+
-4 rows in set (0.00 sec)
+
    
-desc innodb_trx ;
+desc information_schema.innodb_trx ;
 +—————————-+———————+——+—–+———————+——-+
 | Field                      | Type                | Null | Key | Default             | Extra |
 +—————————-+———————+——+—–+———————+——-+
@@ -245,13 +346,17 @@ desc innodb_trx ;
 | trx_adaptive_hash_latched  | int(1)              | NO   |     | 0                   |       |#
 | trx_adaptive_hash_timeout  | bigint(21) unsigned | NO   |     | 0                   |       |#
 +—————————-+———————+——+—–+———————+——-+
-22 rows in set (0.01 sec)
-
 
 
 插入表数据
 ```
 insert into students(name, gender, birthday) values('zhangsan', 1, '1990-7-8');
+
+insert into students(name, gender, birthday) value
+('zhangsan1', 1, '1990-7-8'),
+('zhangsan2', 2, '1990-7-9'),
+('zhangsan3', 3, '1990-7-10'),
+('zhangsan4', 4, '1990-7-11');
 
 
 replace into:
@@ -261,7 +366,9 @@ replace into:
 实例：REPLACE INTO students (id,name,age) VALUES(123, 'chao', 50);
 
 REPLACE INTO students(name, gender, birthday) VALUES ('zhangsan2', 2, '1990-7-18');
-
+```
+eg:
+```
 CREATE TABLE `test` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(25) DEFAULT NULL COMMENT '标题',
@@ -273,7 +380,6 @@ CREATE TABLE `test` (
 
 insert into  test(title,uid) VALUES ('你好','1');
 insert into  test(title,uid) VALUES ('国庆节','2');
-
 REPLACE INTO test(title,uid) VALUES ('这次是8天假哦','3');
 
 当uid存在时，使用replace into 语句
@@ -284,12 +390,10 @@ MySQL replace into 有三种形式：
 第一种形式类似于insert into的用法，
 
 2. replace into tbl_name(col_name, ...) select ...
-replace into tb1( name, title, mood) select rname, rtitle, rmood from tb2
+replace into tb1( name, title, mood) select rname, rtitle, rmood from tb2;
 
 3. replace into tbl_name set col_name=value, ...
 第三种replace set用法类似于update set用法
-
-
 ```
 
 
@@ -297,29 +401,20 @@ mysql大数据量插入
 ```
 INSERT语法
 INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
-
 [INTO] tbl_name [(col_name,...)]
-
 VALUES ({expr | DEFAULT},...),(...),...
-
 [ ON DUPLICATE KEY UPDATE col_name=expr, ... ]
 
 或：
 INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
-
 [INTO] tbl_name
-
 SET col_name={expr | DEFAULT}, ...
-
 [ ON DUPLICATE KEY UPDATE col_name=expr, ... ]
 
 或：
 INSERT [LOW_PRIORITY | HIGH_PRIORITY] [IGNORE]
-
 [INTO] tbl_name [(col_name,...)]
-
 SELECT ...
-
 [ ON DUPLICATE KEY UPDATE col_name=expr, ... ]
 
 
@@ -347,43 +442,35 @@ IGNORE是MySQL相对于标准SQL的扩展。如果在新表中有重复关键字
 
 ON DUPLICATE KEY UPDATE的使用
 如果您指定了ON DUPLICATE KEY UPDATE，并且插入行后会导致在一个UNIQUE索引或PRIMARY KEY中出现重复值，则执行旧行UPDATE。例如，如果列a被定义为UNIQUE，并且包含值1，则以下两个语句具有相同的效果
+INSERT INTO table (a,b,c) VALUES (1,2,3)
+ON DUPLICATE KEY UPDATE cc=c+1;
 
-mysql> INSERT INTO table (a,b,c) VALUES (1,2,3)
-
--> ON DUPLICATE KEY UPDATE cc=c+1;
-
-mysql> UPDATE table SET cc=c+1 WHERE a=1;
-
+UPDATE table SET cc=c+1 WHERE a=1;
 如果行作为新记录被插入，则受影响行的值为1；如果原有的记录被更新，则受影响行的值为2。
-
 注释：如果列b也是唯一列，则INSERT与此UPDATE语句相当：
 
-mysql> UPDATE table SET cc=c+1 WHERE a=1 OR b=2 LIMIT 1;
-
-
+UPDATE table SET cc=c+1 WHERE a=1 OR b=2 LIMIT 1;
 如果a=1 OR b=2与多个行向匹配，则只有一个行被更新。通常，您应该尽量避免对带有多个唯一关键字的表使用ON DUPLICATE KEY子句。您可以在UPDATE子句中使用VALUES(col_name)函数从INSERT…UPDATE语句的INSERT部分引用列值。换句话说，如果没有发生重复关键字冲突，则UPDATE子句中的VALUES(col_name)可以引用被插入的col_name的值。本函数特别适用于多行插入。VALUES()函数只在INSERT…UPDATE语句中有意义，其它时候会返回NULL。
 
 
 示例：
-mysql> INSERT INTO table (a,b,c) VALUES (1,2,3),(4,5,6)
-
--> ON DUPLICATE KEY UPDATE c=VALUES(a)+VALUES(b);
+INSERT INTO table (a,b,c) VALUES (1,2,3),(4,5,6)
+ON DUPLICATE KEY UPDATE c=VALUES(a)+VALUES(b);
 
 本语句与以下两个语句作用相同：
-mysql> INSERT INTO table (a,b,c) VALUES (1,2,3)
--> ON DUPLICATE KEY UPDATE c=3;
-mysql> INSERT INTO table (a,b,c) VALUES (4,5,6)
--> ON DUPLICATE KEY UPDATE c=9;
+INSERT INTO table (a,b,c) VALUES (1,2,3)
+ON DUPLICATE KEY UPDATE c=3;
+
+INSERT INTO table (a,b,c) VALUES (4,5,6)
+ON DUPLICATE KEY UPDATE c=9;
 
 当您使用ON DUPLICATE KEY UPDATE时，DELAYED选项被忽略
 ```
 
 
-
 更新表数据
 ```
 update students set name='lili' where id=1;
-
 
 UPDATE feifei.student s, feifei.temp t
 SET s.name = t.name,
@@ -408,6 +495,9 @@ SET s.name=t.name,
 删除表数据
 ```
 delete from students where id=1;
+
+当有外键时删除会报错
+truncate table students;
 ```
 
 查询地在3到5之间的数据
@@ -436,13 +526,13 @@ select * from subjects where id=(select min(id) from subjects);
 
 select gender,count(*) from students group by gender;
 
-select gender,count(\*) from students group by gender having count(\*) > 2;
+select gender,count(*) from students group by gender having count(*) > 2;
 
 select * from (
-select gender,count(\*) from students group by gender having count(\*) > 2);
+select gender,count(*) from students group by gender having count(*) > 2);
 
 select id,name,gender,birthday from students where gender in 
-(select gender from (select gender,count(\*) from students group by gender having count(\*) > 2) as b);
+(select gender from (select gender,count(*) from students group by gender having count(*) > 2) as b);
 
 select * from students order by birthday asc,gender desc;
 ```
@@ -466,8 +556,7 @@ inner join
 select * from subjects
 ```
 
-
-字段添加索引
+添加索引
 ```
 1.添加PRIMARY KEY（主键索引） 
 ALTER TABLE `students` ADD PRIMARY KEY ( `column` ) 
@@ -505,7 +594,6 @@ ALTER TABLE tbl_name ADD INDEX new_index_name(column_name)
 alter table students add primarykey(id);
 ```
 
-
 删除索引
 ```
 drop index idx_students_id on students;
@@ -532,7 +620,7 @@ alter table students drop primary key;
 alter table students drop foreign key FK1C81D1738DA76;
 ```
 
-删除外键
+删除外键（删除约束，删除外键约束）
 ```
 alter table students drop user_id
 ```
@@ -559,7 +647,8 @@ show profiles;
 
 查看当前表的自动增长id是多少
 ```
-select auto_increment from information_schema.tables where table_schema = 'db_electron_property' and students = 'tb_electron_area';
+select auto_increment from information_schema.tables 
+where table_schema = 'db_electron_property' and table_name = 'tb_electron_area';
 ```
 
 修改表students自动序列值
@@ -615,6 +704,11 @@ show variables like '%timeout%';
 show variables like '%secure%';
 ```
 
+查看所有变量
+```
+show session variables;
+```
+
 查看服务器字符集
 ```
 show variables like '%character%'
@@ -658,16 +752,6 @@ mysql> show global variables like 'max_allowed_packet';
 
 ```
 
-查看正在锁的事务
-```
-SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS; 
-```
-
-查看等待锁的事务
-```
-SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS; 
-```
-
 ```
 show open tables from database;
 ```
@@ -685,7 +769,418 @@ show open tables from database;
 解锁： unlock tables;
 ```
 
+查询正在执行的操作
+```
+select * from information_schema.innodb_trx\G
+```
 
+查看创建的索引的CARDINALITY比率
+```
+--通常cardinality达到表数据的10%左右建索引会有意义
+--如果是一个组合索引，索引第一位的cardinality表示第一个列的cardinality大小，第二列表示第一列和第二列共同的cardinality值
+SELECT 
+    T1.TABLE_SCHEMA,
+    T1.TABLE_NAME,
+    T2.INDEX_NAME,
+    ROUND(T2.CARDINALITY / T1.TABLE_ROWS * 100, 2) AS RATE
+FROM
+    INFORMATION_SCHEMA.TABLES T1,
+    INFORMATION_SCHEMA.STATISTICS T2
+WHERE
+    T1.TABLE_SCHEMA = T2.TABLE_SCHEMA
+        AND T1.TABLE_NAME = T2.TABLE_NAME
+        AND T2.SEQ_IN_INDEX = (SELECT 
+            MIN(T3.SEQ_IN_INDEX)
+        FROM
+            INFORMATION_SCHEMA.STATISTICS T3
+        WHERE
+                T2.TABLE_NAME = T3.TABLE_NAME
+                AND T2.TABLE_SCHEMA = T3.TABLE_SCHEMA
+                AND T2.INDEX_NAME = T3.INDEX_NAME)
+AND T1.TABLE_SCHEMA NOT IN ('MYSQL','PERFORMANCE_SCHEMA','INFORMATION_SCHEMA','SYS')
+AND T1.TABLE_ROWS >=100 
+ORDER BY RATE;
+```
+
+查看锁阻塞
+```
+-- 查看锁的SQL
+SELECT 
+    t3.trx_id waiting_trx_id,
+    t3.trx_mysql_thread_id waiting_thread,
+    t3.trx_query waiting_query,
+    t2.trx_id blocking_trx_id,
+    t2.trx_mysql_thread_id blocking_thread,
+    t2.trx_query blocking_query
+FROM
+    information_schema.innodb_lock_waits t1,
+    information_schema.innodb_trx t2,
+    information_schema.innodb_trx t3
+WHERE
+    t1.blocking_trx_id = t2.trx_id
+        AND t1.requesting_trx_id = t3.trx_id;
+```
+
+
+查询出哪些表不是InnoDB引擎的
+```
+SELECT 
+    TABLE_SCHEMA,
+    TABLE_NAME,
+    TABLE_TYPE,
+    ENGINE,
+    CREATE_TIME,
+    UPDATE_TIME,
+    TABLE_COLLATION
+FROM
+    INFORMATION_SCHEMA.TABLES
+WHERE
+    TABLE_SCHEMA NOT IN ('information_schema' , 'mysql', 'performance_schema', 'sys')
+        AND ENGINE <> 'InnoDB';
+```
+
+
+生成修改存储引擎的语句
+```
+SELECT 
+    -- TABLE_SCHEMA,
+    -- TABLE_NAME,
+    -- TABLE_TYPE,
+    -- ENGINE,
+    -- CREATE_TIME,
+    -- UPDATE_TIME,
+    -- TABLE_COLLATION,
+     CONCAT('alter table ', TABLE_SCHEMA,'.',TABLE_NAME, ' engine=InnoDB;') AS alter_sql
+  FROM INFORMATION_SCHEMA.TABLES
+ WHERE TABLE_SCHEMA NOT IN
+       ('information_schema', 'mysql', 'performance_schema', 'sys')
+   AND ENGINE <> 'InnoDB';
+```
+
+查看指定数据库的表信息
+```
+SET @table_schema='employees';
+SELECT 
+    table_name,
+    table_type,
+    engine,
+    table_rows,
+    avg_row_length,
+    data_length,
+    index_length,
+    table_collation,
+    create_time
+FROM
+    information_schema.tables
+WHERE
+    table_schema = @table_schema
+ORDER BY table_name;
+```
+
+查看会话连接信息
+```
+SELECT 
+    THREAD_ID,
+    name,
+    type,
+    PROCESSLIST_ID,
+    PROCESSLIST_USER AS user,
+    PROCESSLIST_HOST AS host,
+    PROCESSLIST_DB AS db,
+    PROCESSLIST_COMMAND AS cmd,
+    PROCESSLIST_TIME AS time,
+    PROCESSLIST_STATE AS state,
+    PROCESSLIST_INFO AS info,
+    CONNECTION_TYPE AS type,
+    THREAD_OS_ID AS os_id
+FROM
+    performance_schema.threads
+WHERE
+    type = 'FOREGROUND'
+ORDER BY THREAD_ID;
+
+```
+
+
+CHARACTER_SETS 查看数据库支持的字符集
+```
+SELECT * FROM INFORMATION_SCHEMA.CHARACTER_SETS
+WHERE CHARACTER_SET_NAME LIKE 'utf%';
+
+SHOW CHARACTER SET LIKE 'utf%';
+```
+
+COLLATIONS  字符序
+```
+-- 用于指定数据集如何排序，以及字符串的比对规则
+SELECT * FROM INFORMATION_SCHEMA.COLLATIONS
+WHERE COLLATION_NAME LIKE 'utf%';
+
+SHOW COLLATION LIKE 'utf%';
+```
+
+查看表结构定义信息
+```
+SELECT 
+    table_name,
+    COLUMN_NAME,
+    ordinal_position,
+    DATA_TYPE,
+    IS_NULLABLE,
+    COLUMN_DEFAULT,
+    column_type,
+    column_key,
+    character_set_name,
+    collation_name
+FROM
+    INFORMATION_SCHEMA.COLUMNS
+WHERE
+    table_name = 'employees'
+        AND table_schema = 'employees';
+show columns from employees from employees;
+
+
+desc employeees.employees;
+```
+
+
+查看支持的引擎
+```
+SELECT *  FROM INFORMATION_SCHEMA.ENGINES;
+show ENGINES;
+```
+
+查看数据库的数据文件信息
+```
+SELECT 
+    FILE_ID,
+    FILE_NAME,
+    FILE_TYPE,
+    TABLESPACE_NAME,
+    FREE_EXTENTS,
+    TOTAL_EXTENTS,
+    ((TOTAL_EXTENTS - FREE_EXTENTS) * EXTENT_SIZE) / 1024 / 1024 AS MB_used,
+    EXTENT_SIZE,
+    INITIAL_SIZE,
+    MAXIMUM_SIZE,
+    AUTOEXTEND_SIZE,
+    DATA_FREE,
+    STATUS,
+    ENGINE
+FROM
+    INFORMATION_SCHEMA.FILES;
+```
+
+
+查看指定表的约束
+```
+SELECT 
+    constraint_schema,
+    table_name,
+    constraint_name,
+    column_name,
+    ordinal_position,
+    CONCAT(table_name,
+            '.',
+            column_name,
+            ' -> ',
+            referenced_table_name,
+            '.',
+            referenced_column_name) AS list_of_fks
+FROM
+    information_schema.KEY_COLUMN_USAGE
+WHERE
+    REFERENCED_TABLE_SCHEMA = 'employees'
+        AND REFERENCED_TABLE_NAME IS NOT NULL
+ORDER BY TABLE_NAME , COLUMN_NAME;
+```
+
+查看指定分区表信息
+```
+SELECT 
+    TABLE_SCHEMA,
+    table_name,
+    partition_name,
+    subpartition_name sub_par,
+    partition_ordinal_position par_position,
+    partition_method method,
+    partition_expression expression,
+    partition_description description,
+    table_rows
+FROM information_schema.PARTITIONS
+WHERE table_schema = 'test' AND table_name = 't';
+```
+
+
+查看支持的插件
+```
+SELECT
+  PLUGIN_NAME, PLUGIN_STATUS, PLUGIN_TYPE,
+  PLUGIN_LIBRARY, PLUGIN_LICENSE
+FROM INFORMATION_SCHEMA.PLUGINS;
+
+SHOW PLUGINS;
+```
+ 
+
+查看数据库连接信息
+```
+SELECT * FROM INFORMATION_SCHEMA.PROCESSLIST;
+
+SHOW FULL PROCESSLIST;
+``` 
+
+查看数据库中的存储过程、函数等
+```
+SELECT 
+    ROUTINE_SCHEMA,
+    routine_name,
+    ROUTINE_TYPE,
+    data_type,
+    routine_body,
+    routine_definition,
+    routine_comment
+FROM INFORMATION_SCHEMA.ROUTINES
+WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA="employees";
+```
+ 
+
+查看存在的数据库及字符集信息
+```
+SELECT 
+    SCHEMA_NAME,
+    DEFAULT_CHARACTER_SET_NAME,
+    DEFAULT_COLLATION_NAME
+FROM INFORMATION_SCHEMA.SCHEMATA;
+
+SHOW DATABASES;
+```
+ 
+
+查看索引信息
+```
+SELECT 
+    table_schema,
+    table_name,
+    index_name,
+    COLUMN_NAME,
+    COLLATION,
+    CARDINALITY,
+    index_type
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE table_name = 'employees' AND table_schema = 'employees';
+
+SHOW INDEX FROM employees FROM employees;
+```
+ 
+
+查看数据库大小
+```
+SELECT table_schema 'database',CONCAT(ROUND(SUM(data_length + index_length) / (1024 * 1024), 2), 'M') size
+FROM information_schema.TABLES
+WHERE ENGINE in ('MyISAM','InnoDB') and table_schema not in ('information_schema','mysql','sys')
+GROUP BY table_schema;
+```
+ 
+
+查看表大小　　
+```
+SELECT CONCAT(table_schema, '.', table_name) table_name,CONCAT(ROUND(data_length / (1024 * 1024), 2),'M') data_length,
+CONCAT(ROUND(index_length / (1024 * 1024), 2),'M') index_length,
+CONCAT(ROUND(ROUND(data_length + index_length) / (1024 * 1024),2),'M') total_size,engine
+FROM information_schema.TABLES
+WHERE table_schema NOT IN ('information_schema' , 'performance_schema', 'sys', 'mysql')
+ORDER BY data_length DESC;
+```
+
+
+查看各个表数据量
+```
+select table_name,table_rows from information_schema.tables where table_schema = 'magic_online' and table_rows > 0 order by table_rows desc;
+select table_name,table_rows from information_schema.tables where table_schema = 'magic_online' order by table_rows desc;
+
++------------------------------------+------------+
+| table_name                         | table_rows |
++------------------------------------+------------+
+| m_electron                         |   13484200 |
+| m_electron_category                |        701 |
+| auditing_product_video             |          0 |
+| merchant_product_scheme            |          0 |
++------------------------------------+------------+
+```
+
+查看所有表信息
+```
+SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'db_electron_property_base'
+```
+
+查询数据库表数量
+```
+查询MySQL服务中数据库表数据量
+SELECT COUNT(*) TABLES, table_schema FROM information_schema.TABLES    GROUP BY table_schema;
+
+查询指定数据库表数量
+SELECT COUNT(*) TABLES, table_schema FROM information_schema.TABLES   WHERE table_schema = 'szdb'
+```
+
+查询数据库字段
+```
+#查询一个表中有多少字段
+SELECT COUNT(*) FROM information_schema. COLUMNS WHERE table_schema = 'szdb' AND table_name = 'SystemLog';
+
+#查询一个数据库中有多少字段
+SELECT COUNT(column_name) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'szdb';
+
+#查询数据库中所以表、字段、字段类型、注释等信息
+SELECT TABLE_NAME, column_name, DATA_TYPE, column_comment FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'szdb' ;
+```
+
+查询数据库中持久化的数据量
+
+MySQL中有一个名为 information_schema 的数据库，在该库中有一个 TABLES 表，这个表主要字段分别：TABLE_SCHEMA : 数据库名，TABLE_NAME：表名，ENGINE：所使用的存储引擎，TABLES_ROWS：记录数，DATA_LENGTH：数据大小，INDEX_LENGTH：索引大小
+use information_schema；统计数据主要使用的就是这张表了
+```
+#统计数据库中每个表保存的数据量
+use information_schema;
+SELECT TABLE_NAME, (DATA_LENGTH/1024/1024) as DataM ,(INDEX_LENGTH/1024/1024) as IndexM,((DATA_LENGTH+INDEX_LENGTH)/1024/1024) as AllM,TABLE_ROWS FROM TABLES WHERE TABLE_SCHEMA = 'szdb'
+
+#查询每张表数量
+select table_name,table_rows from tables where TABLE_SCHEMA = 'szdb' order by table_rows desc;
+
+#数据库总数量
+SELECT sum(table_rows) from tables where TABLE_SCHEMA = 'szdb' order by table_rows desc;
+```
+
+
+修改数据库名
+```
+select concat('rename table sysbench_testdata.',table_name,' to wenyz.',table_name,';') from information_schema.tables where table_schema='sysbench_testdata';
+
+select concat('rename table magic.',table_name,' to magic_backup.',table_name,';') from information_schema.tables where table_schema='magic' into outfile '/data/mysql_export_dir/rename_database.sql' ;
+
+
+修改数据库名 shell 脚本
+old_db_name = 'magic'
+new_db_name = 'magic_backup'
+
+mysql -h192.168.1.163 -uroot -pmofang123 -e "create database if not exists $new_db_name default character set utf8"
+
+list_table = $(mysql -h192.168.1.163 -uroot -pmofang123 -Nse "select table_name from information_schema.TABLES where table_schema='$old_db_name'")
+
+for table in $list_table
+do
+  mysql -h192.168.1.163 -uroot -pmofang123 -e "rename table $old_db_name.$table to $new_db_name.$table"
+done
+
+问题：脚本执行报错/bin/bash^M: bad interpreter: No such file or directory
+解决方案：
+将脚本上传到linux系统之后，使用vi 或 vim 编辑器打开，在命令模式下输入
+:set ff回车
+查看当前脚本格式，显示为:set ff=dos，将其修改为unix格式
+还是在命令模式下输入:set ff=unix回车
+:wq保存退出
+重新执行脚本就可以了
+```
 
 
 随机数
@@ -836,17 +1331,23 @@ commit;
 ```
 
 
-数学函数
+
+## 进阶操作
 ```
+排序
+将pony表中的d 进行排序，可d的定义为varchar，可以这样解决
+select * from pony order by (d+0)
+
+
+数学函数
 select abs(-32);
 select mod(10/3);
 select 10%3;
 select floor(2/3);
 select ceiling(2/3);
-```
+
 
 日期时间查询，转换等函数
-```
 date_format(date,format), time_format(time,format) 能够把一个日期/时间转换成各种各样的字符串格式。
 它是 str_to_date(str,format) 函数的 一个逆转换
 
@@ -984,12 +1485,7 @@ select date_sub('2008-08-08 12:00:00', interval 8 hour); -- 2008-08-08 04:00:00
 select timestampadd(hour, -8, '2008-08-08 12:00:00'); -- 2008-08-08 04:00:00
 ```
 
-## 进阶操作
-```
-排序
-将pony表中的d 进行排序，可d的定义为varchar，可以这样解决
-select * from pony order by (d+0)
-```
+
 
 ### mysql json
 ```
@@ -1126,12 +1622,347 @@ update tb_user set data=json_merge_preserve(data,'{"60":1}') where factory_id = 
 JSON_MERGE_PATCH()
 会将原有值覆盖
 update tb_user set data=json_merge_patch(data,'{"60":1}') where factory_id = 8202;
+
+
+
+json_array 创建json数组
+json_object 创建json对象
+json_quote 将json转成json字符串类型
+查询json 
+json_contains 判断是否包含某个json值
+json_contains_path 判断某个路径下是否包json值
+json_extract 提取json值
+column->path json_extract的简洁写法，MySQL 5.7.9开始支持
+column->>path json_unquote(column -> path)的简洁写法
+json_keys 提取json中的键值为json数组
+json_search 按给定字符串关键字搜索json，返回匹配的路径
+修改json 
+json_append 废弃，MySQL 5.7.9开始改名为json_array_append
+json_array_append 末尾添加数组元素，如果原有值是数值或json对 象，则转成数组后，再添加元素
+json_array_insert 插入数组元素
+json_insert 插入值（插入新值，但不替换已经存在的旧值）
+json_merge 合并json数组或对象
+json_remove 删除json数据
+json_replace 替换值（只替换已经存在的旧值）
+json_set 设置值（替换旧值，并插入不存在的新值）
+json_unquote 去除json字符串的引号，将值转成string类型
+返回json属性 
+json_depth 返回json文档的最大深度
+json_length 返回json文档的长度
+json_type 返回json值得类型
+json_valid 判断是否为合法json文档
+
+
+
+一,对记录的操作
+1.创建有json字段的表
+
+-- 创建表
+CREATE TABLE t_json(id INT PRIMARY KEY, sname VARCHAR(20) , info  JSON);
+ 
+
+2.插入记录
+
+-- 插入含有json数组的记录
+INSERT INTO t_json(id,sname,info) VALUES( 1, 'name1', JSON_ARRAY(1, "abc", NULL, TRUE, CURTIME()));
+
+-- 插入含有json对象的记录
+INSERT INTO t_json(id,sname,info) VALUES( 2, 'name2', JSON_OBJECT("age", 20, "time", now()));
+INSERT INTO t_json(id,sname,info) VALUES( 3, 'name3', '{"age":20, "time":"2018-07-14 10:52:00"}');
+ 
+
+3.查询记录
+
+-- 查询记录
+SELECT sname,JSON_EXTRACT(info,'$.age') FROM t_json;
+SELECT sname,info->'$.age' FROM t_json;
+-- 查询key
+SELECT id,json_keys(info) FROM t_json;
+ 
+
+4.修改记录
+
+复制代码
+-- 增加键
+UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.1') WHERE id = 2;
+
+-- 变更值
+UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.2') WHERE id = 2;
+
+-- 删除键
+UPDATE t_json SET info = json_remove(info,'$.ip') WHERE id = 2;
+复制代码
+ 
+
+二,创建json值函数
+1.JSON_ARRAY 生成json数组
+
+-- JSON_ARRAY(val1,val2,val3...)
+-- 生成一个包含指定元素的json数组。
+SELECT JSON_ARRAY(1, "abc", NULL, TRUE, CURTIME()); -- [1, "abc", null, true, "10:37:08.000000"]
+ 
+
+2.JSON_OBJECT 生成json对象
+
+-- JSON_OBJECT(key1,val1,key2,val2...)
+-- 生成一个包含指定K-V对的json object。如果有key为NULL或参数个数为奇数，则抛错。
+SELECT JSON_OBJECT('age', 20, 'time', now()); -- {"id": 87, "name": "carrot"}
+ 
+
+3.JSON_QUOTE 加"号
+
+-- JSON_QUOTE(json_val)
+-- 将json_val用"号括起来。
+SELECT JSON_QUOTE('[1,2,3]'); -- "[1,2,3]" 
+ 
+
+三,搜索json值函数
+1.JSON_CONTAINS 指定数据是否存在
+
+set @j = '{"a": 1, "b": 2, "c": {"d": 4}}';
+-- JSON_CONTAINS(json_doc, val[, path])
+-- 查询json文档是否在指定path包含指定的数据，包含则返回1，否则返回0。如果有参数为NULL或path不存在，则返回NULL。
+SELECT JSON_CONTAINS(@j, '4', '$.c.d'); -- 1
+ 
+
+2.JSON_CONTAINS_PATH 指定路径是否存在
+
+-- JSON_CONTAINS_PATH(json_doc, one_or_all, path[, path] ...)
+-- 查询是否存在指定路径，存在则返回1，否则返回0。如果有参数为NULL，则返回NULL。
+-- one_or_all只能取值"one"或"all"，one表示只要有一个存在即可；all表示所有的都存在才行。
+SELECT JSON_CONTAINS_PATH(@j, 'one', '$.a', '$.e'); -- 1
+SELECT JSON_CONTAINS_PATH(@j, 'all', '$.a', '$.c.d'); -- 1
+ 
+
+3.JSON_EXTRACT 查找所有指定数据
+
+-- JSON_EXTRACT(json_doc, path[, path] ...)
+-- 从json文档里抽取数据。如果有参数有NULL或path不存在，则返回NULL。如果抽取出多个path，则返回的数据封闭在一个json array里。
+set @j2 = '[10, 20, [30, 40]]';
+SELECT JSON_EXTRACT('[10, 20, [30, 40]]', '$[1]'); -- 20
+SELECT JSON_EXTRACT('[10, 20, [30, 40]]', '$[1]', '$[0]'); -- [20, 10]
+SELECT JSON_EXTRACT('[10, 20, [30, 40]]', '$[2][*]'); -- [30, 40]
+ 
+
+4.JSON_KEYS 查找所有指定键值
+
+-- JSON_KEYS(json_doc[, path])
+-- 获取json文档在指定路径下的所有键值，返回一个json array。如果有参数为NULL或path不存在，则返回NULL。
+SELECT JSON_KEYS('{"a": 1, "b": {"c": 30}}'); -- ["a", "b"]
+SELECT JSON_KEYS('{"a": 1, "b": {"c": 30}}', '$.b'); -- ["c"]
+SELECT id,json_keys(info) FROM t_json;
+ 
+
+5.JSON_SEARCH 查找所有指定值的位置
+
+复制代码
+-- JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])
+-- 查询包含指定字符串的paths，并作为一个json array返回。如果有参数为NUL或path不存在，则返回NULL。
+-- one_or_all："one"表示查询到一个即返回；"all"表示查询所有。
+-- search_str：要查询的字符串。 可以用LIKE里的'%'或‘_’匹配。
+-- path：在指定path下查。
+SET @j3 = '["abc", [{"k": "10"}, "def"], {"x":"abc"}, {"y":"bcd"}]';
+SELECT JSON_SEARCH(@j3, 'one', 'abc'); -- "$[0]"
+SELECT JSON_SEARCH(@j3, 'all', 'abc'); -- ["$[0]", "$[2].x"]
+SELECT JSON_SEARCH(@j3, 'all', 'abc', NULL, '$[2]'); -- "$[2].x"
+SELECT JSON_SEARCH(@j3, 'all', '10'); -- "$[1][0].k"
+SELECT JSON_SEARCH(@j3, 'all', '%b%'); -- ["$[0]", "$[2].x", "$[3].y"]
+SELECT JSON_SEARCH(@j3, 'all', '%b%', NULL, '$[2]'); -- "$[2].x"
+复制代码
+ 
+
+四,修改json值函数
+1.JSON_ARRAY_APPEND  指定位置追加数组元素
+
+复制代码
+-- JSON_ARRAY_APPEND(json_doc, path, val[, path, val] ...)
+-- 在指定path的json array尾部追加val。如果指定path是一个json object，则将其封装成一个json array再追加。如果有参数为NULL，则返回NULL。
+SET @j4 = '["a", ["b", "c"], "d"]';
+-- SELECT JSON_ARRAY_APPEND(@j4, '$[1][0]', 3); -- ["a", [["b", 3], "c"], "d"]
+SET @j5 = '{"a": 1, "b": [2, 3], "c": 4}';
+SELECT JSON_ARRAY_APPEND(@j5, '$.b', 'x'); -- {"a": 1, "b": [2, 3, "x"], "c": 4} 
+SELECT JSON_ARRAY_APPEND(@j5, '$.c', 'y'); -- {"a": 1, "b": [2, 3], "c": [4, "y"]}
+SELECT JSON_ARRAY_APPEND(@j5, '$', 'z'); -- [{"a": 1, "b": [2, 3], "c": 4}, "z"]
+复制代码
+ 
+
+2.JSON_ARRAY_INSERT 指定位置插入数组元素
+
+复制代码
+-- JSON_ARRAY_INSERT(json_doc, path, val[, path, val] ...)
+-- 在path指定的json array元素插入val，原位置及以右的元素顺次右移。如果path指定的数据非json array元素，则略过此val；如果指定的元素下标超过json array的长度，则插入尾部。
+SET @j6 = '["a", {"b": [1, 2]}, [3, 4]]';
+SELECT JSON_ARRAY_INSERT(@j6, '$[1]', 'x'); -- ["a", "x", {"b": [1, 2]}, [3, 4]]
+SELECT JSON_ARRAY_INSERT(@j6, '$[100]', 'x'); -- ["a", {"b": [1, 2]}, [3, 4], "x"]
+SELECT JSON_ARRAY_INSERT(@j6, '$[1].b[0]', 'x'); -- ["a", {"b": ["x", 1, 2]}, [3, 4]]
+SELECT JSON_ARRAY_INSERT(@j6, '$[0]', 'x', '$[3][1]', 'y'); -- ["x", "a", {"b": [1, 2]}, [3, "y", 4]]
+复制代码
+ 
+
+3.JSON_INSERT 指定位置插入
+
+-- JSON_INSERT(json_doc, path, val[, path, val] ...)
+-- 在指定path下插入数据，如果path已存在，则忽略此val（不存在才插入）。
+SET @j7 = '{ "a": 1, "b": [2, 3]}';
+SELECT JSON_INSERT(@j7, '$.a', 10, '$.c', '[true, false]'); -- {"a": 1, "b": [2, 3], "c": "[true, false]"}
+ 
+
+4.JSON_REPLACE 指定位置替换
+
+-- JSON_REPLACE(json_doc, path, val[, path, val] ...)
+-- 替换指定路径的数据，如果某个路径不存在则略过（存在才替换）。如果有参数为NULL，则返回NULL。
+SELECT JSON_REPLACE(@j7, '$.a', 10, '$.c', '[true, false]'); -- {"a": 10, "b": [2, 3]}
+ 
+
+5.JSON_SET 指定位置设置
+
+-- JSON_SET(json_doc, path, val[, path, val] ...)
+-- 设置指定路径的数据（不管是否存在）。如果有参数为NULL，则返回NULL。
+SELECT JSON_SET(@j7, '$.a', 10, '$.c', '[true, false]'); -- {"a": 10, "b": [2, 3], "c": "[true, false]"}
+ 
+
+6.JSON_MERGE 合并
+
+复制代码
+-- JSON_MERGE(json_doc, json_doc[, json_doc] ...)
+-- merge多个json文档。规则如下：
+-- 如果都是json array，则结果自动merge为一个json array；
+-- 如果都是json object，则结果自动merge为一个json object；
+-- 如果有多种类型，则将非json array的元素封装成json array再按照规则一进行mege。
+SELECT JSON_MERGE('[1, 2]', '[true, false]'); -- [1, 2, true, false]
+SELECT JSON_MERGE('{"name": "x"}', '{"id": 47}'); -- {"id": 47, "name": "x"}
+SELECT JSON_MERGE('1', 'true'); -- [1, true]
+SELECT JSON_MERGE('[1, 2]', '{"id": 47}'); -- [1, 2, {"id": 47}]
+复制代码
+ 
+
+7.JSON_REMOVE 指定位置移除
+
+-- JSON_REMOVE(json_doc, path[, path] ...)
+-- 移除指定路径的数据，如果某个路径不存在则略过此路径。如果有参数为NULL，则返回NULL。
+SET @j8 = '["a", ["b", "c"], "d"]';
+SELECT JSON_REMOVE(@j8, '$[1]'); -- ["a", "d"]
+ 
+
+8.JSON_UNQUOTE 去"号
+
+-- JSON_UNQUOTE(val)
+-- 去掉val的引号。如果val为NULL，则返回NULL。
+SELECT JSON_UNQUOTE("\"123\""); -- 123
+ 
+
+五,返回json值属性的函数
+1.JSON_DEPTH 深度
+
+-- JSON_DEPTH(json_doc)
+-- 获取json文档的深度。如果参数为NULL，则返回NULL。
+-- 空的json array、json object或标量的深度为1。
+SELECT JSON_DEPTH('{}'), JSON_DEPTH('[]'), JSON_DEPTH('true'); -- 1 1 1
+SELECT JSON_DEPTH('[10, 20]'), JSON_DEPTH('[[], {}]'); -- 2 2
+SELECT JSON_DEPTH('[10, {"a": 20}]'); -- 3
+ 
+
+2.JSON_LENGTH 长度
+
+复制代码
+-- JSON_LENGTH(json_doc[, path])
+-- 获取指定路径下的长度。如果参数为NULL，则返回NULL。　
+-- 长度的计算规则：
+-- 标量的长度为1；
+-- json array的长度为元素的个数；
+-- json object的长度为key的个数。
+SELECT JSON_LENGTH('[1, 2, {"a": 3}]'); -- 3
+SELECT JSON_LENGTH('{"a": 1, "b": {"c": 30}}'); -- 2
+SELECT JSON_LENGTH('{"a": 1, "b": {"c": 30}}', '$.b'); -- 1
+复制代码
+ 
+
+3.JSON_TYPE 类型
+
+-- JSON_TYPE(json_val)
+-- 获取json文档的具体类型。如果参数为NULL，则返回NULL。
+select JSON_TYPE('[1,2]'); -- ARRAY
+ 
+
+4.JSON_VALID 是否有效json格式
+
+-- JSON_VALID(val)
+-- 判断val是否为有效的json格式，是为1，不是为0。如果参数为NUL，则返回NULL。
+SELECT JSON_VALID('{"a": 1}'); -- 1
+SELECT JSON_VALID('hello'), JSON_VALID('"hello"'); -- 1
+ 
+
+附录:
+
+复制代码
+JSON_ARRAY 生成json数组
+JSON_OBJECT 生成json对象
+JSON_QUOTE 加"号
+JSON_CONTAINS 指定数据是否存在
+JSON_CONTAINS_PATH 指定路径是否存在
+JSON_EXTRACT 查找所有指定数据
+JSON_KEYS 查找所有指定键值
+JSON_SEARCH 查找所有指定值的位置
+JSON_ARRAY_APPEND  指定位置追加数组元素
+JSON_ARRAY_INSERT 指定位置插入数组元素
+JSON_INSERT 指定位置插入
+JSON_REPLACE 指定位置替换
+JSON_SET 指定位置设置
+JSON_MERGE 合并
+JSON_REMOVE 指定位置移除
+JSON_UNQUOTE 去"号
+JSON_DEPTH 深度
+JSON_LENGTH 长度
+JSON_TYPE 类型
+JSON_VALID 是否有效json格式
+复制代码
+ 
+
+函数名 描述
+JSON_APPEND()（废弃的5.7.9） JSON文件追加数据
+JSON_ARRAY()  创建JSON数组
+JSON_ARRAY_APPEND() JSON文件追加数据
+JSON_ARRAY_INSERT() 插入JSON数组
+->  在评估路径返回JSON列值；相当于json_extract()。
+JSON_CONTAINS() 是否包含特定对象的JSON文档路径
+JSON_CONTAINS_PATH()  无论是JSON文件包含任何数据路径
+JSON_DEPTH()  JSON文档的最大深度
+JSON_EXTRACT()  从JSON文档返回数据
+->> 在评估路径和结束引语结果返回JSON列值；相当于json_unquote（json_extract()）。
+JSON_INSERT() 将数据插入到JSON文档
+JSON_KEYS() 从JSON文件密钥数组
+JSON_LENGTH() 在JSON文档中的元素数
+JSON_MERGE()（废弃的5.7.22） 合并的JSON文件，保存重复键。不json_merge_preserve()的同义词
+JSON_MERGE_PATCH()  合并的JSON文件，免去重复键的值
+JSON_MERGE_PRESERVE() 合并的JSON文件，保存重复键
+JSON_OBJECT() 创建JSON对象
+JSON_PRETTY() 版画在人类可读的格式JSON文档，每个数组元素或对象成员打印在新的行中，缩进两个空格就其母。
+JSON_QUOTE()  引用JSON文档
+JSON_REMOVE() 从JSON文件中删除数据
+JSON_REPLACE()  在JSON文件的值替换
+JSON_SEARCH() 在JSON文件价值路径
+JSON_SET()  将数据插入到JSON文档
+JSON_STORAGE_SIZE() 用于一个JSON文件的二进制表示形式存储空间；一个JSON柱，空间时使用的文档插入到任何部分更新之前，
+JSON_TYPE() JSON值类型
+JSON_UNQUOTE()  JSON值而言
+JSON_VALID()  JSON值是否是有效的
+  
+
+mysql官方文档:https://dev.mysql.com/doc/refman/5.7/en/json-utility-functions.html
+
+参考:https://www.cnblogs.com/waterystone/p/5626098.html
+
+
+eg:
+select cast(json_extract(json_keys(extra_data),'$[0]') as unsigned) as country_id from tb_electron_factory limit 1;
 ```
+
+
 
 
 ## 高级操作
 
-### mysql导出数据
+### mysql导出文件数据
 ```
 into outfile '导出的目录和文件名'
 指定导出的目录和文件名
@@ -1181,10 +2012,12 @@ select * from user into outfile '/data/mysql_export_dir/user.csv' fields termina
 select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 
 select * from db_electron_cleaning.tb_extra_category_params into outfile '/data/mysql_export_dir/tb_extra_category_params.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+select id,model_name,images,source_web,data_sheet from tb_electron where factory_id is null limit 100000 into outfile '/data/mysql_export_dir/tb_electron_no_factory.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 ```
 
 
-### mysql导入数据
+### mysql导入文件数据
 ```
 load data infile 'c:/wamp/tmp/Data_OutFile.csv' replace into table data_1 character set utf8 fields terminated by ',' enclosed by '"' lines terminated by '\r\n' (name,age,description );
 
@@ -1241,7 +2074,6 @@ BULK INSERT
     )] 
 
 ```
-
 
 
 eg:
@@ -1810,13 +2642,14 @@ IF(condition, value_if_true, value_if_false)
 condition 必须，判断条件
 value_if_true 可选，当条件为true值返回的值
 condition 可选，当条件为false值返回的值
+
+eg:
 SELECT IF(500<1000, 5, 10);
 SELECT IF(STRCMP("hello","bye") = 0, "YES", "NO");
 
 
 
 常用的字符串函数：
-
 函数                                说明
 CONCAT(s1,s2，...)                  返回连接参数产生的字符串，一个或多个待拼接的内容，任意一个为NULL则返回值为NULL。
 CONCAT_WS(x,s1,s2,...)              返回多个字符串拼接之后的字符串，每个字符串之间有一个x。
@@ -1826,9 +2659,6 @@ INSERT(s1,x,len,s2)                 返回字符串s1，其子字符串起始于
 REPLACE(s,s1,s2)                    返回一个字符串，用字符串s2替代字符串s中所有的字符串s1。
 LOCATE(str1,str)、POSITION(str1 IN str)、INSTR(str,str1)  三个函数作用相同，返回子字符串str1在字符串str中的开始位置（从第几个字符开始）。
 FIELD(s,s1,s2,...)                  返回第一个与字符串s匹配的字符串的位置。
-
-
-
 ```
 
 
@@ -2278,7 +3108,54 @@ alter database db_electron_property_base character set utf8;
 ```
 
 
+### Cannot delete or update a parent row: a foreign key constraint fails
+```
+先设置外键约束检查关闭
+set foreign_key_checks = 0;
 
+删除数据，表或者视图
+drop table m_electron;
+
+开启外键约束检查，以保持表结构完整性
+set foreign_key_checks = 1;
+```
+
+
+### TypeError: object of type ‘builtin_function_or_method’ has no len()
+```
+出现这个错误，最常见的是引入的函数需要后面加()
+如， s.strip()
+```
+
+###ERROR 1270 (HY000): Illegal mix of collations (utf8_general_ci,COERCIBLE), (latin1_swedish_ci,IMPLICIT), (utf8_general_ci,COERCIBLE) for operation 'concat'
+```
+
+```
+
+### mysql Lock wait timeout exceeded; try restarting transaction
+```
+问题场景 
+问题出现环境： 
+1、在同一事务内先后对同一条数据进行插入和更新操作； 
+2、多台服务器操作同一数据库； 
+3、瞬时出现高并发现象；
+
+原因分析 
+在高并发的情况下，Spring事物造成数据库死锁，后续操作超时抛出异常。 
+Mysql数据库采用InnoDB模式，默认参数:innodb_lock_wait_timeout设置锁等待的时间是50s，一旦数据库锁超过这个时间就会报错。
+
+解决方案 
+1. 运行以下命令，查找提交事务的数据，杀掉线程即可解决
+
+select * from information_schema.innodb_trx
+ 
+kill thread_id;
+ 2. 增加锁等待时间，即增大下面配置项参数值，单位为秒（s）
+
+innodb_lock_wait_timeout=500
+3、优化存储过程,事务避免过长时间的等待。
+
+```
 
 
 ```

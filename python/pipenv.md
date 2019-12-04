@@ -115,6 +115,18 @@ python3 -m site --user-base
 ### 首先要安装pip才能运行以下命令
 `pip install pipenv`
 
+# centos7
+安装pipenv
+```
+pip install pipenv
+把pipenv安装好后，pipenv命令出现-bash: pipenv: command not found，/usr/local/bin下没有pipenv文件
+-bash: pipenv: command not found
+原因：没有全局安装
+解决方法：sudo -H pip install -U pipenv
+
+ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
+```
+
 ### 在指定目录下创建虚拟环境,首先进入到项目根目录下，会使用本地默认版本的python
 `pipenv install`
 
