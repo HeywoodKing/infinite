@@ -395,3 +395,97 @@ sudo service nginx stop
 ```
 
 10. 到此就大功告成啦！访问你的域名试试咯！
+
+
+```
+server{
+    listen 80;
+    listen [::]:80;
+
+    server_name xachf.com www.xachf.com;
+
+    charset utf-8;
+    client_max_body_size 75M;
+
+
+    location /static {      
+        expires 30d;
+        autoindex on;
+        add_header Cache-Control private;
+        alias /var/www/chfweb/static;
+    }
+
+    location /media {
+        alias /var/www/chfweb/uploads;
+    }
+
+    location / {
+        uwsgi_pass 127.0.0.1:8020;
+        include /etc/nginx/uwsgi_params;
+    }
+}
+
+server{
+    listen 8000;
+    listen [::]:8000;
+
+    server_name 47.99.121.101;
+
+    charset utf-8;
+    client_max_body_size 75M;
+
+
+    location /static {
+        expires 30d;
+        autoindex on;
+        add_header Cache-Control private;
+        alias /var/www/chfweb/static;
+    }
+
+    location /media {
+        alias /var/www/chfweb/uploads;
+    }
+
+    location / {
+        uwsgi_pass 127.0.0.1:8020;
+        include /etc/nginx/uwsgi_params;
+    }
+}
+
+
+
+# chfweb_nginx.conf
+upstream django{
+    # server unix:///opt/project/chf-project/chfweb/chfweb.sock;
+    server 127.0.0.1:8020;
+}
+
+server{
+    listen 80;
+    listen [::]:80;
+    server_name xachf.com www.xachf.com;
+    charset utf-8;
+
+    # max upload size
+    client_max_body_size    75M;
+
+    location /media {
+        alias  /var/www/chfweb/uploads;
+    }
+
+    location /static {
+        expires 30d;
+        autoindex on;
+        add_header Cache-Control private;
+        alias  /var/www/chfweb/static;
+    }
+
+    # finally, send all non-media requests to the django server
+    location / {
+        include  /etc/nginx/uwsgi_params;
+        uwsgi_pass  django;
+        uwsgi_read_timeout 2;
+    }
+}
+
+```
