@@ -245,6 +245,37 @@ select * from information_schema.innodb_trx\G;
 SELECT * FROM information_schema.INNODB_TRX\G
 ```
 
+手动提交未提交的事物
+```
+select connection_id() from dual;
+
+set session autocommit=0;
+
+delete from kkk where id =1;
+
+SELECT t.trx_mysql_thread_id
+ ,t.trx_state
+ ,t.trx_tables_in_use
+ ,t.trx_tables_locked
+ ,t.trx_query
+ ,t.trx_rows_locked 
+ ,t.trx_rows_modified
+ ,t.trx_lock_structs
+ ,t.trx_started
+ ,t.trx_isolation_level
+ ,p.time
+ ,p.user
+ ,p.host
+ ,p.db
+ ,p.command
+FROM information_schema.innodb_trx t 
+ INNER JOIN information_schema.processlist p 
+  ON t.trx_mysql_thread_id = p.id 
+WHERE t.trx_state = 'RUNNING'
+ AND p.time > 10 
+ AND p.command = 'Sleep'\G
+```
+
 查看表锁信息
 ```
 查看正在锁的事务
@@ -277,7 +308,7 @@ begin
   deallocate prepare ex_alter_id;
 
   -- set @result = concat("select concat(", inout_table_name, "' 表的 auto_increment=@max_id 更新完成!')");
-  set @result = concat("select concat('", inout_table_name, " 表的 auto_increment=',@max_id,' 更新完成！')");
+  set @result = concat("select concat('", inout_table_name, " 表的 auto_increment=',@max_id,' 更新完成！') as comment");
   PREPARE ex_result FROM @result;
   EXECUTE ex_result;
   # 释放掉预处理段
@@ -285,6 +316,7 @@ begin
 
 end $$
 
+切换回来结束符为;
 DELIMITER ;
 
 call pro_update_auto_increment_to_max('db_electron_property_online.tb_electron_area', 'id');
@@ -769,10 +801,79 @@ show open tables from database;
 解锁： unlock tables;
 ```
 
-查询正在执行的操作
+查询所有事物
 ```
 select * from information_schema.innodb_trx\G
 ```
+
+查看正在运行的事物
+```
+select * from information_schema.innodb_trx where trx_state='RUNNING' \G
+```
+
+查看未提交的事务(3秒内未操作的事务)
+```
+SELECT 
+p.ID AS conn_id,
+P.USER AS login_user,
+P.HOST AS login_host,
+p.DB AS database_name,
+P.TIME AS trx_sleep_seconds,
+TIME_TO_SEC(TIMEDIFF(NOW(),T.trx_started)) AS trx_open_seconds,
+T.trx_started,
+T.trx_isolation_level,
+T.trx_tables_locked,
+T.trx_rows_locked,
+t.trx_state,
+p.COMMAND AS process_state,
+(
+SELECT GROUP_CONCAT(T1.`SQL_TEXT` SEPARATOR ';
+') 
+FROM performance_schema.events_statements_history AS T1
+INNER JOIN performance_schema.threads AS T2
+ON T1.`THREAD_ID`=T2.`THREAD_ID`
+WHERE T2.`PROCESSLIST_ID`=P.id
+) AS trx_sql_text
+FROM `information_schema`.`INNODB_TRX` t
+INNER JOIN `information_schema`.`PROCESSLIST` p
+ON t.trx_mysql_thread_id=p.id
+WHERE t.trx_state='RUNNING'
+AND p.COMMAND='Sleep'
+AND P.TIME>3
+ORDER BY T.trx_started ASC \G
+```
+
+查看当前会话连接的事物
+```
+SELECT tx.trx_id
+FROM information_schema.innodb_trx tx
+WHERE tx.trx_mysql_thread_id = connection_id()
+```
+
+查看数据库的隔离级别
+```
+select @@tx_isolation;
+```
+
+查看正在运行的sql
+```
+select  *  from information_schema.processlist where info is not null;
+```
+
+杀掉事物
+```
+SELECT  concat('kill ',trx_mysql_thread_id,";")t_sql FROM  information_schema.INNODB_TRX；
+```
+
+使用sys.session视图来查看会话最后一次执行的SQL
+```
+SELECT * 
+FROM sys.session 
+WHERE CONN_ID = 20036 \G
+```
+
+
+
 
 查看创建的索引的CARDINALITY比率
 ```
@@ -1759,7 +1860,7 @@ SELECT id,json_keys(info) FROM t_json;
 -- JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])
 -- 查询包含指定字符串的paths，并作为一个json array返回。如果有参数为NUL或path不存在，则返回NULL。
 -- one_or_all："one"表示查询到一个即返回；"all"表示查询所有。
--- search_str：要查询的字符串。 可以用LIKE里的'%'或‘_’匹配。
+-- search_str：要查询的字符串。 可以用LIKE里的'%'或'_’匹配。
 -- path：在指定path下查。
 SET @j3 = '["abc", [{"k": "10"}, "def"], {"x":"abc"}, {"y":"bcd"}]';
 SELECT JSON_SEARCH(@j3, 'one', 'abc'); -- "$[0]"
@@ -3121,7 +3222,7 @@ set foreign_key_checks = 1;
 ```
 
 
-### TypeError: object of type ‘builtin_function_or_method’ has no len()
+### TypeError: object of type 'builtin_function_or_method’ has no len()
 ```
 出现这个错误，最常见的是引入的函数需要后面加()
 如， s.strip()
@@ -3141,18 +3242,17 @@ set foreign_key_checks = 1;
 3、瞬时出现高并发现象；
 
 原因分析 
-在高并发的情况下，Spring事物造成数据库死锁，后续操作超时抛出异常。 
+在高并发的情况下，事物造成数据库死锁，后续操作超时抛出异常。 
 Mysql数据库采用InnoDB模式，默认参数:innodb_lock_wait_timeout设置锁等待的时间是50s，一旦数据库锁超过这个时间就会报错。
 
 解决方案 
 1. 运行以下命令，查找提交事务的数据，杀掉线程即可解决
-
-select * from information_schema.innodb_trx
- 
+select * from information_schema.innodb_trx;
 kill thread_id;
- 2. 增加锁等待时间，即增大下面配置项参数值，单位为秒（s）
 
-innodb_lock_wait_timeout=500
+2. 增加锁等待时间，即增大下面配置项参数值，单位为秒（s）
+innodb_lock_wait_timeout=500;
+
 3、优化存储过程,事务避免过长时间的等待。
 
 ```

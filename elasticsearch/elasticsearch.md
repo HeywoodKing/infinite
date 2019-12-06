@@ -85,17 +85,20 @@ cd elasticsearch-6.3.2/bin
 ### http
 ```
 查看索引
-http://192.168.1.169:9200/_cat/indices?v
+http://192.168.1.169:9201/_cat/indices?v
+
+查询 category_with_kwargs 索引的参数name=Java的数据
+http://172.16.22.133:9201/category_with_kwargs/_search?q=name:Java
 
 查看指定索引的文档数量
-http://110.43.50.188:9201/category_with_kwargs/_count
-http://110.43.50.188:9201/electron_with_kwargs_00/_count
+http://172.16.22.133:9201/category_with_kwargs/_count
+http://172.16.22.133:9201/electron_with_kwargs_00/_count
 
 模糊查看前缀为xx的索引数量
-http://110.43.50.188:9201/electron_with_kwargs_*/_count
+http://172.16.22.133:9201/electron_with_kwargs_*/_count
 
 查询某个索引的文档记录
-http://110.43.50.188:9201/electron_with_kwargs_00/_search
+http://172.16.22.133:9201/electron_with_kwargs_00/_search
 ```
 
 
