@@ -1,4 +1,4 @@
-## mysql
+## MYSQL
 
 ### 安装mysql
 1. windows安装
@@ -6,44 +6,44 @@
 
 2. linux(ubuntu18.04)
 
+>安装与初始化
 
-安装与初始化
-在 Download MySQL Yum Repository 页面获取 MySQL 8 Community Yum 仓库文件的链接，例如：
+>在 Download MySQL Yum Repository 页面获取 MySQL 8 Community Yum 仓库文件的链接，例如：
+>`https://repo.mysql.com//mysql80-community-release-el7-2.noarch.rpm`
 
-https://repo.mysql.com//mysql80-community-release-el7-2.noarch.rpm
-通过 SSH 远程连接服务器实例，执行下面命令切换到其它拥有 root 权限的用户，阿里云服务器实例默认有一个拥有 root 权限的 admin 用户，这里以切换到 admin 用户为例子：
+>通过 SSH 远程连接服务器实例，执行下面命令切换到其它拥有 root 权限的用户，阿里云服务器实例默认有一个拥有 root 权限的 admin 用户，这里以切换到 admin 用户为例子：
+>`$ su admin`
 
-$ su admin
-执行下面命令，下载 MySQL 8 Community Yum 仓库文件：
+>执行下面命令，下载 MySQL 8 Community Yum 仓库文件：
+>$ wget https://repo.mysql.com//mysql80-community-release-el7-2.noarch.rpm
 
-$ wget https://repo.mysql.com//mysql80-community-release-el7-2.noarch.rpm
-执行下面命令，安装 MySQL 8 Community Yum 仓库文件：
+>执行下面命令，安装 MySQL 8 Community Yum 仓库文件：
+>$ sudo yum localinstall mysql80-community-release-el7-2.noarch.rpm
 
-$ sudo yum localinstall mysql80-community-release-el7-2.noarch.rpm
-执行下面命令，检查 MySQL 8 Community Yum 仓库文件是否正确安装 ：
+>执行下面命令，检查 MySQL 8 Community Yum 仓库文件是否正确安装 ：
+>$ yum repolist enabled | grep "mysql.*-community.*"
 
-$ yum repolist enabled | grep "mysql.*-community.*"
-执行下面命令，安装 MySQL 8 Community ：
+>执行下面命令，安装 MySQL 8 Community ：
+>$ sudo yum install mysql-community-server
 
-$ sudo yum install mysql-community-server
-使用 service 命令管理 MySQL 服务：
+>使用 service 命令管理 MySQL 服务：
+>$ sudo service mysqld start          # 启动 MySQL 服务
+>$ sudo service mysqld stop           # 停止 MySQL 服务
+>$ sudo service mysqld restart        # 重启 MySQL 服务
+>$ sudo service mysqld status         # 查看 MySQL 服务状态
 
-$ sudo service mysqld start          # 启动 MySQL 服务
-$ sudo service mysqld stop           # 停止 MySQL 服务
-$ sudo service mysqld restart        # 重启 MySQL 服务
-$ sudo service mysqld status         # 查看 MySQL 服务状态
-使用 systemctl 命令管理 MySQL 服务：
+>使用 systemctl 命令管理 MySQL 服务：
+>$ sudo systemctl start mysqld   # 启动 MySQL 服务
+>$ sudo systemctl stop mysqld    # 停止 MySQL 服务
+>$ sudo systemctl restart mysqld # 重启 MySQL 服务
+>$ sudo systemctl status mysqld  # 查看 MySQL 服务状态
+>$ sudo systemctl enable mysqld  # 设置 MySQL 服务开机自启动
+>$ sudo systemctl disable mysqld # 关闭 MySQL 服务开机自启动
 
-$ sudo systemctl start mysqld   # 启动 MySQL 服务
-$ sudo systemctl stop mysqld    # 停止 MySQL 服务
-$ sudo systemctl restart mysqld # 重启 MySQL 服务
-$ sudo systemctl status mysqld  # 查看 MySQL 服务状态
-$ sudo systemctl enable mysqld  # 设置 MySQL 服务开机自启动
-$ sudo systemctl disable mysqld # 关闭 MySQL 服务开机自启动
-首次启动 MySQL 服务，会自动初始化数据目录、生成 SSL 证书和密钥文件、创建超级用户 ' root'@'localhost' ，超级用户的密码被设置并存储在错误日志文件中。可以使用以下命令查询临时密码：
+>首次启动 MySQL 服务，会自动初始化数据目录、生成 SSL 证书和密钥文件、创建超级用户 ' root'@'localhost' ，超级用户的密码被设置并存储在错误日志文件中。可以使用以下命令查询临时密码：
+>$ sudo grep 'temporary password' /var/log/mysqld.log
 
-$ sudo grep 'temporary password' /var/log/mysqld.log
-现在你可以用你查询到的临时密码连接数据库服务器了。
+>现在你可以用你查询到的临时密码连接数据库服务器了。
 
 
 ### 基本操作
@@ -815,6 +815,34 @@ select b.table_name,b.column_name,b.character_set_name,b.collation_name
 ```
 show global variables like '%timeout';
 ```
+
+查看mysql最大连接数(查看mysql连接数)
+```
+SHOW VARIABLES LIKE '%connections%';
+SHOW STATUS LIKE 'Thread%';
+```
+
+修改MySQL最大连接数
+1. 方式一
+```
+最大连接数:
+set global max_connections=1000;
+
+最大错误连接数:
+set global max_connect_errors = 100;
+```
+2. 方式二
+MySQL配置文件my.ini 或 my.cnf的参数(通常再默认安装路径下)
+在最下面添加：
+```
+# 修改最大连接数
+max_connections=1000;
+
+# 修改最大错误连接数
+max_connect_errors = 1000;
+```
+![my.ini配置图](https://img-blog.csdnimg.cn/20190316165547341.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpcnVpZG9uZzAx,size_16,color_FFFFFF,t_70 "my.ini配置图")
+
 
 查看请求链接进程被主动kill
 ```
@@ -1829,7 +1857,7 @@ SELECT id,json_keys(info) FROM t_json;
 
 4.修改记录
 
-复制代码
+
 -- 增加键
 UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.1') WHERE id = 2;
 
@@ -1838,7 +1866,7 @@ UPDATE t_json SET info = json_set(info,'$.ip','192.168.1.2') WHERE id = 2;
 
 -- 删除键
 UPDATE t_json SET info = json_remove(info,'$.ip') WHERE id = 2;
-复制代码
+
  
 
 二,创建json值函数
@@ -1902,7 +1930,7 @@ SELECT id,json_keys(info) FROM t_json;
 
 5.JSON_SEARCH 查找所有指定值的位置
 
-复制代码
+
 -- JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])
 -- 查询包含指定字符串的paths，并作为一个json array返回。如果有参数为NUL或path不存在，则返回NULL。
 -- one_or_all："one"表示查询到一个即返回；"all"表示查询所有。
@@ -1915,13 +1943,12 @@ SELECT JSON_SEARCH(@j3, 'all', 'abc', NULL, '$[2]'); -- "$[2].x"
 SELECT JSON_SEARCH(@j3, 'all', '10'); -- "$[1][0].k"
 SELECT JSON_SEARCH(@j3, 'all', '%b%'); -- ["$[0]", "$[2].x", "$[3].y"]
 SELECT JSON_SEARCH(@j3, 'all', '%b%', NULL, '$[2]'); -- "$[2].x"
-复制代码
+
  
 
 四,修改json值函数
 1.JSON_ARRAY_APPEND  指定位置追加数组元素
 
-复制代码
 -- JSON_ARRAY_APPEND(json_doc, path, val[, path, val] ...)
 -- 在指定path的json array尾部追加val。如果指定path是一个json object，则将其封装成一个json array再追加。如果有参数为NULL，则返回NULL。
 SET @j4 = '["a", ["b", "c"], "d"]';
@@ -1930,12 +1957,98 @@ SET @j5 = '{"a": 1, "b": [2, 3], "c": 4}';
 SELECT JSON_ARRAY_APPEND(@j5, '$.b', 'x'); -- {"a": 1, "b": [2, 3, "x"], "c": 4} 
 SELECT JSON_ARRAY_APPEND(@j5, '$.c', 'y'); -- {"a": 1, "b": [2, 3], "c": [4, "y"]}
 SELECT JSON_ARRAY_APPEND(@j5, '$', 'z'); -- [{"a": 1, "b": [2, 3], "c": 4}, "z"]
-复制代码
- 
+
+
+
+将tags的值设置为字段类型的数组eg:{"1": [], "2": []}
+update fk_message set tags=json_object(1,json_array(),2,json_array()) where id=6;
+
+update fk_message set tags = json_set(tags,'$."2"',json_array_append(tags,'$."2"',1)) where id = 6;
+update fk_message set tags = json_insert(tags,'$."2"',json_array_append(tags,'$."2"',1)) where id = 6;
+
+
+update fk_message set tags = json_object(1,json_array_append(tags,'$."1"',1)) where id = 6;
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+| id | name                  | data                                                               | tags                        |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+|  6 | lisi                  | {"1": 1}                                                           | {"1": {"1": [1]}}           |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+6 rows in set (0.00 sec)
+
+
+update fk_message set tags = json_object(1,json_array_append(tags,'$',1)) where id = 6;
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+| id | name                  | data                                                               | tags                        |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+|  6 | lisi                  | {"1": 1}                                                           | {"1": {"1": [1]}}           |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+
+
+MySQL [db_test]> update fk_message set tags=json_object(1,json_array_append(tags->'$."1"','$',2)) where id = 6;
+Query OK, 1 row affected (0.08 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MySQL [db_test]> select * from fk_message;
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+| id | name                  | data                                                               | tags                        |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+|  6 | lisi                  | {"1": 1}                                                           | {"1": [1, 2]}               |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+6 rows in set (0.00 sec)
+
+
+当有键值的时候才可以更新
+MySQL [db_test]> update fk_message set tags=json_array_append(tags,'$."1"',2) where id = 6;
+Query OK, 1 row affected (1.28 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MySQL [db_test]> select * from fk_message;
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+| id | name                  | data                                                               | tags                        |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+|  6 | lisi                  | {"1": 1}                                                           | {"1": [1, 2]}               |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+6 rows in set (0.02 sec)
+
+
+当没有键值 "2" 的时候是更新不了的，
+MySQL [db_test]> update fk_message set tags=json_array_append(tags,'$."2"',2) where id = 6;
+Query OK, 0 rows affected (5.33 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+MySQL [db_test]> select * from fk_message;
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+| id | name                  | data                                                               | tags                        |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+|  6 | lisi                  | {"1": 1}                                                           | {"1": [1, 2]}               |
++----+-----------------------+--------------------------------------------------------------------+-----------------------------+
+6 rows in set (0.02 sec)
+
+
+查询某个键的数组值中是否包含某值 
+查询data字段里有jack的数据
+MySQL [db_test]> select * from fk_message where JSON_CONTAINS(data->'$[*]', '"jack"', '$');
+MySQL [db_test]> select * from fk_message where id=6 and json_contains(tags,json_object("1",1));
++----+------+----------+------------+
+| id | name | data     | tags       |
++----+------+----------+------------+
+|  6 | lisi | {"1": 1} | {"1": [1]} |
++----+------+----------+------------+
+1 row in set (0.33 sec)
+
+MySQL [db_test]> select * from fk_message where id = 6 and json_contains(tags,json_object("1",2));
++----+------+----------+---------------+
+| id | name | data     | tags          |
++----+------+----------+---------------+
+|  6 | lisi | {"1": 1} | {"1": [1, 2]} |
++----+------+----------+---------------+
+1 row in set (0.38 sec)
+
+
+
 
 2.JSON_ARRAY_INSERT 指定位置插入数组元素
 
-复制代码
 -- JSON_ARRAY_INSERT(json_doc, path, val[, path, val] ...)
 -- 在path指定的json array元素插入val，原位置及以右的元素顺次右移。如果path指定的数据非json array元素，则略过此val；如果指定的元素下标超过json array的长度，则插入尾部。
 SET @j6 = '["a", {"b": [1, 2]}, [3, 4]]';
@@ -1943,7 +2056,7 @@ SELECT JSON_ARRAY_INSERT(@j6, '$[1]', 'x'); -- ["a", "x", {"b": [1, 2]}, [3, 4]]
 SELECT JSON_ARRAY_INSERT(@j6, '$[100]', 'x'); -- ["a", {"b": [1, 2]}, [3, 4], "x"]
 SELECT JSON_ARRAY_INSERT(@j6, '$[1].b[0]', 'x'); -- ["a", {"b": ["x", 1, 2]}, [3, 4]]
 SELECT JSON_ARRAY_INSERT(@j6, '$[0]', 'x', '$[3][1]', 'y'); -- ["x", "a", {"b": [1, 2]}, [3, "y", 4]]
-复制代码
+
  
 
 3.JSON_INSERT 指定位置插入
@@ -1969,8 +2082,6 @@ SELECT JSON_SET(@j7, '$.a', 10, '$.c', '[true, false]'); -- {"a": 10, "b": [2, 3
  
 
 6.JSON_MERGE 合并
-
-复制代码
 -- JSON_MERGE(json_doc, json_doc[, json_doc] ...)
 -- merge多个json文档。规则如下：
 -- 如果都是json array，则结果自动merge为一个json array；
@@ -1980,7 +2091,6 @@ SELECT JSON_MERGE('[1, 2]', '[true, false]'); -- [1, 2, true, false]
 SELECT JSON_MERGE('{"name": "x"}', '{"id": 47}'); -- {"id": 47, "name": "x"}
 SELECT JSON_MERGE('1', 'true'); -- [1, true]
 SELECT JSON_MERGE('[1, 2]', '{"id": 47}'); -- [1, 2, {"id": 47}]
-复制代码
  
 
 7.JSON_REMOVE 指定位置移除
@@ -2011,7 +2121,7 @@ SELECT JSON_DEPTH('[10, {"a": 20}]'); -- 3
 
 2.JSON_LENGTH 长度
 
-复制代码
+
 -- JSON_LENGTH(json_doc[, path])
 -- 获取指定路径下的长度。如果参数为NULL，则返回NULL。　
 -- 长度的计算规则：
@@ -2021,7 +2131,7 @@ SELECT JSON_DEPTH('[10, {"a": 20}]'); -- 3
 SELECT JSON_LENGTH('[1, 2, {"a": 3}]'); -- 3
 SELECT JSON_LENGTH('{"a": 1, "b": {"c": 30}}'); -- 2
 SELECT JSON_LENGTH('{"a": 1, "b": {"c": 30}}', '$.b'); -- 1
-复制代码
+
  
 
 3.JSON_TYPE 类型
@@ -2041,7 +2151,7 @@ SELECT JSON_VALID('hello'), JSON_VALID('"hello"'); -- 1
 
 附录:
 
-复制代码
+
 JSON_ARRAY 生成json数组
 JSON_OBJECT 生成json对象
 JSON_QUOTE 加"号
@@ -2062,7 +2172,7 @@ JSON_DEPTH 深度
 JSON_LENGTH 长度
 JSON_TYPE 类型
 JSON_VALID 是否有效json格式
-复制代码
+
  
 
 函数名 描述
@@ -3300,6 +3410,23 @@ kill thread_id;
 innodb_lock_wait_timeout=500;
 
 3、优化存储过程,事务避免过长时间的等待。
+```
+
+### mysql AttributeError: 'NoneType' object has no attribute 'settimeout'
+```
+报错：
+Exception ignored in: <function MySQLResult.__del__ at 0x000001CF71069168>
+Traceback (most recent call last):
+  File "D:\workspace\virtualenv\mofang_data_cleaning-PcrGzYSV\lib\site-packages\pymysql\connections.py", line 1071, in __del__
+    self._finish_unbuffered_query()
+  File "D:\workspace\virtualenv\mofang_data_cleaning-PcrGzYSV\lib\site-packages\pymysql\connections.py", line 1177, in _finish_unbuffered_query
+    packet = self.connection._read_packet()
+  File "D:\workspace\virtualenv\mofang_data_cleaning-PcrGzYSV\lib\site-packages\pymysql\connections.py", line 657, in _read_packet
+    packet_header = self._read_bytes(4)
+  File "D:\workspace\virtualenv\mofang_data_cleaning-PcrGzYSV\lib\site-packages\pymysql\connections.py", line 688, in _read_bytes
+    self._sock.settimeout(self._read_timeout)
+AttributeError: 'NoneType' object has no attribute 'settimeout'
+解决方法：
 
 ```
 

@@ -37,3 +37,93 @@ version                            Show SFTP version
 ?                                  Synonym for help
 ```
 
+```
+sftp-- help 
+可用命令： 
+cd 路径                        更改远程目录到“路径” 
+lcd 路径                       更改本地目录到“路径” 
+chgrp group path               将文件“path”的组更改为“group” 
+chmod mode path                将文件“path”的权限更改为“mode” 
+chown owner path               将文件“path”的属主更改为“owner” 
+exit                           退出 sftp 
+help                           显示这个帮助文本 
+get 远程路径                   下载文件 
+ln existingpath linkpath       符号链接远程文件 
+ls [选项] [路径]               显示远程目录列表 
+lls [选项] [路径]              显示本地目录列表 
+mkdir 路径                     创建远程目录 
+lmkdir 路径                    创建本地目录 
+mv oldpath newpath             移动远程文件 
+open [用户@]主机[:端口]        连接到远程主机 
+put 本地路径                   上传文件 
+pwd                            显示远程工作目录 
+lpwd                           打印本地工作目录 
+quit                           退出 sftp 
+rmdir 路径                     移除远程目录 
+lrmdir 路径                    移除本地目录 
+rm 路径                        删除远程文件 
+lrm 路径                       删除本地文件 
+symlink existingpath linkpath  符号链接远程文件 
+version                        显示协议版本
+```
+
+我们主要用到的就是一下六个命令:
+```
+cd 路径                        更改远程目录到“路径” 
+lcd 路径                       更改本地目录到“路径” 
+ls [选项] [路径]               显示远程目录列表 
+lls [选项] [路径]              显示本地目录列表 
+put 本地路径                   上传文件 
+get 远程路径                   下载文件 
+```
+
+```
+#!/bin/bash
+
+SCRIPT_NAME=`basename $0`
+CURRENT_DIR=$(cd "$(dirname "$0")";pwd)
+
+execute_sftp_cmd()
+{
+    local host_ip=$1
+    local user_name=$2
+    local user_password=$3
+    local file_name=$4
+    local file_dir=$5
+    local cmd=$6
+ 
+    local log_file=${CURRENT_DIR}/execute_sftp_cmd.log
+    # 如果密码中包含$符号，需要转义以下
+    user_password=`echo ${user_password} | sed 's/\\$/\\\\$/g'`
+
+    /usr/bin/expect <<EOF > ${log_file}
+    set timeout -1
+    spawn sftp ${user_name}@${host_ip}:${file_dir}
+    expect {
+        "(yes/no)?"
+        {
+            send "yes\n"
+            expect "*password:" { send "${user_password}\n"}
+        }
+        "*assword:"
+        {
+            send "${user_password}\n"
+        }
+    }
+    expect "Changing to:*"
+    send "${cmd} ${file_name}\n"
+    expect "100%"
+    send "exit\n"
+    expect eof
+EOF
+   cat ${log_file} | grep -iE "denied|error|failed" >/dev/null
+   if [ $? -eq 0 ];then
+        echo "Script execute failed!"
+        return 1
+   fi
+   return 0
+}
+execute_sftp_cmd "$@"
+
+```
+

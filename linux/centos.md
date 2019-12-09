@@ -483,11 +483,15 @@ uptime
 ```
 
 ### 系统资源使用情况
+```
+vmstat 1
+
 vmstat 1 -S m
 procs ———–memory———- —swap– —–io—- –system– —–cpu——
 r b swpd free buff cache si so bi bo in cs us sy id wa st
 0 0 0 233 199 778 0 0 4 25 1 1 3 0 96 0 0
 0 0 0 233 199 778 0 0 0 0 1029 856 13 1 86 0 0
+```
 
 + 实用命令
 ```
