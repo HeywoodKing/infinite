@@ -238,7 +238,6 @@ select @@autocommit;
 查看有木有未提交的事物（查询事务情况）
 ```
 select * from information_schema.innodb_trx\G;
-
 ```
 MySQL 5.5 版本以后，information_schema（ski:mə） 库中新增了三个关于锁的表，亦即 innodb_trx 、innodb_locks 和 innodb_lock_waits 。其中 innodb_trx 表记录当前运行的所有事务，innodb_locks 表记录当前出现的锁，innodb_lock_waits 表记录锁等待的对应关系
 ```

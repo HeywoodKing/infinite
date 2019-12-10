@@ -99,6 +99,9 @@ http://172.16.22.133:9201/electron_with_kwargs_*/_count
 
 查询某个索引的文档记录
 http://172.16.22.133:9201/electron_with_kwargs_00/_search
+
+查询某个索引文档的category_id=05050的记录
+http://110.43.50.188:9201/category_with_kwargs/_search?q=category_id:05050
 ```
 
 
