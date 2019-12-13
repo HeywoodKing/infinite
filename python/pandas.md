@@ -28,4 +28,15 @@ for row in df.itertuples(index=True, name='pandas'):
 ```
 
 
+#### ValueError: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all()
+```
+
+```
+
+
+#### TypeError: 'int' object does not support item assignment
+```
+
+```
+
 
