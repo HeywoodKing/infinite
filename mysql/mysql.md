@@ -781,8 +781,8 @@ show variables like "%slow%";
 
 查询到相对应的进程
 ```
-show processlist
-show full processlist
+show processlist;
+show full processlist;
 ```
 
 查看服务器配置参数
