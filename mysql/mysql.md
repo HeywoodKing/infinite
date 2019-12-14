@@ -1,4 +1,4 @@
-## MYSQL
+# MYSQL
 
 ### 安装mysql
 1. windows安装
@@ -331,9 +331,12 @@ SELECT * FROM information_schema.INNODB_LOCK_waits;
 
 创建存储过程
 ```
-创建更新auto_increment存储过程
+删除存储过程命令：
+DROP {PROCEDURE | FUNCTION} [IF EXISTS] 名称；
+
 drop procedure pro_update_auto_increment_to_max;
 
+创建更新auto_increment存储过程
 DELIMITER $$
 create procedure pro_update_auto_increment_to_max(in inout_table_name VARCHAR(200), in field_id VARCHAR(20))
 begin
@@ -365,6 +368,8 @@ end $$
 DELIMITER ;
 
 call pro_update_auto_increment_to_max('db_electron_property_online.tb_electron_area', 'id');
+
+
 ```
 
 
@@ -794,6 +799,30 @@ show variables like '%secure%';
 查看所有变量
 ```
 show session variables;
+```
+
+查看错误连接数
+```
+show variables like '%max_connect_errors%';
+
+MySQL [db_electron_property]> show variables like '%max_connect_errors%';
++--------------------+---------+
+| Variable_name      | Value   |
++--------------------+---------+
+| max_connect_errors | 1000000 |
++--------------------+---------+
+1 row in set (0.04 sec)
+
+mysql> set global max_connect_errors=3;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> show variables like '%max_connect_error%';
++--------------------+-------+
+| Variable_name      | Value |
++--------------------+-------+
+| max_connect_errors | 3     |
++--------------------+-------+
+1 row in set (0.00 sec)
 ```
 
 查看服务器字符集
