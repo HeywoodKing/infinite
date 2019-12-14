@@ -407,7 +407,7 @@ date
 df -h
 df -hv
 df -lh
-fdisk -l 也可以查看分区
+fdisk -l 也可以查看分区  查看硬盘号
 du -sh 可以看到全部占用的空间
 du /etc -sh 可以看到这个目录的大小
 ```

@@ -50,6 +50,7 @@ else
             #其他异常情况
             else
                 echo "参数1不是MEM、CPU和DISK中的一个，请重新输入参数"
+
                 exit 1
             fi           
         else
