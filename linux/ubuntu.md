@@ -83,13 +83,13 @@ tar:
 备份：
 sudo su -
 cd /
-tar cvpzf /home/flack/ubuntu18_`date +%Y%m%d_%H`.tgz --exclude=/proc --exclude=lost+found --exclude=/home/flack/ubuntu18_`date +%Y%m%d_%H`.tgz --exclude=/mnt --exclude=/sys --exclude=/media /
+sudo tar -cvpzf /home/flack/ubuntu18_`date +%Y%m%d_%H`.tgz --exclude=/proc --exclude=lost+found --exclude=/home/flack/ubuntu18_`date +%Y%m%d_%H`.tgz --exclude=/mnt --exclude=/sys --exclude=/media /
 
 还原：
 sudo su -
-cp /home/flack/ubuntu18_`date + %Y%m%d_%H`.tgz /
+cp /home/flack/ubuntu18_`date +%Y_%m_%d_%H`.tgz /
 cd /
-tar xvpzf ubuntu18_`date + %Y%m%d_%H`.tgz -C /
+tar -xvpzf ubuntu18_`date +%Y_%m_%d_%H`.tgz -C /
 ```
 
 ### date
