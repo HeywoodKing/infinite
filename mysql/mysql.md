@@ -890,10 +890,21 @@ show global status like 'com_kill';
 查看文件大小是否超过 max_allowed_packet ，如果超过则需要调整参数，或者优化语句
 ```
 show global variables like 'max_allowed_packet';
-mysql> set global max_allowed_packet=1024*1024*16;
+set global max_allowed_packet=1024*1024*16;
 
-mysql> show global variables like 'max_allowed_packet';
 
+show variables like '%max_allowed_packet%';
+将修改成 100M
+set global max_allowed_packet = 1024*1024*100;
+这种修改只会临时生效，MySQL重启后，依旧会变为4M，想要长期生效，需要修改「my.ini」
+```
+
+wait_timeout太小，MySQL链接长时间没有新请求，就被Server端关闭了
+```
+show global variables like '%timeout';
+MySQL无操作28800秒后会被自动化关闭
+set global wait_time = 28800;
+但这不是长久之策，因为长时间不操作，MySQL Server端依旧会将其关闭，这个问题依旧会出现，为了避免这个问题，你需要自己关闭链接，对于一些MySQL操作量不大的情景，建议使用短连接的形式，如果依旧需要用MySQL连接池，以长连接的方式来操作MySQL，就需要实现判断当前链接是否存活的逻辑并在不存活的情况下自动重连
 ```
 
 ```
