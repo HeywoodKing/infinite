@@ -330,6 +330,18 @@ POST /bank/_search?pretty
 在Elasticsearch中,你有能力执行搜索返回命中结果,同时拆分命中结果，然后统一返回结果。当你使用简单的API运行搜索和多个聚合，然后返回所有结果避免网络带宽过大的情况是高效的。
 根据state分组，降序统计top 10 state
 
+
+返回指定的字段，排除不需要的字段
+GET /_search
+{
+    "_source": {
+        "includes": [ "obj1.*", "obj2.*" ],
+        "excludes": [ "*.description" ]
+    },
+    "query" : {
+        "term" : { "user" : "kimchy" }
+    }
+}
 ```
 
 

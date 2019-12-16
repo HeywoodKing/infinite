@@ -1300,7 +1300,11 @@ SHOW INDEX FROM employees FROM employees;
 
 查看数据库大小
 ```
-SELECT table_schema 'database',CONCAT(ROUND(SUM(data_length + index_length) / (1024 * 1024), 2), 'M') size
+SELECT table_schema 'database',
+CONCAT(ROUND(SUM(data_length + index_length) / (1024 * 1024), 2), 'MB') mb_size,
+CONCAT(ROUND(SUM(data_length + index_length) / (1024 * 1024 * 1024), 2), 'GB') gb_size,
+CONCAT(ROUND(SUM(data_length + index_length) / (1024 * 1024 * 1024 * 1024), 4), 'TB') tb_size,
+CONCAT(ROUND(SUM(data_length + index_length) / (1024 * 1024 * 1024 * 1024 * 1024), 6), 'PB') pb_size
 FROM information_schema.TABLES
 WHERE ENGINE in ('MyISAM','InnoDB') and table_schema not in ('information_schema','mysql','sys')
 GROUP BY table_schema;
@@ -1309,19 +1313,20 @@ GROUP BY table_schema;
 
 查看表大小　　
 ```
-SELECT CONCAT(table_schema, '.', table_name) table_name,CONCAT(ROUND(data_length / (1024 * 1024), 2),'M') data_length,
+SELECT CONCAT(table_schema, '.', table_name) table_name,
+CONCAT(ROUND(data_length / (1024 * 1024), 2),'M') data_length,
 CONCAT(ROUND(index_length / (1024 * 1024), 2),'M') index_length,
 CONCAT(ROUND(ROUND(data_length + index_length) / (1024 * 1024),2),'M') total_size,engine
 FROM information_schema.TABLES
-WHERE table_schema NOT IN ('information_schema' , 'performance_schema', 'sys', 'mysql')
+WHERE table_schema NOT IN ('information_schema' , 'performance_schema', 'mysql', 'sys')
 ORDER BY data_length DESC;
 ```
 
 
 查看各个表数据量
 ```
-select table_name,table_rows from information_schema.tables where table_schema = 'magic_online' and table_rows > 0 order by table_rows desc;
-select table_name,table_rows from information_schema.tables where table_schema = 'magic_online' order by table_rows desc;
+select table_name,table_rows from information_schema.tables where table_schema = 'db_test' and table_rows > 0 order by table_rows desc;
+select table_name,table_rows from information_schema.tables where table_schema = 'db_test' order by table_rows desc;
 
 +------------------------------------+------------+
 | table_name                         | table_rows |

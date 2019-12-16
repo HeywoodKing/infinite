@@ -632,6 +632,19 @@ mongorestore -h IP --port 端口 -u 用户名 -p 密码 -d 数据库 --drop 文�
 mongorestore -h IP --port 27017 -u flack -p 123456 -d test --drop D:/MongoDB/Backups/2019-04-27/test  本地不用加 -h IP
 ```
 
+### 修改数据库名
+```
+拷贝数据库后，删除原来的数据库
+db.copyDatabase('old_name', 'new_name'); 
+use old_name 
+db.dropDatabase();
+
+利用renameCollection命令
+db.adminCommand({renameCollection: "db1.test1", to: "db2.test2"})
+```
+
+
+
 
 ## python使用mongodb
 ```
