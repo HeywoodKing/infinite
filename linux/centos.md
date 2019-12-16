@@ -1,4 +1,4 @@
-### center os
+# center
 
 ```
 [root@iZ0xi3h306hbdom7k6ejmjZ ~]# yum --help
@@ -859,7 +859,7 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
  0  3 980600 661724      0 433528   12    6   803   626    1    0  4  1 86  9  0
  0  4 980600 658076      0 434264    0    0  2238  3203 1097  935  3  1 34 63  0
- 
+
 io bo: 磁盘写的数据量稍大，如果是大文件的写，10M以内基本不用担心，如果是小文件写2M以内基本正常
 
 r 表示运行队列的大小，
