@@ -289,6 +289,10 @@ blocking_trx_id：阻塞事务的 ID。
 blocking_lock_id：某一事务的锁的 ID，该事务阻塞了另一事务的运行。可以和 INNODB_LOCKS 表 JOIN。
 ```
 
+查找my.cnf所在目录
+```
+mysql --help | grep my.cnf
+```
 
 手动提交未提交的事物
 ```
@@ -759,6 +763,53 @@ show status like 'table_lock%';
 show status like '%lock%'
 ```
 
+查看开机起来数据库被连接了多少次？
+```
+show status like '%connection%';
++-----------------------------------+---------------------+
+| Variable_name                     | Value               |
++-----------------------------------+---------------------+
+| Connection_errors_accept          | 0                   |
+| Connection_errors_internal        | 0                   |
+| Connection_errors_max_connections | 0                   |
+| Connection_errors_peer_address    | 0                   |
+| Connection_errors_select          | 0                   |
+| Connection_errors_tcpwrap         | 0                   |
+| Connections                       | 7782                |
+| Max_used_connections              | 13                  |
+| Max_used_connections_time         | 2019-12-16 14:03:58 |
++-----------------------------------+---------------------+
+9 rows in set (0.02 sec)
+
+```
+
+
+开启查询缓存
+```
+MySQL [db_electron]> show variables like '%query_cache_type%';
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| query_cache_type | OFF   |
++------------------+-------+
+1 row in set (0.00 sec)
+
+query_cache_size设置为1024*1024*128
+```
+
+修改thread_concurrency值，由目前默认的8，修改为64 thread_concurrency=64
+thread_concurrency应设为CPU核数的2倍. 比如有1个双核的CPU, 那thread_concurrency 的应该为4;2个双核的cpu, thread_concurrency的值应为8.
+```
+MySQL [(none)]> show variables like '%thread_concurrency%';
++---------------------------+-------+
+| Variable_name             | Value |
++---------------------------+-------+
+| innodb_thread_concurrency | 0     |
++---------------------------+-------+
+1 row in set (0.00 sec)
+```
+
+
 查看服务器用运行时长（查看mysql服务器运行时长）
 ```
 show global status like 'uptime';
@@ -861,6 +912,15 @@ SHOW STATUS LIKE 'Thread%';
 ```
 
 修改MySQL最大连接数
+```
+show variables like '%max_connections%';
+
+修改max_user_connections值，由默认的0，修改为800，max_user_connections=800
+针对某一个账号的所有客户端并行连接到MYSQL服务的最大并行连接数。简单说是指同一个账号能够同时连接到mysql服务的最大连接数。
+设置为0表示不限制。查看max_user_connections值
+show variables like 'max_user_connections';
+```
+
 1. 方式一
 ```
 最大连接数:
@@ -1320,6 +1380,14 @@ CONCAT(ROUND(ROUND(data_length + index_length) / (1024 * 1024),2),'M') total_siz
 FROM information_schema.TABLES
 WHERE table_schema NOT IN ('information_schema' , 'performance_schema', 'mysql', 'sys')
 ORDER BY data_length DESC;
+
+SELECT CONCAT(table_schema, '.', table_name) table_name,
+CONCAT(ROUND(data_length / (1024 * 1024), 2),'M') data_length,
+CONCAT(ROUND(index_length / (1024 * 1024), 2),'M') index_length,
+CONCAT(ROUND(ROUND(data_length + index_length) / (1024 * 1024),2),'M') total_size,engine
+FROM information_schema.TABLES
+WHERE table_schema = 'db_electron_to_es'
+ORDER BY table_name asc;
 ```
 
 
@@ -2352,12 +2420,16 @@ a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_
 a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging
 from db_electron.tb_electron a,db_electron_property.tb_electron_factory b 
 where a.factory_id = b.id) c;
+
+
+select * into outfile '/data/mysql_export_dir/segment_electron_hash_data.xlsx' character set gbk fields terminated by '\\t' optionally enclosed by '"' lines terminated by '\\n' from ( select "id","org_id","create_at","update_at","model_name","category_id","org_category_id","factory_id","factory_zh_name", "factory_en_name","source_web","data_sheet_name","data_sheet","state","pintopin","similar","summary","pdf_path","txt_path","packaging" union select a.id,a.org_id,a.create_at,a.update_at,a.model_name,a.category_id,a.org_category_id, a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_web,a.data_sheet_name, a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging from db_electron.tb_electron a,db_electron_property.tb_electron_factory b  where a.factory_id = b.id) c;
+
 ```
 
 
 ### mysql导入文件数据
 ```
-load data infile 'c:/wamp/tmp/Data_OutFile.csv' replace into table data_1 character set utf8 fields terminated by ',' enclosed by '"' lines terminated by '\r\n' (name,age,description );
+load data infile 'c:/wamp/tmp/Data_OutFile.csv' replace into table tb_electron character set utf8 fields terminated by ',' enclosed by '"' lines terminated by '\r\n' (name,age,description );
 
 replace into table data_1   ：指 在表data_1中插入数据时，碰到相同的数据怎么处理。replace是替换。也可以使用ignore，指不处理本条数据。
 character set utf8：  使用字符集 utf8。
@@ -3521,13 +3593,9 @@ mysql出现ERROR : (2006, 'MySQL server has gone away') 问题意思是指client
 mysql> show global status like 'uptime';
 
 +---------------+---------+
-
 | Variable_name | Value   |
-
 +---------------+---------+
-
 | Uptime        | 3414707 |
-
 +---------------+---------+
 
 1 row in set或者查看MySQL的报错日志，看看有没有重启的信息
@@ -3547,31 +3615,18 @@ mysql> show global status like 'uptime';
 mysql> show global variables like '%timeout';
 
 +----------------------------+----------+
-
 | Variable_name              | Value    |
-
 +----------------------------+----------+
-
 | connect_timeout            | 10       |
-
 | delayed_insert_timeout     | 300      |
-
 | innodb_lock_wait_timeout   | 50       |
-
 | innodb_rollback_on_timeout | OFF      |
-
 | interactive_timeout        | 28800    |
-
 | lock_wait_timeout          | 31536000 |
-
 | net_read_timeout           | 30       |
-
 | net_write_timeout          | 60       |
-
 | slave_net_timeout          | 3600     |
-
 | wait_timeout               | 28800    |
-
 +----------------------------+----------+
 
 10 rows in set
@@ -3585,13 +3640,9 @@ wait_timeout 是28800秒，即mysql链接在无操作28800秒后被自动关闭
 mysql> show global status like 'com_kill';
 
 +---------------+-------+
-
 | Variable_name | Value |
-
 +---------------+-------+
-
 | Com_kill      | 21    |
-
 +---------------+-------+
 
 1 row in set原因四. Your SQL statement was too large.
@@ -3603,13 +3654,9 @@ mysql> show global status like 'com_kill';
 mysql> show global variables like 'max_allowed_packet';
 
 +--------------------+---------+
-
 | Variable_name      | Value   |
-
 +--------------------+---------+
-
 | max_allowed_packet | 1048576 |
-
 +--------------------+---------+
 
 1 row in set (0.00 sec)
@@ -3621,13 +3668,9 @@ mysql> set global max_allowed_packet=1024*1024*16;
 mysql> show global variables like 'max_allowed_packet';
 
 +--------------------+----------+
-
 | Variable_name      | Value    |
-
 +--------------------+----------+
-
 | max_allowed_packet | 16777216 |
-
 +--------------------+----------+
 
 1 row in set (0.00 sec)

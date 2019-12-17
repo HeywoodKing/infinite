@@ -102,6 +102,129 @@ http://172.16.22.133:9201/electron_with_kwargs_00/_search
 
 查询某个索引文档的category_id=05050的记录
 http://110.43.50.188:9201/category_with_kwargs/_search?q=category_id:05050
+
+查看帮助
+http://192.168.1.169:9200/_cat/master?help
+
+查看索引(列出所有索引及存储大小)
+http://192.168.1.169:9200/_cat/indices?v
+
+Verbose 显示列名
+http://192.168.1.169:9200/_cat/master?v
+
+Headers 只显示特定列
+health status index                   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+http://192.168.1.169:9200/_cat/indices?v
+http://192.168.1.169:9200/_cat/master?v&h=host,ip,node
+
+数字格式化
+http://192.168.1.169:9200/_cat/indices?v&h=index,docs.count,store.size&bytes=kb
+
+Format 输出格式：
+#以json格式输出 format=json&pretty
+http://192.168.1.169:9200/_cat/indices?v&h=index,docs.count,store.size&bytes=kb&format=json&pretty
+
+#以yaml格式输出 format=yaml&pretty
+http://192.168.1.169:9200/_cat/indices?v&h=index,docs.count,store.size&bytes=kb&format=yaml&pretty
+
+Sort 排序
+#按index升序，docs.count降序
+http://192.168.1.169:9200/_cat/indices?v&bytes=kb&s=index:asc,docs.count:desc
+
+#按index升序，docs.count降序
+http://110.43.50.188:9201/_cat/indices?v&s=index:asc,docs.count:desc
+
+#按index升序，docs.count降序
+http://192.168.1.169:9200/_cat/indices?v&h=index,docs.count,store.size&bytes=kb&format=json&pretty&s=index,docs.count:desc
+
+查看集群健康状态
+http://192.168.1.169:9200/_cat/health?v&h=cluster,status
+http://192.168.0.12:9200/_cluster/health?pretty
+
+向_cluster API发送放置请求以定义要打开的慢速日志级别：警告，信息，调试和跟踪
+http://localhost:9201/_cluster/settings -H 'Content-Type: application/json' -d'
+
+查看集群节点和磁盘剩余
+#集群节点
+http://192.168.1.169:9200/_cat/nodes?v
+
+#磁盘剩余
+http://192.168.1.169:9200/_cat/nodes?v&h=ip,node.role,name,disk.avail
+
+查看集群master节点
+http://192.168.1.169:9200/_cat/master?v
+
+查看分配
+#查看每个数据节点上的分片数(shards)，以及每个数据节点磁盘剩余
+http://192.168.1.169:9200/_cat/allocation?v
+
+查看被挂起任务
+http://192.168.1.169:9200/_cat/pending_tasks?v
+
+查看每个节点正在运行的插件
+http://192.168.1.169:9200/_cat/plugins?v
+
+查看每个节点的自定义属性
+http://192.168.1.169:9200/_cat/nodeattrs?v
+
+查看索引分片的恢复视图
+#索引分片的恢复视图,包括正在进行和先前已完成的恢复
+#只要索引分片移动到群集中的其他节点，就会发生恢复事件
+http://192.168.1.169:9200/_cat/recovery/.kibana?v&format=json&pretty
+
+查看每个数据节点上fielddata当前占用的堆内存
+全文检索用倒排索引非常合适;但过滤、分组聚合、排序这些操作，正排索引更合适。
+ES中引入了fielddata的数据结构用来做正排索引。如果需要对某一个字段排序、分组聚合、过滤，则可将字段设置成fielddata。
+
+默认情况下:
+text类型的字段是不能分组及排序的，如需要则需要开启该字段的fielddata=true,但是这样耗费大量的内存，不建议这么使用。
+keyword类型默认可分组及排序。
+fielddata默认是采用懒加载的机制加载到堆内存中。当某个字段基数特别大，可能会出现OOM。
+
+http://192.168.1.169:9200/_cat/fielddata?v&h=node,field,size
+
+#对某一字段进行查看
+http://192.168.1.169:9200/_cat/fielddata?v&h=node,field,size&fields=kibana_stats.kibana.uuid
+
+
+查看注册的快照仓库
+http://192.168.1.169:9200/_cat/repositories?v
+
+查看快照仓库下的快照
+#可将ES中的一个或多个索引定期备份到如HDFS、S3等更可靠的文件系统，以应对灾难性的故障
+#第一次快照是一个完整拷贝，所有后续快照则保留的是已存快照和新数据之间的差异
+#当出现灾难性故障时，可基于快照恢复
+
+http://192.168.1.169:9200/_cat/snapshots/repo1?v
+
+查看每个节点线程池的统计信息
+#查看每个节点bulk线程池的统计信息
+# actinve（活跃的），queue（队列中的）和 reject（拒绝的）
+http://192.168.1.169:9200/_cat/thread_pool/bulk?v&format=json&pretty
+
+查看索引
+http://192.168.1.169:9200/_cat/indices/.monitoring*?v&h=index,health
+
+查看别名
+http://192.168.1.169:9200/_cat/aliases?v&h=alias,index
+
+查看索引模板
+http://192.168.1.169:9200/_cat/templates?v&format=json&pretty
+
+查看单个或某类或整个集群文档数
+#整个集群文档数
+http://192.168.1.169:9200/_cat/count?v
+
+#某类索引文档数
+http://192.168.1.169:9200/_cat/count/.monitoring*?v
+
+查看每个索引的分片
+http://192.168.1.169:9200/_cat/shards?v&format=json&pretty&s=index
+
+查看每个索引的segment
+http://192.168.1.169:9200/_cat/segments/.kibana?v&format=json&pretty
+
+
 ```
 
 
