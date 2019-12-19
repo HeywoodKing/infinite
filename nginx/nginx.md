@@ -70,12 +70,20 @@ service nginx stop
 sudo systemctl restart nginx
 sudo /etc/init.d/nginx restart
 service nginx restart
+
+sudo nginx -s reload
 ```
 
 ### 查看错误日志
 ```
 grep /var/log/nginx/error.log
 ```
+
+### 建立软连接
+```
+sudo ln -s /etc/nginx/sites-available/default-filter /etc/nginx/sites-enabled/default-filter
+```
+
 
 ### 打开nginx.conf配置文件编辑
 ```
