@@ -686,7 +686,47 @@ POST twitter/_update_by_query?conflicts=proceed
 Reindex
 POST /_reindex
 
+```
 
+#### search APIs
+```
+POST /twitter/_doc?routing=kimchy
+{
+    "user" : "kimchy",
+    "post_date" : "2009-11-15T14:12:12",
+    "message" : "trying out Elasticsearch"
+}
+
+POST /twitter/_search?routing=kimchy
+{
+    "query": {
+        "bool" : {
+            "must" : {
+                "query_string" : {
+                    "query" : "some query string here"
+                }
+            },
+            "filter" : {
+                "term" : { "user" : "kimchy" }
+            }
+        }
+    }
+}
+
+PUT /_cluster/settings
+{
+    "transient": {
+        "cluster.routing.use_adaptive_replica_selection": false
+    }
+}
+
+POST /_search
+{
+    "query" : {
+        "match_all" : {}
+    },
+    "stats" : ["group1", "group2"]
+}
 ```
 
 
