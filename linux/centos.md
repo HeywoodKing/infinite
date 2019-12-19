@@ -267,6 +267,23 @@ find /data/digikey/800/ -type f -size 0 | wc -l
 查找大于100M的文件
 find /data/digikey/800/ -size +100M -exec ls -lh {} \;
 
+查找大于100M的文件数量
+find /data/digikey/800/ -type f -size +100M | wc -l
+
+查找大于100字节的文件数量
+find /data4/new_pdf/ -type f -size +100 | wc -l
+
+查找后缀为.pdf的文件数量
+find /data4/new_pdf/ -type f  -name '*.pdf' | wc -l
+
+查找后缀为.txt的文件数量
+find /data4/new_pdf/ -type f  -name '*.txt' | wc -l
+
+查找后缀为.txt,大小大于100字节的文件数量
+find /data4/new_pdf/ -type f  -name '*.txt' -size +100b | wc -l
+
+
+
 删除文件大小为0k的文件
 find /data/digikey/800 -name "*" -type f -size 0c | xargs -n 1 rm -f
 

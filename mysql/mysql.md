@@ -654,25 +654,22 @@ select * from subjects
 
 添加索引
 ```
-1.添加PRIMARY KEY（主键索引） 
-ALTER TABLE `students` ADD PRIMARY KEY ( `column` ) 
+1.添加PRIMARY KEY（主键索引）
+ALTER TABLE `students` ADD PRIMARY KEY (`column`)
 
-2.添加UNIQUE(唯一索引) 
-mysql>ALTER TABLE `students` ADD UNIQUE ( 
-`column` 
-) 
+2.添加UNIQUE(唯一索引)
+ALTER TABLE `students` ADD UNIQUE (`column`)
 
 3.添加INDEX(普通索引) 
-ALTER TABLE `students` ADD INDEX index_name ( `column` ) 
-ALTER TABLE students ADD INDEX idx_name(NAME);
-
-ALTER TABLE students ADD key idx_name(NAME) using btree;
+ALTER TABLE `students` ADD INDEX index_name (`column`)
+ALTER TABLE `students` ADD key idx_name(NAME) using btree;
+ALTER TABLE `students` ADD INDEX idx_name(NAME);
 
 4.添加FULLTEXT(全文索引) 
-ALTER TABLE `students` ADD FULLTEXT ( `column`) 
+ALTER TABLE `students` ADD FULLTEXT (`column`)
 
 5.添加多列索引 
-ALTER TABLE `students` ADD INDEX index_name ( `column1`, `column2`, `column3` )
+ALTER TABLE `students` ADD INDEX index_name (`column1`, `column2`, `column3`)
 ```
 
 修改索引名
@@ -685,11 +682,6 @@ ALTER TABLE tbl_name DROP INDEX old_index_name
 ALTER TABLE tbl_name ADD INDEX new_index_name(column_name)
 ```
 
-添加主键约束(添加主键唯一性约束)
-```
-alter table students add primarykey(id);
-```
-
 删除索引
 ```
 drop index idx_students_id on students;
@@ -698,13 +690,17 @@ alter table students drop index index_name ;
 alter table students drop primary key;
 ```
 
+添加主键约束(添加主键唯一性约束)
+```
+alter table students add primarykey(id);
+```
+
 删除唯一约束
 ```
 DROP INDEX index_name ON students
 或ALTER TABLE语法：
 ALTER TABLE students DROP INDEX index_name
 ```
-
 
 删除主键
 ```
@@ -845,6 +841,35 @@ show full processlist;
 ```
 show variables like '%timeout%';
 show variables like '%secure%';
+```
+
+查询最近执行的sql语句
+```
+先查看一下二进制的记录日志是否打开
+show variables where variable_name = 'general_log';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| general_log   | OFF   |
++---------------+-------+
+1 row in set (0.12 sec)
+如果是OFF。则需要打开这个选项
+set global general_log = on;
+
+然后确认一下默认的log产生在哪里
+show variables where variable_name = 'general_log_file';
++------------------+---------------------------------------+
+| Variable_name    | Value                                 |
++------------------+---------------------------------------+
+| general_log_file | /data/mysql_zabbix/data/localhost.log |
++------------------+---------------------------------------+
+1 row in set (0.00 sec)
+
+然后搜索一下它，得到日志路径
+find /data/mysql_zabbix/data/ -name "localhost.log"
+
+查看日志内容
+sudo tail -n 50 /data/mysql_zabbix/data/localhost.log
 ```
 
 查看所有变量
@@ -3898,6 +3923,11 @@ sqlalchemy.exc.InternalError: (pymysql.err.InternalError) Packet sequence number
 ```
 
 ### (1205, 'Lock wait timeout exceeded; try restarting transaction')
+```
+
+```
+
+### (1213, 'Deadlock found when trying to get lock; try restarting transaction')
 ```
 
 ```
