@@ -458,6 +458,8 @@ cat /etc/sysconfig/selinux
 
 + 使用CentOS常用命令查看ip，mac地址,在ifcfg-eth0 文件里你可以看到mac，网关等信息。
 ```
+ip a
+
 ifconfig
 cat /etc/sysconfig/network-scripts/ifcfg-eth0 | grep IPADDR
 cat /etc/sysconfig/network-scripts/ifcfg-eth0 | grep IPADDR | cut -f2

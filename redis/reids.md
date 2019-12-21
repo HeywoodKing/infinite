@@ -579,12 +579,12 @@ aaron
 ```
 
 
-##Redis高可用集群之水平扩展
+## Redis高可用集群之水平扩展
 Redis3.0以后的版本虽然有了集群功能，提供了比之前版本的哨兵模式更高的性能与可用性，但是集群的水平扩展却比较麻烦，今天就来带大家看看redis高可用集群如何做水平扩展，原始集群(见下图)由6个节点组成，且6个节点都在一台机器上(ip为192.168.0.61)，采用伪分布式的三主三从模式，集群搭建方法请参考<轻松搭建Redis缓存高可用集群>
 
 ![redis集群](https://static.oschina.net/uploads/img/201804/02213913_dF5B.jpg "redis集群")
 
-###1、启动集群
+### 1、启动集群
 ```
 # 启动整个集群
  /usr/local/redis/bin/redis-server /usr/local/redis-cluster/8001/redis.conf
@@ -605,7 +605,7 @@ Redis3.0以后的版本虽然有了集群功能，提供了比之前版本的哨
 
 从上图可以看出，整个集群运行正常，三个master节点和三个slave节点，8001端口的实例节点存储0-5460这些hash槽，8002端口的实例节点存储5461-10922这些hash槽，8003端口的实例节点存储10923-16383这些hash槽，这三个master节点存储的所有hash槽组成redis集群的存储槽位，slave点是每个主节点的备份从节点，不显示存储槽位
 
-###2、集群操作
+### 2、集群操作
 我们在原始集群基础上再增加一主(8007)一从(8008)，增加节点后的集群参见下图，新增节点用虚线框表示﻿
 ![集群操作](https://static.oschina.net/uploads/space/2018/0402/210834_YNoy_3796575.png "集群操作")
 
@@ -686,7 +686,7 @@ Do you want to proceed with the proposed reshard plan (yes/no)? yes
 (ps:输入yes确认开始执行分片任务)
 ```
 
-####查看最新的集﻿群状态
+#### 查看最新的集﻿群状态
 ![查看最新的集﻿群状态](https://static.oschina.net/uploads/space/2018/0402/211822_TUZq_3796575.png "查看最新的集﻿群状态")
 
 如上图所示，现在我们的8007已经有hash槽了，也就是说可以在8007上进行读写数据啦！到此为止我们的8007已经加入到集群中，并且是主节点(Master)
@@ -706,7 +706,7 @@ Do you want to proceed with the proposed reshard plan (yes/no)? yes
 
 192.168.0.61:8008> cluster replicate eb57a5700ee6f9ff099b3ce0d03b1a50ff247c3c
 
-####查看集群状态，8008节点已成功添加为8007的从节点﻿
+#### 查看集群状态，8008节点已成功添加为8007的从节点﻿
 ![示例](https://static.oschina.net/uploads/space/2018/0402/212251_JqVp_3796575.png "示例")
 
 + 5）删除8008从节点
@@ -752,7 +752,7 @@ Do you want to proceed with the proposed reshard plan (yes/no)? Yes
 至此，我们已经成功的把8007主节点的数据迁移到8001上去了，我们可以看一下现在的集群状态如下图，你会发现8007下面已经没有任何hash槽了，证明迁移成功！
 ![示例](https://static.oschina.net/uploads/space/2018/0402/212814_xFrV_3796575.png "示例")
 
-####最后我们直接使用del-node命令删除8007主节点即可（红色表示8007的节点id）
+#### 最后我们直接使用del-node命令删除8007主节点即可（红色表示8007的节点id）
 ```
 /usr/local/redis-3.0.0/src/redis-trib.rb del-node 192.168.0.61:8007 eb57a5700ee6f9ff099b3ce0d03b1a50ff247c3c
 ```
