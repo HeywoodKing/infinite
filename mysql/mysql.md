@@ -374,9 +374,6 @@ DELIMITER ;
 call pro_update_auto_increment_to_max('db_electron_property_online.tb_electron_area', 'id');
 
 
-```
-
-
 desc information_schema.INNODB_LOCKS;
 +————-+———————+——+—–+———+——-+
 | Field       | Type                | Null | Key | Default | Extra |
@@ -432,7 +429,13 @@ desc information_schema.innodb_trx ;
 | trx_adaptive_hash_latched  | int(1)              | NO   |     | 0                   |       |#
 | trx_adaptive_hash_timeout  | bigint(21) unsigned | NO   |     | 0                   |       |#
 +—————————-+———————+——+—–+———————+——-+
+```
 
+mysql查询某一个字段是否包含中文字符
+在使用mysql时候，某些字段会存储中文字符，或是包含中文字符的串，查询出来的方法是：
+```
+SELECT col FROM table WHERE length(col)!=char_length(col);
+```
 
 插入表数据
 ```
@@ -1415,6 +1418,10 @@ WHERE table_schema = 'db_electron_to_es'
 ORDER BY table_name asc;
 ```
 
+统计所有表数据（在生产环境中不建议使用，因为会锁表！）
+```
+Analyze table tb_electron_with_kwargs;
+```
 
 查看各个表数据量
 ```

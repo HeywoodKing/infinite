@@ -684,6 +684,9 @@ chkconfig --list | grep on # 列出所有启动的系统服务
 
 + 查看磁盘io
 如果 iostat 没有，要 yum install sysstat安装这个包
+iostat主要用于监控系统设备的IO负载情况，iostat首次运行时显示自系统启动开始的各项统计信息，之后运行iostat将显示自上次运行该命令以后的统计信息。用户可以通过指定统计的次数和时间来获得所需的统计信息
+
+iostat [ -c ] [ -d ] [ -h ] [ -N ] [ -k | -m ] [ -t ] [ -V ] [ -x ] [ -z ] [ device [...] | ALL ] [ -p [ device [,...] | ALL ] ] [ interval [ count ] ]
 ```
 iostat -c 1 10
 iostat还可以用来获取cpu部分状态值：
@@ -731,6 +734,22 @@ Average:        all      4.51      0.00      2.86     81.94      0.00     10.69
 %wio指的是等待io完成的百分比，这是值得观注的一项;
 %idle即空闲的百分比。
 如果wio列的值很大，如在35%以上，说明系统的IO存在瓶颈，CPU花费了很大的时间去等待I/O的完成。Idle很小说明系统CPU很忙。像以上的示例，可以看到wio平均值为11，说明I/O没什么特别的问题，而idle值为零，说明cpu已经满负荷运行了
+
+
+指定监控的设备名称为sda，该命令的输出结果和上面命令完全相同。
+iostat -d sda 2
+
+
+iostat还有一个比较常用的选项-x，该选项将用于显示和io相关的扩展数据。
+iostat -d -x -k 1 10
+
+
+iostat还可以用来获取cpu部分状态值：
+iostat -c 1 10
+
+iostat -d -k 1 10         #查看TPS和吞吐量信息(磁盘读写速度单位为KB)
+iostat -d -m 2            #查看TPS和吞吐量信息(磁盘读写速度单位为MB)
+iostat -d -x -k 1 10      #查看设备使用率（%util）、响应时间（await） iostat -c 1 10 #查看cpu状态
 
 
 top
@@ -836,6 +855,24 @@ cat /proc/cpuinfo
 
 查看进程状态
 cat /proc/进程id/status
+
+eg:
+cat /proc/8120/status
+/proc/[pid]/status中所保存的信息除了内存信息，还包括进程IDs、信号等信息，此处暂时只介绍内存相关的信息
+
+字段 说明
+VmPeak    进程所使用的虚拟内存的峰值
+VmSize    进程当前使用的虚拟内存的大小
+VmLck     已经锁住的物理内存的大小（锁住的物理内存不能交换到硬盘）
+VmHWM     进程所使用的物理内存的峰值
+VmRSS     进程当前使用的物理内存的大小
+VmData    进程占用的数据段大小
+VmStk     进程占用的栈大小
+VmExe     进程占用的代码段大小（不包括库）
+VmLib     进程所加载的动态库所占用的内存大小（可能与其它进程共享）
+VmPTE     进程占用的页表大小（交换表项数量）
+VmSwap    进程所使用的交换区的大小
+
 
 查看经常地址空间信息
 cat /proc/进程id/maps
