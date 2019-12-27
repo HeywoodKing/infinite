@@ -1788,4 +1788,51 @@ systemctl disable firewalld.service
 /usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf update //更新全部conf文件
 
 ```
+centos 使用 supervisor 守护进程
+2019.10.23 22:37 409浏览
+程序运行稳定一直我们期望的结果，但是，我们不能期望它永远不出问题，一旦程序因为一些特殊原因终止运行，在实战中是一个可怕的事情。那么有什么好的办法可以对程序进行监控，如果退出就重启呢，这里我使用过一个线程守护工具supervisor。
+
+但其实这个supervisor 现在已经很老了，现在也应该有其他的方案可以替代，这里作为笔记还是记下来使用过程，毕竟使用了才有话语权。
+
+安装：
+pip install supervisor
+
+生成配置文件：
+echo_supervisord_conf > /etc/supervisord.conf
+
+启动
+supervisord -c /etc/supervisord.conf
+
+查看是否运行
+ps aux | grep supervisord
+
+配置
+vim /etc/supervisord.conf
+
+添加如下内容：
+
+[include]
+files=/etc/supervisor/*.conf #若你本地无/etc/supervisor目录，请自建
+cd /etc/supervisor
+以ss为例，写一个守护线程：
+vim /etc/supervisor/shadowsocks.conf
+
+[program:shadowsocks]
+  command = ssserver -c /etc/shadowsocks.json
+  user = root
+  autostart = true
+  autoresart = true
+  stderr_logfile = /var/log/supervisor/ss.stderr.log
+  stdout_logfile = /var/log/supervisor/ss.stdout.log
+  
+重新加载配置：
+supervisorctl reload
+
+命令
+supervisord : 启动
+supervisorctl reload :修改完配置文件后重新启动
+supervisorctl status :查看supervisor监管的进程状态
+supervisorctl start 进程名 ：启动XXX进程
+supervisorctl stop 进程名 ：停止XXX进程
+supervisorctl stop all：停止全部进程，注：start、restart、stop都不会载入最新的配置文件。
 
