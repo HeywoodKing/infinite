@@ -1630,3 +1630,162 @@ java -version
 ```
 
 
+### chmod
+```
+使用权限:所有使用者 
+使用方式:chmod [-cfvR] [–help] [–version] mode file… 
+必要参数： 
+-c 当发生改变时，报告处理信息 
+-f 错误信息不输出 
+-R 处理指定目录以及其子目录下的所有文件 
+-v 运行时显示详细处理信息 
+该命令有两种用法。一种是包含字母和操作符表达式的文字设定法；另一种是包含数字的数字设定法。 
+1) 文字设定法: 
+chmod ［who］ ［+ | - | =］ ［mode］ 文件名 
+who: (ugoa) 
+u 表示该文件的拥有者(user) 
+g 表示与该文件的拥有者属于同一个群体(group)者 
+o 表示其他以外的人(other) 
+a 表示这三者皆是(all) 
++ /- / =： 
++ 表示增加权限 
+- 表示取消权限 
+= 表示唯一设定权限 
+mode: 
+r:读权限，用数字4表示 
+w:写权限，用数字2表示 
+x:执行权限，用数字1表示 
+2) 数字设定法 
+chmod ［mode］ 文件名 
+用数字表示的属性的含义：0表示没有权限，1表示可执行权限，2表示可写权限，4表示可读权限，然后将其相加。所以数字属性的格式应为3个从0到7的八进制数，其顺序是(u)(g)(o) 
+数字与字符对应关系如下： 
+r=4，w=2，x=1 
+若要rwx属性则4+2+1=7 
+若要rw-属性则4+2=6 
+若要r-x属性则4+1=5
+
+drwxr-xrwx 4 root root 28 3月 3 07:18 test 
+-rw-r–r– 1 root root 334 3月 3 07:39 test.txt 
+每行代表一个文件或目录，d代表目录，-代表文件。后面紧跟着的是该文件或目录的权限，前三位代表的是文件拥有者的权限，中间三位代表的是文件组权限，后三位代表的是其它用户的权限。 
+例子： 
+将档案 test.txt 设为所有人皆可读取 : 
+chmod -v ugo+r test.txt 等价于# chmod –v a+r test.txt 
+将档案 test1.txt设为该文件拥有者，与其所属同一个群体者可写入，但其他以外的人则不可写入 : 
+chmod –v ug+w,o-w test1.txt 
+将 test2.txt设定为只有该文件拥有者可以执行 : 
+chmod u+x test2.txt 
+将目前目录下的所有档案与子目录皆设为任何人可读取 : 
+chmod -R a+r * 
+chmod a=rwx test.txt和 # chmod 777 test.txt效果相同 
+chmod ug=rwx,o=x test.txt和 chmod 771 test.txt 效果相同
+
+```
+
+
+### chown
+```
+使用权限 : root 
+使用方式 : chown [-cfhvR] [–help] [–version] user[:group] file… 
+必要参数: 
+-c 显示更改的部分的信息 
+-f 忽略错误信息 
+-h 修复符号链接 
+-R 处理指定目录以及其子目录下的所有文件 
+-v 显示详细的处理信息 
+-deference 作用于符号链接的指向，而不是链接文件本身 
+例子： 
+改变拥有者和群组 
+chown mail:mail test.txt 
+改变文件拥有者和群组 
+chown root: test.txt 
+改变文件群组 
+chown :mail test.txt
+```
+
+
+### centos 安装supservisor
+```
+CentOS安装Supervisor
+什么是Supervisor
+Supervisor是一个进程控制系统。 它是一个C/S系统,服务端是supervisord进程，控制端使用supervisorctl来进行控制启动进程。同时它也提供了一个web界面，来可以使我们方便的进行进程的控制和查看日志信息。 
+
+本篇博客将介绍如何安装/配置Supeivisor，希望能对你有所帮助。
+
+下载
+Supervisor是基于Python开发的，因此下载可以使用Python的pip命令（推荐使用pip方式安装）
+
+pip3 install git+https://github.com/Supervisor/supervisor
+如出现错误
+
+
+
+是因为你没有安装 git ，使用 yum install git 来安装git
+
+配置
+我们进入一个目录准备配置 Supervisor
+
+我个人习惯将所有自己安装的软件放至 /usr/lib 下面
+
+cd进入
+
+cd /usr/lib
+新建文件夹 supervisor
+
+mkdir supervisor
+进入 新建的文件夹
+
+cd supervisor/
+将 supervisor 的配置导入该目录
+
+echo_supervisord_conf > /usr/lib/supervisor/supervisord.conf
+如提示
+
+
+
+请指定supervisor的安装位置，如
+
+/usr/lib/python3/bin/echo_supervisord_conf > /usr/lib/supervisor/supervisord.conf
+命令完成后我们看到目录下多了 supervisord.conf 文件
+
+
+
+我们新建文件夹 config 存放以后的项目配置文件
+
+mkdir config
+我们使用vim编辑该配置文件
+
+vim supervisord.conf
+配置里有很多选项,更多的配置请网路搜索或查询官方文档（EN）
+
+修改以下选项
+
+然后我们保存，退出
+
+再启动 supervisord
+
+/usr/lib/python3/bin/supervisord -c /usr/lib/supervisor/supervisord.conf
+我们来启动查看是否成功
+
+/usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf
+出现以下界面而没有错误提示代表成功
+
+
+
+如出现如下
+
+
+
+请关闭防火墙,然后确保每次都使用 -c 指定conf
+
+systemctl stop firewalld.service
+systemctl disable firewalld.service
+ 
+
+ 常用命令
+复制代码
+/usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf reload //重启supervisor
+/usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf restart //重启某个conf，加 all 指重启全部
+/usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf update //更新全部conf文件
+
+```
+
