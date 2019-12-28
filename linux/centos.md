@@ -1836,3 +1836,9 @@ supervisorctl start 进程名 ：启动XXX进程
 supervisorctl stop 进程名 ：停止XXX进程
 supervisorctl stop all：停止全部进程，注：start、restart、stop都不会载入最新的配置文件。
 
+
+```
+whereis nginx
+sudo netstat -anp | grep nginx
+ps -ef | grep nginx
+```

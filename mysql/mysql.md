@@ -2430,7 +2430,9 @@ select id,model_name,images,source_web,data_sheet from tb_electron where factory
 select id,model_name,images,source_web,data_sheet from tb_electron order by id desc into outfile '/data/mysql_export_dir/".$file_name."' fields terminated by ',' optionally enclosed by '\"' escaped by '\"' lines terminated by '\r\n' 
 
 带表头:
-select * into outfile '/data/mysql_export_dir/tb_extra_category_params.xlsx' fields terminated by '\\t' OPTIONALLY ENCLOSED BY '"' lines terminated by '\\n' from (select '姓名','性别','年龄' union select username,sex,age from table) b;
+select * from (select '姓名','性别','年龄' union select username,sex,age from table) b into outfile '/data/mysql_export_dir/tb_extra_category_params.xlsx' fields terminated by '\\t' OPTIONALLY ENCLOSED BY '"' lines terminated by '\\n';
+
+select a.category_id,min(b.cname),min(b.ename),count(*) from db_electron.tb_electron_digikey a,db_electron_property.tb_electron_category b where a.category_id = b.category_id group by a.category_id into outfile '/data/mysql_export_dir/category_electron_count.xlsx' character set gbk  fields terminated by '\\t' optionally enclosed by '"' lines terminated by '\\n';
 
 
 -- 导出不带标题的xlsx

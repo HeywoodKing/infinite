@@ -74,6 +74,76 @@ service nginx restart
 sudo nginx -s reload
 ```
 
+### 查看状态
+```
+sudo systemctl status nginx
+sudo /etc/init.d/nginx status
+service nginx status
+```
+
+### 重载让配置生效，而不会丢失链接
+```
+sudo systemctl reload nginx
+sudo /etc/init.d/nginx reload
+service nginx reload
+```
+
+### 配置nginx随服务器启动而启动
+```
+sudo systemctl enable nginx
+```
+
+### 禁用nginx随服务器启动而启动
+```
+sudo systemctl disable nginx
+```
+
+
+```
+./nginx -s stop
+./nginx -s start
+./nginx -s quit
+./nginx -s reload
+```
+
+### 查看防火墙
+```
+sudo ufw app list
+
+可用应用程序：
+  CUPS
+  Nginx Full
+  Nginx HTTP
+  Nginx HTTPS
+  OpenSSH
+
+正如你所看到的，Nginx有三个配置文件可用：Nginx Full、Nginx HTTP、Nginx HTTPS
+Nginx Full ：此配置文件打开端口80（正常，未加密的网络流量）和端口443（TLS / SSL加密流量）
+Nginx HTTP ：此配置文件仅打开端口80（正常，未加密的网络流量）
+Nginx HTTPS ：此配置文件仅打开端口443（TLS / SSL加密流量）
+```
+
+### 查看防火墙状态
+```
+sudo ufw status
+```
+
+### 开启防火墙,启动防火墙
+```
+sudo ufw enable
+```
+
+### 关闭防火墙
+```
+sudo ufw disable
+```
+
+### 允许服务通过防火墙
+```
+sudo ufw allow 'Ningx HTTP'
+sudo ufw allow 'Ningx HTTPS'
+```
+
 ### 查看错误日志
 ```
 grep /var/log/nginx/error.log
@@ -82,6 +152,7 @@ grep /var/log/nginx/error.log
 ### 建立软连接
 ```
 sudo ln -s /etc/nginx/sites-available/default-filter /etc/nginx/sites-enabled/default-filter
+sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
 ```
 
 
@@ -120,6 +191,23 @@ sudo systemctl enable nginx
 
 ### 查看80进程
 `sudo lsof -i：80`
+
+
+### Nginx文件和目录
++ nginx服务器配置文件：
+```
+/etc/nginx ：Nginx配置目录。 所有的Nginx配置文件都驻留在这里。
+/etc/nginx/nginx.conf ：主要的Nginx配置文件。 这可以修改，以更改Nginx全局配置。
+/etc/nginx/sites-available/ ：可存储每个站点服务器块的目录。 除非将Nginx链接到sites-enabled了sites-enabled目录，否则Nginx不会使用此目录中的配置文件。 通常，所有服务器块配置都在此目录中完成，然后通过链接到其他目录启用。
+/etc/nginx/sites-enabled/ ：存储启用的每个站点服务器块的目录。 通常，这些是通过链接到sites-available目录中的配置文件创建的。
+/etc/nginx/snippets ：这个目录包含可以包含在Nginx配置其他地方的配置片段。 可重复配置的片段可以重构为片段。
+```
++ nginx服务器日志文件：
+```
+/var/log/nginx/access.log ：除非Nginx配置为其他方式，否则每个对您的Web服务器的请求都会记录在此日志文件中。
+/var/log/nginx/error.log ：任何Nginx错误都会记录在这个日志中
+```
+
 
 ### 配置防火墙
 >

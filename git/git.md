@@ -480,6 +480,8 @@ ssh-keygen -t rsa -C "YOUR_EMAIL@YOUREMAIL.COM" -f ~/.ssh/aysee
 ```
 eg:
 $ ssh-keygen -t rsa -C "opencoding@hotmail.com" -f D:/Flack/Work/.ssh/aysee
+$ ssh-keygen -t rsa -C "flack.chen" -f D:/flack/work/.ssh/110.43.50.188
+
 ```
 执行完成后，会在 ~/.ssh/目录下生成一个 aysee 和 aysee.pub 文件。
 2、在 SSH 用户配置文件 ~/.ssh/config 中指定对应服务所使用的公秘钥名称，如果没有 config 文件的话就新建一个，并输入以下内容：
