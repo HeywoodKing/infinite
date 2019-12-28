@@ -17,6 +17,11 @@ pip install SomePackage
 
 安装使用清华源
 pip install package_name -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+安装使用豆瓣源
+pip install package_name --trusted-host pypi.douban.com -i http://pypi.douban.com/simple
+
+pip --default-timeout=100 install package_name
 ```
 
 ## 卸载包 
@@ -26,7 +31,13 @@ pip uninstall SomePackage
 
 ## 升级指定的包
 ```
-pip install -U SomePackage
+升级指定包
+pip install -U package_name
+或
+pip install --upgrade package_name
+
+从豆瓣源升级指定包
+pip install package_name -i http://e.pypi.python.org --trusted-host e.pypi.python.org --upgrade
 ```
 
 ## 搜索包

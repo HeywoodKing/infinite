@@ -200,3 +200,35 @@ or available locally via: info '(coreutils) date invocation'
 flack@flack-K43SM:~/.local/share/virtualenvs/DataXWeb-aU-zDc
 ```
 
+### Ubuntu安装SSH SERVER
+```
+sudo apt-get update
+sudo apt-get install openssh-server
+
+```
+安装好后查看SSH是否启动 
+```
+sudo ps -ef |grep ssh
+```
+有sshd,说明ssh服务已经启动，如果没有启动,启动ssh服务
+```
+sudo service ssh start
+```
+
+使用gedit修改配置文件”/etc/ssh/sshd_config” 获取远程ROOT权限
+```
+sudo gedit /etc/ssh/sshd_config
+
+PermitRootLogin without-password
+修改为：
+# PermitRootLogin without-password
+PermitRootLogin yes
+```
+保存退出，修改成功
+
+### 卸载openssh
+```
+apt-get purge openssh-client
+```
+
+
