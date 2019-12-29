@@ -17,6 +17,10 @@ Shift+Ctrl+Alt+R 记录一小段屏幕录像
 ls
 ll
 ls -a
+ls --full-time --author -la
+man ls 
+info ls
+
 pwd
 cd ~
 whereis python
@@ -151,37 +155,54 @@ sudo apt-get --fix-broken install
 ```
 
 ### 修改权限
-```
 1. 修改chfweb文件夹权限为777
+```
 sudo chmod 777 chfweb
 sudo chmod 777 /data1/from_163/digikey_pdf6/ -R
+```
 2. 修改文件夹chfweb以及子文件夹和子文件的权限为777
+```
 sudo chmod -R 777 chfweb
+```
 3. 增加组
-`sudo groupadd --system webapps`
+```
+sudo groupadd --system webapps
+```
 
 4. 增加用户
 用户名为user_test
-`sudo useradd --system --gid webapps --shell /bin/bash --home /webapps/test user_test`
+```
+sudo useradd --system --gid webapps --shell /bin/bash --home /webapps/test user_test
+```
 
 设置密码为：test
-`passwd test`
+```
+passwd test
+```
 
 5. 给用户赋值权限
 创建用户目录
-`mkdir -p /webapps/test`
+```
+mkdir -p /webapps/test
+```
 修改目录权限，下面的命令意思是：使/webapps/test/这个目录属于user_test这个用户
-`chown user_test /webapps/test/`
+```
+chown user_test /webapps/test/
+```
 
 添加用户user_test sudo权限 
 在/etc/sudoers添加 
 使用命令vim /etc/sudoers打开/etc/sudoers 
 在里面添加下面这一句：
-`user_test ALL=(ALL:ALL) ALL`
+```
+user_test ALL=(ALL:ALL) ALL
+```
 使用:wq!强制保存
 
 切换用户为：user_test
-`su - user_test`
+```
+su - user_test
+```
 
 6. 修改python默认版本
 ```
@@ -190,10 +211,71 @@ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
 sudo update-alternatives --config python3
 ```
-7. 
 
+#### chgrp 改变用户所属用户组
+```
+chgrp users -R /home/flack.chen/log.txt
+```
+
+
+#### chown 改变文件所有者
+```
+chown flack.chen -R install.log
+
+修改文件夹以及下属子目录和文件所属用户为root,用户组为root
+chown root:root -R /home/flack.chen
+
+修改文件所属用户为root,用户组为root
+chown root.root install.log
+
+修改文件所属用户组为root
+chown .root -R install.log
+```
+
+#### chmod 改变文件权限
+```
+-rwxrwxrwx
+r:4
+w:2
+x:1
+owner = rwx = 4+2+1 = 7
+group = rwx = 4+2+1 = 7
+others=	r-- = 4		= 4
+
+chmod 774 -R /home/flack.chen/
+chmod 770 .bashrc
+
+-rwxr-xr--
+chmod 754 .bashrc
+chmod u=rwx,g=rx,o=r .bashrc
+
+-rw-rw-r--
+chmod 664 .bashrc
+chmod u=rw,g=rw,o=r .bashrc
+
+-rwxr-xr-x
+chmod 755 .bashrc
+chmod u=rwx,g=rx,o=rx .bashrc
+
+-rwxr-----
+chmod 740 .bashrc
+chmod u=rwx,g=r .bashrc
+
+-rw-r--r--
+chmod 644 .bashrc
+chmod u=rw,g=r,o=r .bashrc
+
+每个人均可以写入
+chmod a+w .bashrc
+
+去掉所有人的可执行权限，其他不变
+chmod a-x .bashrc
+
+chmod 600 testing.txt
+chmod u=rw,g=-r,o=-r testing.txt
 
 ```
+
 
 ### 查找被占用的端口
 ```
