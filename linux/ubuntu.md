@@ -231,4 +231,91 @@ PermitRootLogin yes
 apt-get purge openssh-client
 ```
 
+### ubuntu18 安装 xmind8
+1. 下载安装包
+xmind8安装包 [官网地址](https://www.xmind.cn/download/xmind8 "官网地址")
+破解文件 [下载地址](http://web.wvdon.com/soft/XMind_amd64.tar.gz "下载地址")
+
+2. 将下载的安装包解压到指定目录
+```
+mkdir /opt/xmind8
+unzip -d /opt/xmind8/ xmind-8-update8-linux.zip
+```
+
+3. 解压破解文件
+将下载的破解文件解压到/xmind8/xmind-8-update8-linux/XMind_amd64/ 并选择替换
+```
+unzip -o -d /opt/xmind8/xmind-8-update8-linux/XMind_amd64/ XMind_amd64.tar.gz
+```
+
+4. 修改host
+```
+sudo vim /etc/hosts
+```
+在最后添加
+```
+127.0.0.1 www.xmind.net
+```
+
+5. 进入到解压后的目录下
+执行
+```
+sudo ./setup.sh
+```
+
+6. 进入/opt/xmind8/xmind-8-update8-linux/XMind_amd64/ 点击运行XMind
+
++ 点击 帮助 序列号
++ 输入 邮箱（随便输入）
++ 输入序列号
+```
+XAka34A2rVRYJ4XBIU35UZMUEEF64CMMIYZCK2FZZUQNODEKUHGJLFMSLIQMQUCUBXRENLK6NZL37JXP4PZXQFILMQ2RG5R7G4QNDO3PSOEUBOCDRYSSXZGRARV6MGA33TN2AMUBHEL4FXMWYTTJDEINJXUAV4BAYKBDCZQWVF3LWYXSDCXY546U3NBGOI3ZPAP2SO3CSQFNB7VVIY123456789012345
+```
+激活成功
+
+7. 创建桌面快捷方式
++ 进入到/opt/xmind8/xmind-8-update8-linux/XMind_amd64/并创建运行脚本文件
+```
+sudo vim run.sh
+```
++ 输入以下
+```
+cd /opt/xmind8/xmind-8-update8-linux/XMind_amd64/
+/opt/xmind8/xmind-8-update8-linux/XMind_amd64/XMind
+```
+保存退出
+
++ 为run.sh加上可执行权限
+```
+chmod +x ./run.sh
+```
++ 进入到applications目录下
+```
+cd /usr/share/applications/
+```
++ 创建xmind.desktopp
+```
+sudo vim xmind.desktop
+```
++ 输入以下
+```
+[Desktop Entry]
+Name=XMind
+Exec=/opt/xmind8/xmind-8-update8-linux/XMind_amd64/run.sh
+Icon=/opt/xmind8/xmind-8-update8-linux/XMind_amd64/configuration/org.eclipse.osgi/983/0/.cp/icons/xmind.128.png
+Path=/opt/xmind8/xmind-8-update8-linux/XMind_amd64/
+Type=Application
+Categories=GTK;GNOME;Office;
+
+字段解释：
+Name: 应用文件名，本例中此处填写 XMind 。
+Exec: 应用执行路径，必须准确填写。
+Icon: 图标路径。(自己选择下载的图片所在路径）
+Path：应用所在路径。
+Type: .desktop 类型，此处我们应填写 Application 。
+sudo chmod a+x XMind.desktop
+```
+
+8. 复制XMind.desktop 到桌面粘贴即可创建快捷方式,也可以搜索 xmind 添加到收藏夹
+
 
