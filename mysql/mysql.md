@@ -2375,19 +2375,11 @@ select cast(json_extract(json_keys(extra_data),'$[0]') as unsigned) as country_i
 
 ### mysql导出文件数据
 ```
-into outfile '导出的目录和文件名'
-指定导出的目录和文件名
+into outfile '导出的目录和文件名'       指定导出的目录和文件名
+fields terminated by '字段间分隔符'    定义字段间的分隔符
+optionally enclosed by '字段包围符'    定义包围字段的字符（数值型字段无效）
+lines terminated by '行间分隔符'       定义每行的分隔符 
 
-fields terminated by '字段间分隔符'
-定义字段间的分隔符
-
-optionally enclosed by '字段包围符'
-定义包围字段的字符（数值型字段无效）
-
-lines terminated by '行间分隔符' 
-定义每行的分隔符 
-
-select * from tb_electron_label_mapping_factory into outfile '/data/mysql_export_dir/user.csv' fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 
 查看官方文档，secure_file_priv参数用于限制LOAD DATA, SELECT …OUTFILE, LOAD_FILE()传到哪个指定目录
 secure_file_priv 为 NULL 时，表示限制mysqld不允许导入或导出。
@@ -2415,48 +2407,79 @@ mysql> show global variables like '%secure_file_priv%';
 修改后再次执行，成功导出。
 
 into outfile 实例:
-不带表头:
+-- 不带表头,导出不带标题的xlsx,导出的文件有点问题，需要验证和测试
+select a.id,a.org_id,a.create_at,a.update_at,a.model_name,a.category_id,a.org_category_id,
+a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_web,a.data_sheet_name,
+a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging
+from db_electron.tb_electron a,db_electron_property.tb_electron_factory b 
+where a.factory_id = b.id 
+into outfile '/data/mysql_export_dir/segment_electron_hash_data.xlsx' character set gbk
+fields terminated by '\\t' optionally enclosed by '"' lines terminated by '\\n';
+
+-- 不带表头,导出不带标题的csv
+select * from tb_electron_label_mapping_factory 
+into outfile '/data/mysql_export_dir/user.csv' fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+select a.id,a.org_id,a.create_at,a.update_at,a.model_name,a.category_id,a.org_category_id,
+a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_web,a.data_sheet_name,
+a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging
+from db_electron.tb_electron a,db_electron_property.tb_electron_factory b 
+where a.factory_id = b.id 
+into outfile '/data/mysql_export_dir/segment_electron_hash_data.csv' character set gbk
+fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
 select kw.zh_category,kw.en_category,kw.zh_sub_category,kw.en_sub_category,kw.category_id_1,kw.category_id_2,  kw.category_id_3,kw.temp_zh_sub_category,kw.temp_en_sub_category  from db_digikey_electron_base.temp_digikey_category_kwargs kw  
-where kw.temp_category_id_3 is null  and category_id_1 not in ('08','09','10') into outfile '/data/mysql_export_dir/category_data.csv';
+where kw.temp_category_id_3 is null  and category_id_1 not in ('08','09','10') 
+into outfile '/data/mysql_export_dir/category_data.csv';
 
-select * from user into outfile '/data/mysql_export_dir/user.csv' fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+select * from user 
+into outfile '/data/mysql_export_dir/user.csv' fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 
-select * from db_electron_property_base.tb_electron_category order by level asc into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+select * from db_electron_property_base.tb_electron_category order by level asc 
+into outfile '/data/mysql_export_dir/category_data.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 
-select * from db_electron_cleaning.tb_extra_category_params into outfile '/data/mysql_export_dir/tb_extra_category_params.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+select * from db_electron_cleaning.tb_extra_category_params 
+into outfile '/data/mysql_export_dir/tb_extra_category_params.csv' character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 
-select id,model_name,images,source_web,data_sheet from tb_electron where factory_id is null limit 100000 into outfile '/data/mysql_export_dir/tb_electron_no_factory.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+select id,model_name,images,source_web,data_sheet from tb_electron where factory_id is null limit 100000 
+into outfile '/data/mysql_export_dir/tb_electron_no_factory.csv' character set gbk fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
 
-select id,model_name,images,source_web,data_sheet from tb_electron order by id desc into outfile '/data/mysql_export_dir/".$file_name."' fields terminated by ',' optionally enclosed by '\"' escaped by '\"' lines terminated by '\r\n' 
+select id,model_name,images,source_web,data_sheet from tb_electron order by id desc 
+into outfile '/data/mysql_export_dir/".$file_name."' character set gbk fields terminated by ',' optionally enclosed by '\"' escaped by '\"' lines terminated by '\r\n' 
 
-带表头:
+
+
+-- 带表头,导出带标题的xlsx
 select * from (select '姓名','性别','年龄' union select username,sex,age from table) b into outfile '/data/mysql_export_dir/tb_extra_category_params.xlsx' fields terminated by '\\t' OPTIONALLY ENCLOSED BY '"' lines terminated by '\\n';
 
 select a.category_id,min(b.cname),min(b.ename),count(*) from db_electron.tb_electron_digikey a,db_electron_property.tb_electron_category b where a.category_id = b.category_id group by a.category_id into outfile '/data/mysql_export_dir/category_electron_count.xlsx' character set gbk  fields terminated by '\\t' optionally enclosed by '"' lines terminated by '\\n';
 
-
--- 导出不带标题的xlsx
-select a.id,a.org_id,a.create_at,a.update_at,a.model_name,a.category_id,a.org_category_id,
-a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_web,a.data_sheet_name,
-a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging
-from db_electron.tb_electron a,db_electron_property.tb_electron_factory b 
-where a.factory_id = b.id into outfile '/data/mysql_export_dir/segment_electron_hash_data.csv' character set gbk
-fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
-
-
--- 导出带标题的xlsx
-select * into outfile '/data/mysql_export_dir/segment_electron_hash_data.xlsx' character set gbk
-fields terminated by '\\t' optionally enclosed by '"' lines terminated by '\\n' from (
-select "id","org_id","create_at","update_at","model_name","category_id","org_category_id","factory_id","factory_zh_name",
-"factory_en_name","source_web","data_sheet_name","data_sheet","state","pintopin","similar","summary","pdf_path","txt_path","packaging" union
-select a.id,a.org_id,a.create_at,a.update_at,a.model_name,a.category_id,a.org_category_id,
-a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_web,a.data_sheet_name,
-a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging
+select * into outfile '/data/mysql_export_dir/segment_electron_hash_data.xlsx' character set gbk 
+fields terminated by '\\t' optionally enclosed by '"' lines terminated by '\\n' from ( select 
+"id","org_id","create_at","update_at","model_name","category_id","org_category_id","factory_id","factory_zh_name", 
+"factory_en_name","source_web","data_sheet_name","data_sheet","state","pintopin","similar","summary","pdf_path","txt_path","packaging" union 
+select a.id,a.org_id,a.create_at,a.update_at,a.model_name,a.category_id,a.org_category_id, 
+a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_web,a.data_sheet_name, 
+a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging 
 from db_electron.tb_electron a,db_electron_property.tb_electron_factory b 
 where a.factory_id = b.id) c;
 
 
-select * into outfile '/data/mysql_export_dir/segment_electron_hash_data.xlsx' character set gbk fields terminated by '\\t' optionally enclosed by '"' lines terminated by '\\n' from ( select "id","org_id","create_at","update_at","model_name","category_id","org_category_id","factory_id","factory_zh_name", "factory_en_name","source_web","data_sheet_name","data_sheet","state","pintopin","similar","summary","pdf_path","txt_path","packaging" union select a.id,a.org_id,a.create_at,a.update_at,a.model_name,a.category_id,a.org_category_id, a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_web,a.data_sheet_name, a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging from db_electron.tb_electron a,db_electron_property.tb_electron_factory b  where a.factory_id = b.id) c;
+
+-- 带表头,导出带标题的csv
+select * from (select '姓名','性别','年龄' union select username,sex,age from table) b into outfile '/data/mysql_export_dir/tb_extra_category_params.csv' fields terminated by ',' OPTIONALLY ENCLOSED BY '"' lines terminated by '\r\n';
+
+select a.category_id,min(b.cname),min(b.ename),count(*) from db_electron.tb_electron_digikey a,db_electron_property.tb_electron_category b where a.category_id = b.category_id group by a.category_id into outfile '/data/mysql_export_dir/category_electron_count.csv' character set gbk  fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n';
+
+select * into outfile '/data/mysql_export_dir/segment_electron_hash_data.csv' character set gbk 
+fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n' from ( select 
+"id","org_id","create_at","update_at","model_name","category_id","org_category_id","factory_id","factory_zh_name", 
+"factory_en_name","source_web","data_sheet_name","data_sheet","state","pintopin","similar","summary","pdf_path","txt_path","packaging" union 
+select a.id,a.org_id,a.create_at,a.update_at,a.model_name,a.category_id,a.org_category_id, 
+a.factory_id,b.zh_name as factory_zh_name,b.en_name as factory_en_name,a.source_web,a.data_sheet_name, 
+a.data_sheet,a.state,a.pintopin,a.similar,a.summary,a.pdf_path,a.txt_path,a.packaging 
+from db_electron.tb_electron a,db_electron_property.tb_electron_factory b 
+where a.factory_id = b.id) c;
 
 ```
 

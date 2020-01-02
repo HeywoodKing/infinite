@@ -301,6 +301,9 @@ zadd myset 0 ‘project1’ [1 ‘project2’] 添加集合元素；中括号是
 zrangebyscore myset 0 100 选取分数在0~100的元素
 zcount key min max 选取分数在min~max的元素的个数
 
+
+redis 127.0.0.1:6379> scan 0 MATCH alldatasheet:* COUNT 10000
+
 redis 127.0.0.1:6379> ZCARD alldatasheet:requests
 zset类型取 0到999范围的没有得分的数据
 redis 127.0.0.1:6379> ZRANGE alldatasheet:requests 0 999 WITHSCORES
