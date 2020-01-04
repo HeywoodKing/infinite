@@ -94,7 +94,7 @@ db.createUser(
         {
 	user: "flack",
 	pwd: "123456",
-	roles: [{role: "userAdmin", db: "test"}]
+	roles: [{role: "userAdmin", db: "NoDigikey"}]
         }
 )
 ```
@@ -106,7 +106,7 @@ db.auth("flack", "123456")
 
 创建表
 ```
-db.createCollection("userinfo")
+db.createCollection("NoDigikey")
 ```
 
 查看表是否创建成功
@@ -114,15 +114,14 @@ db.createCollection("userinfo")
 show collections
 ```
 
-
 添加数据
 ```
-db.userinfo.save({age: 1})
+db.NoDigikey.save({age: 1})
 ```
 
 查询所有记录
 ```
-db.userinfo.find()
+db.NoDigikey.find()
 ```
 
 显示当前的数据集合
@@ -137,15 +136,15 @@ db.dropDatabase()
 
 删除集合，删除指定的集合 删除表
 ```
-db.userinfo.drop()
+db.NoDigikey.drop()
 ```
 
 
 插入一条数据
 插入数据，随着数据的插入，数据库创建成功了，集合也创建成功了。
 ```
-db.userinfo.insert({"name":"xiaoming"})
-db.userinfo.insert(
+db.NoDigikey.insert({"name":"xiaoming"})
+db.NoDigikey.insert(
 {
 	"_id": ObjectId("57172b0f657f8bbb34d70144"),
 	"name": "测试"
@@ -155,128 +154,128 @@ db.userinfo.insert(
 查找数据
 查询所有记录
 ```
-db.userinfo.find()
-相当于：select* from userInfo; 
+db.NoDigikey.find()
+相当于：select* from NoDigikey; 
 ```
 
 查询去掉后的当前聚集集合中的某列的重复数据
 ```
-db.userinfo.distinct("name")
-会过滤掉 name 中的相同数据 相当于：select distict name from userinfo;
+db.NoDigikey.distinct("name")
+会过滤掉 name 中的相同数据 相当于：select distict name from NoDigikey;
 ```
 
 查询 age = 22 的记录
 ```
-db.userinfo.find({"age": 22})
-相当于： select * from userInfo where age = 22; 
+db.NoDigikey.find({"age": 22})
+相当于： select * from NoDigikey where age = 22; 
 ```
 
 查询 age > 22 的记录
 ```
-db.userinfo.find({age:{$gt: 22}})
-相当于：select * from userInfo where age >22;
+db.NoDigikey.find({age:{$gt: 22}})
+相当于：select * from NoDigikey where age >22;
 ```
 
 查询 age < 22 的记录
 ```
-db.userinfo.find({age: {$lt: 22}})
-相当于：select * from userInfo where age <22; 
+db.NoDigikey.find({age: {$lt: 22}})
+相当于：select * from NoDigikey where age <22; 
 ```
 
 查询 age >= 25 的记录
 ```
-db.userinfo.find({age: {$gte: 25}})
-相当于：select * from userInfo where age >= 25; 
+db.NoDigikey.find({age: {$gte: 25}})
+相当于：select * from NoDigikey where age >= 25; 
 ```
 
 查询 age <= 25 的记录
 ```
-db.userinfo.find({age: {$lte: 25}})
-相当于：select * from userInfo where age <= 25; 
+db.NoDigikey.find({age: {$lte: 25}})
+相当于：select * from NoDigikey where age <= 25; 
 ```
 
 查询 age >= 23 并且 age <= 26
 ```
-db.userinfo.find({age: {$gte: 23, $lte: 26}})
-相当于：select * from userInfo where age >= 23 and age <= 26; 
+db.NoDigikey.find({age: {$gte: 23, $lte: 26}})
+相当于：select * from NoDigikey where age >= 23 and age <= 26; 
 ```
 
 查询 name 中包含 mongo 的数据
 ```
 模糊查询用于搜索
-db.userinfo.find({name: /mongo/})
-相当于%% select * from userInfo where name like '%mongo%'; 
+db.NoDigikey.find({name: /mongo/})
+相当于%% select * from NoDigikey where name like '%mongo%'; 
 ```
 
 查询 name 中以 mongo 开头的
 ```
-db.userinfo.find({name: /^mongo/})
-相当于：select * from userInfo where name like 'mongo%'; 
+db.NoDigikey.find({name: /^mongo/})
+相当于：select * from NoDigikey where name like 'mongo%'; 
 ```
 
 查询指定列 name、age 数据
 ```
-db.userinfo.find({}, {name: 1, age: 1})
+db.NoDigikey.find({}, {name: 1, age: 1})
 或者
-db.userinfo.find({}, {name: true, age: true})
+db.NoDigikey.find({}, {name: true, age: true})
 当然 name 也可以用 true 或 false,当用 ture 的情况下河 name:1 效果一样，如果用 false 就 是排除 name，显示 name 以外的列信息
 ```
 
 查询指定列 name、age 数据, age > 25
 ```
-db.userinfo.find({age:{$gt: 25}}, {name:1, age: 1})
-相当于：select name, age from userInfo where age >25; 
+db.NoDigikey.find({age:{$gt: 25}}, {name:1, age: 1})
+相当于：select name, age from NoDigikey where age >25; 
 ```
 
 按照年龄排序 1 升序 -1 降序
 ```
-升序：db.userinfo.find().sort({age: 1})
-降序：db.userinfo.find().sort({age: -1})
+升序：db.NoDigikey.find().sort({age: 1})
+降序：db.NoDigikey.find().sort({age: -1})
 ```
 
 查询 name = zhangsan, age = 22 的数据
 ```
-db.userinfo.find({name: "zhangsan", age: 22})
-相当于：select * from userInfo where name = 'zhangsan' and age = '22'; 
+db.NoDigikey.find({name: "zhangsan", age: 22})
+相当于：select * from NoDigikey where name = 'zhangsan' and age = '22'; 
 ```
 
 查询前 5 条数据
 ```
-db.userinfo.find().limit(5)
-相当于：select top 5 * from userInfo; 
+db.NoDigikey.find().limit(5)
+相当于：select top 5 * from NoDigikey; 
 ```
 
 查询 10 条以后的数据
 ```
-db.userinfo.find().skip(10)
-相当于：select * from userInfo where id not in (  
-selecttop 10 * from userInfo  
+db.NoDigikey.find().skip(10)
+相当于：select * from NoDigikey where id not in (  
+selecttop 10 * from NoDigikey  
 ); 
 ```
 
 查询在 5-10 之间的数据
 ```
-db.userinfo.find().limit(10).skip(5)
+db.NoDigikey.find().limit(10).skip(5)
 可用于分页，limit 是 pageSize，skip 是第几页*pageSize 
 ```
 
 or 与 查询
 ```
-db.userinfo.find({$or: [{age: 22}, {age: 25}]})
-相当于：select * from userInfo where age = 22 or age = 25; 
+db.NoDigikey.find({$or: [{age: 22}, {age: 25}]})
+相当于：select * from NoDigikey where age = 22 or age = 25; 
 ```
 
 findOne 查询第一条数据
 ```
-db.userinfo.findOne()
-相当于：select top 1 * from userInfo;  
-db.userInfo.find().limit(1);  
+db.NoDigikey.findOne()
+相当于：select top 1 * from NoDigikey;  
+db.NoDigikey.find().limit(1);  
 ```
 
 查询某个结果集的记录条数 统计数量
 ```
-db.userinfo.find({age: {$gte: 20}}).count()
-相当于：select count(*) from userInfo where age >= 20;  
+db.NoDigikey.find({age: {$gte: 20}}).count()
+相当于：select count(*) from NoDigikey where age >= 20;  
 如果要返回限制之后的记录数量，要使用 count(true)或者 count(非 0)  db.users.find().skip(10).limit(5).count(true);
 以www.diodes.com开头
 db.NoDigikey.find({data_sheet:/^www.diodes.com/})
@@ -285,6 +284,17 @@ db.NoDigikey.find({data_sheet:'/^http://www.yageo.com/'})
 以www.diodes.com结尾
 db.NoDigikey.find({data_sheet:/www.diodes.com^/})
 ```
+
+判断字段是否存在
+```
+db.NoDigikey.find({zh_name:{$exists:true}});
+```
+
+移除某个字段（删除某个字段）
+```
+db.NoDigikey.update({},{$unset:{zh_name:""}},{multi:true});
+```
+
 
 修改数据
 ```
@@ -308,61 +318,63 @@ writeConcern :可选，抛出异常的级别。
 
 修改里面还有查询条件。你要修改谁，要告诉 mongo。 查找名字叫做小明的，把年龄更改为 16 岁：
 ```
-db.userinfo.update({"name":"xiaoming"}, {$set: {"age": 16}})
+db.NoDigikey.update({"name":"xiaoming"}, {$set: {"age": 16}})
 ```
 
 查找数学成绩是 70，把年龄更改为 33 岁：
 ```
-db.userinfo.update({"score.shuxue": 70}, {$set: {"age": 33}})
+db.NoDigikey.update({"score.shuxue": 70}, {$set: {"age": 33}})
 ```
 
 更改所有匹配项目： 
 以上语句只会修改第一条发现的文档，如果你要修改多条相同的文档，则需要设置 multi 参数为 true。 
 ```
 multi : 可选，mongodb 默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
-db.userinfo.update({"sex": "男"}, {$set: {"age": 33}}, {multi: true})
+db.NoDigikey.update({"sex": "男"}, {$set: {"age": 33}}, {multi: true})
 ```
 
 完整替换，不出现$set 关键字了： 注意
 ```
-db.userinfo.update({"name": "xiaoming"}, {"name": "daming", "age": 16})
+db.NoDigikey.update({"name": "xiaoming"}, {"name": "daming", "age": 16})
 
-db.userinfo.update({"name": "Lisi"}, {$inc: {age: 50}}, false, true)
+db.NoDigikey.update({"name": "Lisi"}, {$inc: {age: 50}}, false, true)
 相当于：update users set age = age + 50 where name = 'Lisi'; 
 
-db.userinfo.update({"name": "Lisi"}, {$inc: {age: 50}, $set: {name: "hihi"}}, false, true)
-相当于：update userinfo set age = age + 50,name = "hihi"
+db.NoDigikey.update({"name": "Lisi"}, {$inc: {age: 50}, $set: {name: "hihi"}}, false, true)
+相当于：update NoDigikey set age = age + 50,name = "hihi"
 where name = "Lisi"
 ```
 
 只更新第一条记录：
 ```
-db.userinfo.update({"count": {$gt: 1}}, {$set: {"test2": "OK"}})
+db.NoDigikey.update({"count": {$gt: 1}}, {$set: {"NoDigikey2": "OK"}})
 ```
 
 全部更新：
 ```
-db.userinfo.update({"count": {$gt: 3}}, {$set: {"test2": "OK"}}, false, true)
+db.NoDigikey.update({"count": {$gt: 3}}, {$set: {"NoDigikey2": "OK"}}, false, true)
 ```
 
 只添加第一条：
 ```
-db.userinfo.update({"count": {$gt: 4}}, {$set: {"test5": "OK"}}, true, false)
+根据条件往表里插入一个字段
+db.NoDigikey.update({"course_id":"5352d5ab92fc7705666ae8c9"},{$set:{"file_type":"PDF"}},{multi:true});
+db.NoDigikey.update({"count": {$gt: 4}}, {$set: {"NoDigikey5": "OK"}}, true, false);
 ```
 
 全部添加进去:
 ```
-db.userinfo.update({"count": {$gt: 5}}, {$set: {"test5": "OK"}}, true, true)
+db.NoDigikey.update({"count": {$gt: 5}}, {$set: {"NoDigikey5": "OK"}}, true, true)
 ```
 
 全部更新：
 ```
-db.userinfo.update({"count": {$gt: 15}}, {$inc: {"count": 1}}, false, true)
+db.NoDigikey.update({"count": {$gt: 15}}, {$inc: {"count": 1}}, false, true)
 ```
 
 只更新第一条记录：
 ```
-db.userinfo.update({"count": {$gt: 10}}, {$inc: {"count": 1}}, false, false)
+db.NoDigikey.update({"count": {$gt: 10}}, {$inc: {"count": 1}}, false, false)
 ```
 
 在3.2版本开始，MongoDB提供以下更新集合文档的方法：
@@ -373,18 +385,18 @@ db.collection.updateMany() 向指定集合更新多个文档
 
 更新单个文档
 ```
-db.userinfo.updateOne({"name": "abc"}, {$set: {"age": "28"}})
+db.NoDigikey.updateOne({"name": "abc"}, {$set: {"age": "28"}})
 ```
 
 更新多个文档
 ```
-db.userinfo.updateMany({"age": {$gt: "10"}}, {$set: {"status": "xyz"}})
+db.NoDigikey.updateMany({"age": {$gt: "10"}}, {$set: {"status": "xyz"}})
 ```
 ```
 更新字段前缀+本身
-db.userinfo.find({'status':{'$ne': 1}}).forEach(
+db.NoDigikey.find({'status':{'$ne': 1}}).forEach(
   function(item){
-    db.userinfo.update({'_id': item._id},{$set: {'date_sheet': 'http://www.ecliptek.com/SpecSheetGenerator/specific.aspx?PartNumber=' + item.model_name}})
+    db.NoDigikey.update({'_id': item._id},{$set: {'date_sheet': 'http://www.ecliptek.com/SpecSheetGenerator/specific.aspx?PartNumber=' + item.model_name}})
   }
 )
 
@@ -468,20 +480,20 @@ writeConcern :（可选）抛出异常的级别。
 ```
 
 ```
-db.userinfo.remove({"name": "manhattan"})
-db.userinfo.remove({"age": 123})
-db.userinfo.remove({"name": "newyork"}, {justOne: true})
+db.NoDigikey.remove({"name": "manhattan"})
+db.NoDigikey.remove({"age": 123})
+db.NoDigikey.remove({"name": "newyork"}, {justOne: true})
 ```
 
-删除test数据库中所有记录
+删除NoDigikey数据库中所有记录
 ```
-db.test.deleteMany({})
+db.NoDigikey.deleteMany({})
 {}表示没有约束条件。
 ```
 
-删除test数据库中_id为5abb3b5bce69c048be080199的记录。
+删除NoDigikey数据库中_id为5abb3b5bce69c048be080199的记录。
 ```
-db.test.deleteMany({_id: ObjectId("5abb3b5bce69c048be080199")})
+db.NoDigikey.deleteMany({_id: ObjectId("5abb3b5bce69c048be080199")})
 ```
 
 分组
@@ -492,22 +504,30 @@ db.NoDigikey.aggregate([
   {$group:{_id:"$link_status",total:{$sum:1}}}, 
   {$sort:{_id:1}}
 ]);
-db.orders.aggregate([
+
+db.NoDigikey.aggregate([
   { $match: { status: "A" } },
   { $group: { _id: "$cust_id", total: { $sum: "$amount" } } },
   { $sort: { total: -1 } }
-])
+]);
+
 db.NoDigikey.aggregate([
   {$match:{status:3}},
   {$group:{_id:"$link_status",total:{$sum:1}}}, 
   {$sort:{_id:1}}
-])
+]);
+
 db.NoDigikey.aggregate([
   {$match:{link_status:{$ne:null},status:1}},
   {$group:{_id:"$link_status",total:{$sum:1}}}, 
   {$sort:{_id:1}}
-])
-db.NoDigikey.aggregate([{$match:{status:{$in:[4,3,2]}}},{$group:{_id:'$link_status',total:{$sum:1}}},{$sort:{_id:1}}])
+]);
+
+db.NoDigikey.aggregate([
+  {$match:{status:{$in:[4,3,2]}}},
+  {$group:{_id:'$link_status',total:{$sum:1}}},
+  {$sort:{_id:1}}
+]);
 ```
 
 多条件查询
@@ -608,7 +628,7 @@ mongoimport --host 192.168.1.163 --port 27017 -d configs -c digikey -u king -p k
 mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWorkers 50 --file digikey2.json
 mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
 mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
-mongoimport --host 127.0.0.1 --port 27017 -d wc -c male --numInsertionWorkers 8 --file "digikey - test.json"
+mongoimport --host 127.0.0.1 --port 27017 -d wc -c male --numInsertionWorkers 8 --file "digikey - NoDigikey.json"
 mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
 ```
 
@@ -616,8 +636,8 @@ mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 
 ### 备份MongoDB数据库
 ```
 导出指定数据库
-mongodump -h IP --port 27017 -u flack -p 123456 -d test -o D:/MongoDB/Backups/  本地不用加:-h IP
-mongodump -h IP -d test -o D:/MongoDB/Backups/ 
+mongodump -h IP --port 27017 -u flack -p 123456 -d NoDigikey -o D:/MongoDB/Backups/  本地不用加:-h IP
+mongodump -h IP -d NoDigikey -o D:/MongoDB/Backups/ 
 
 mongodump -h IP --port 端口 -u 用户名 -p 密码 -d 数据库 -o 文件存储路径
 如果没有用户，可以去掉 -u和-p
@@ -629,7 +649,7 @@ mongodump -h IP --port 端口 -u 用户名 -p 密码 -d 数据库 -o 文件存�
 ### 还原MongoDB数据库
 ```
 mongorestore -h IP --port 端口 -u 用户名 -p 密码 -d 数据库 --drop 文件存在路径
-mongorestore -h IP --port 27017 -u flack -p 123456 -d test --drop D:/MongoDB/Backups/2019-04-27/test  本地不用加 -h IP
+mongorestore -h IP --port 27017 -u flack -p 123456 -d NoDigikey --drop D:/MongoDB/Backups/2019-04-27/NoDigikey  本地不用加 -h IP
 ```
 
 ### 修改数据库名
@@ -640,7 +660,7 @@ use old_name
 db.dropDatabase();
 
 利用renameCollection命令
-db.adminCommand({renameCollection: "db1.test1", to: "db2.test2"})
+db.adminCommand({renameCollection: "db1.NoDigikey1", to: "db2.NoDigikey2"})
 ```
 
 
@@ -653,7 +673,7 @@ pymongo
 client = pymongo.MongoClient("127.0.0.1", 27017)
 client = pymongo.MongoClient("mongodb://localhost:27017/")
 mydb = client["douban"]
-mycol = mydb["userinfo"]
+mycol = mydb["NoDigikey"]
 
 x = mycol.find_one()
 
@@ -763,7 +783,8 @@ db.foo.getIndexes() 显示表的所有索引
 db.foo.group( { key : ..., initial: ..., reduce : ...[, cond: ...] } ) 根据条件分组 
 db.foo.mapReduce( mapFunction , reduceFunction , <optional params> ) 
 db.foo.remove(query) 根据条件删除数据 
-db.foo.renameCollection( newName ) renames the collection  重命名表 
+db.foo.renameCollection( newName ) renames the collection  重命名表  修改表名
+db.foo.renameCollection("foo_001");
 db.foo.save(obj) 保存数据 
 db.foo.stats()  查看表的状态 
 db.foo.storageSize() - includes free space allocated to this collection 查询分配到表空间大小 
@@ -829,9 +850,17 @@ db.setProfilingLevel(1)
 
 show profile 
 
-#拷贝数据库 
+#拷贝数据库（复制数据库）
 
 db.copyDatabase('mail_addr','mail_addr_tmp') 
+
+拷贝表(复制表)
+db.category（原表）.find().forEach(function(x){
+  db.category_merge_20200203（新表）.insert(x)
+});
+db.category.find().forEach(function(x){
+  db.category_merge_20200203.insert(x)
+});
 
 #删除collection 
 
@@ -853,7 +882,7 @@ db.foo.save({'name':'ysz','address':{'city':'beijing','post':100096},'phone':[13
 
 #存储数组对象 
 
-db.user_addr.save({'Uid':'yushunzhi@sohu.com','Al':['test-1@sohu.com','test-2@sohu.com']}) 
+db.user_addr.save({'Uid':'yushunzhi@sohu.com','Al':['NoDigikey-1@sohu.com','NoDigikey-2@sohu.com']}) 
 
 #根据query条件修改，如果不存在则插入，允许修改多条记录 
 
@@ -945,12 +974,12 @@ import pymongo
 con = pymongo.Connection('localhost', 27017)
 
 mydb = con.mydb # new a database
-mydb.add_user('test', 'test') # add a user
-mydb.authenticate('test', 'test') # check auth
+mydb.add_user('NoDigikey', 'NoDigikey') # add a user
+mydb.authenticate('NoDigikey', 'NoDigikey') # check auth
 
 muser = mydb.user # new a table
  
-muser.save({'id':1, 'name':'test'}) # add a record
+muser.save({'id':1, 'name':'NoDigikey'}) # add a record
 
 muser.insert({'id':2, 'name':'hello'}) # add a record
 muser.find_one() # find a record

@@ -178,19 +178,23 @@ Slave服务器中配置Slave Redis（Redis-1S）和Slave Sentinel（Sentinel-1S�
 
 
 ### 常用操作（常用命令）
-```
+
 查看redis服务端版本
+```
 redis-server -v 
 redis-server --version
+```
 
 查看redis客户端版本
+```
 redis-cli -v 
 redis-cli --version
-
+```
 
 进入redis终端
 
 查看是否有密码
+```
 config get requirepass
 
 如果结果显示：
@@ -199,53 +203,76 @@ config get requirepass
 那就说明requirepass对应的密码是ranbos，
 要取消就输入命令
 config set requirepass ''
-
+```
 
 查看所有键
+```
 keys *
 
 2) "jobbole:dupefilter"
 3) "jobbole:requests"
 
+```
+
 凡是在spider(这里是jobbole爬虫)中用yield出去的记录，都通过scheduler.py里面的enqueue_request方法发push送到这jobbole:requests里面记录着，然后jobbole:dupefilter是个过滤器里面记录的是指纹
 
 查看redis里面存储的requests数据
+```
 zrangebyscore jobbole:requests 0 100
+```
 
 设置键值对
+```
 set name flack
+```
 
 取出键值对
+```
 get name
+```
 
 Redis CONFIG 命令格式如下
+```
 redis 127.0.0.1:6379> CONFIG GET CONFIG_SETTING_NAME
 redis 127.0.0.1:6379> CONFIG GET loglevel
 redis 127.0.0.1:6379> CONFIG GET *
+```
 
 CONFIG SET 命令基本语法
+```
 redis 127.0.0.1:6379> CONFIG SET CONFIG_SETTING_NAME NEW_CONFIG_VALUE
 redis 127.0.0.1:6379> CONFIG SET loglevel "notice"
 redis 127.0.0.1:6379> CONFIG GET loglevel
 
 redis 127.0.0.1:6379> info all
+```
+
 查看redis的内存使用情况
+```
 redis 127.0.0.1:6379> info memory
+```
 
 查看redis当前客户端的连接情况： 
 
 
 ping
+```
 redis 127.0.0.1:6379> ping
-
+```
 
 选择第8个db
+```
 redis 127.0.0.1:6379> select 8
+```
+
 查看键alldatasheet:requests的数据类型
+```
 redis 127.0.0.1:6379> type alldatasheet:requests
+```
 
 
-string查看数据
+1. string查看数据
+```
 set mykey ”cnblogs” 创建变量
 get mykey 查看变量
 getrange mykey start end 获取字符串，如:get name 2 5 #获取name2~5的字符串
@@ -254,9 +281,10 @@ incr/decr mykey 加一减一，类型是int
 append mykey ”com” 添加字符串，添加到末尾
 
 redis 127.0.0.1:6379> get key_name
+```
 
-
-hash类型查看数量
+2. hash类型查看数量
+```
 hset myhash name “cnblogs” 创建变量，myhash类似于变量名，name类似于key，”cnblogs”类似于values
 hgetall myhash 得到key和values两者
 hget myhash name 得到values
@@ -268,9 +296,10 @@ hvals myhash 查看values
 redis 127.0.0.1:6379> HLEN cart_10365
 hash类型查看数据
 redis 127.0.0.1:6379> HSCAN cart_10365 0 COUNT 10000
+```
 
-
-list类型查看数量
+3. list类型查看数量
+```
 lpush/rpush mylist “cnblogs” 左添加/右添加值
 lrange mylist 0 10 查看列表0~10的值
 blpop/brpop key1[key2] timeout 左删除/右删除一个，timeout是如果没有key，等待设置的时间后结束。
@@ -280,9 +309,10 @@ llen key 获得长度
 lindex key index 取第index元素，index是从0开始的
 redis 127.0.0.1:6379> len(key_name)
 redis 127.0.0.1:6379> scan 0 MATCH * COUNT 10000
+```
 
-
-set类型查看数量
+4. set类型查看数量
+```
 sadd myset “cnblogs” 添加内容，返回1表示不存在，0表示存在
 scard key 查看set中的值
 sdiff key1 [key2] 2个set做减法，其实就是减去了交际部分
@@ -294,9 +324,10 @@ smember key 获取全部的元素
 redis 127.0.0.1:6379> SCARD cart_selected_10365
 set类型查看数据
 redis 127.0.0.1:6379> SSCAN cart_selected_10365 0 COUNT 10000
+```
 
-
-zset类型查看数量
+5. zset类型查看数量
+```
 zadd myset 0 ‘project1’ [1 ‘project2’] 添加集合元素；中括号是没有的，在这里是便于理解
 zrangebyscore myset 0 100 选取分数在0~100的元素
 zcount key min max 选取分数在min~max的元素的个数
@@ -309,10 +340,11 @@ zset类型取 0到999范围的没有得分的数据
 redis 127.0.0.1:6379> ZRANGE alldatasheet:requests 0 999 WITHSCORES
 zset类型查看数据
 redis 127.0.0.1:6379> ZSCAN alldatasheet:requests 0 COUNT 10000
+```
 
 在redis里面设置key
+```
 lpush jobbole:start_urls http://blog.jobbole.com/all-posts
-
 ```
 
 ### 参数说明
