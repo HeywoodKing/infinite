@@ -102,7 +102,7 @@ select * from mysql.user;
 
 修改密码
 ```
-update mysql.user set password='123456' where user='root';
+update mysql.user set password=password('123456') where user='root';
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
 ```
 
@@ -614,8 +614,16 @@ select * from students where id is not null;
 ```
 GRANT ALL ON *.* TO 'root'@'%';
 
+grant all on *.* to flack@localhost identified by '123456';
+grant all on *.* to flack@'192.168.0.0/255.255.255.0' identified by '123456';
+
 刷新权限
 flush privileges;
+```
+
+收回权限
+```
+revoke insert on db_electron.* from flack@'192.168.1.2';
 ```
 
 统计查询
