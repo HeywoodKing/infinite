@@ -2494,7 +2494,7 @@ where a.factory_id = b.id) c;
 
 ### mysql导入文件数据
 ```
-load data infile 'c:/wamp/tmp/Data_OutFile.csv' replace into table tb_electron character set utf8 fields terminated by ',' enclosed by '"' lines terminated by '\r\n' (name,age,description );
+load data infile 'c:/wamp/tmp/Data_OutFile.csv' replace into table tb_electron character set utf8 fields terminated by ',' optionally enclosed by '"' lines terminated by '\r\n' (name,age,description );
 
 replace into table data_1   ：指 在表data_1中插入数据时，碰到相同的数据怎么处理。replace是替换。也可以使用ignore，指不处理本条数据。
 character set utf8：  使用字符集 utf8。

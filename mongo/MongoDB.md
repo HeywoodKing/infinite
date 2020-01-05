@@ -285,6 +285,32 @@ db.NoDigikey.find({data_sheet:'/^http://www.yageo.com/'})
 db.NoDigikey.find({data_sheet:/www.diodes.com^/})
 ```
 
+返回指定的字段
+```
+db.NoDigikey.find({zh_name:"张三"},{second_zh_name:1,third_zh_name:1,third_category_id:1});
+db.category_zh.find({"second_zh_name":"风扇"},{_id:1,zh_name:1,second_zh_name:1,third_zh_name:1,third_category_id:1}).pretty();
+```
+
+限制要返回的字段
+```
+db.NoDigikey.find({zh_name:"张三"},{second_zh_name:0,third_zh_name:0});
+
+错误的语句如下：
+db.category_zh.find({"second_zh_name":"风扇"},{_id:1,zh_name:0,second_zh_name:0,third_zh_name:1,third_category_id:1}).pretty();
+正确的语句如下：
+db.category_zh.find({"second_zh_name":"风扇"},{_id:0,second_zh_name:0}).pretty();
+```
+
+```
+上面两种模式不能混用，因为这样的话，MongoDB就无法推断其他键是否应该返回。即projection中的字段值，要么全是1，要么全是0。但是_id字段是个特例，在包含模式下，_id字段可以为0
+```
+
+
+限制数组中返回的内容
+```
+db.NoDigikey.find({zh_name:"张三"},{status:0,second_zh_name:{$slice:1}});
+```
+
 判断字段是否存在
 ```
 db.NoDigikey.find({zh_name:{$exists:true}});
@@ -615,11 +641,21 @@ default_language  string  对于文本索引，该参数决定了停用词及词
 ## 高级用法
 ### 导出文档
 ```
-mongoexport -h 192.168.1.141 --port 27018 -d configs -c NoDigikey --type=csv -q "{$and: [{link_status: {$ne: null}}, {link_status:{$gt: 200}}, {link_status:{$ne: 429}}, {link_status:{$ne: 908}}]}" -f _id,id,model_name,data_sheet,status,link_status -o D:/Flack/Work/nodigikey.csv
+mongoexport -h 192.168.1.141 --port 27018 -d configs -c NoDigikey --csv -q "{$and: [{link_status: {$ne: null}}, {link_status:{$gt: 200}}, {link_status:{$ne: 429}}, {link_status:{$ne: 908}}]}" -f _id,id,model_name,data_sheet,status,link_status -o D:/Flack/Work/nodigikey.csv
 
 mongoexport --host 192.168.1.141 --port 27018 -d configs -c digikey -u king -p king@2016 -q "{$or:[{status:2},{status:3},{status:4}]}" --out D:\flack\work\digikey.json
 mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey2 -u king -p king@2016 -q "{$or:[{status:2},{status:20}]}" --out D:\flack\work\digikey2.json
 mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey3 -u king -p king@2016 -q "{$or:[{status:2},{status:10}]}" --out D:\flack\work\digikey3.json
+
+参数说明：
+-h：数据库宿主机的IP
+-u：数据库用户名
+-p：数据库密码
+-d：数据库名字
+-c：集合的名字
+-f：导出的列名
+-q：导出数据的过滤条件
+--csv：导出格式为csv
 ```
 
 ### 导入文档
@@ -630,6 +666,14 @@ mongoimport --host 127.0.0.1 --port 27017 -d mofang -c digikey --numInsertionWor
 mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
 mongoimport --host 127.0.0.1 --port 27017 -d wc -c male --numInsertionWorkers 8 --file "digikey - NoDigikey.json"
 mongoimport -h 127.0.0.1 -p 27017 -d mofang -c digikey --numInsertionWorkers 80 --file digikey3.json
+
+参数说明：
+-h:指明数据库宿主机的IP
+-u:指明数据库的用户名
+-p:指明数据库的密码
+-d:指明数据库的名字
+-c:指明collection的名字
+-f:指明要导入那些列
 ```
 
 
@@ -663,6 +707,51 @@ db.dropDatabase();
 db.adminCommand({renameCollection: "db1.NoDigikey1", to: "db2.NoDigikey2"})
 ```
 
+### 修改表名
+```
+db.category.renameCollection("category_zh");
+或
+db.getCollection('category').renameCollection("category_zh");
+```
+
+### 修改表的字段名
+```
+db.getCollection('category_zh').update({},{$rename:{"son_zh_name":"third_zh_name"}}, false, true);
+或
+db.category_zh.update({},{$rename:{"son_zh_name":"third_zh_name"}}, false, true);
+
+db.collection.update(criteria,objNew,upsert,multi)
+参数说明：
+criteria：查询条件
+objNew：update对象和一些更新操作符
+upsert：如果不存在update的记录，是否插入objNew这个新的文档，true为插入，默认为false，不插入。
+multi：默认是false，只更新找到的第一条记录。如果为true，把按条件查询出来的记录全部更新。
+```
+
+### mongodb 修改 collection 的字段名
+```
+db.category_zh.update({},{$rename:{"sub_zh_name":"second_zh_name","sub_zh_url":"second_zh_url","son_zh_name":"third_zh_name","son_zh_url":"third_zh_url","son_category_id":"third_category_id"}}, false, true);
+db.category_en.update({},{$rename:{"sub_en_name":"second_en_name","sub_en_url":"second_en_url","son_en_name":"third_en_name","son_en_url":"third_en_url","son_category_id":"third_category_id"}}, false, true);
+```
+
+### mongodb 增加 data_version 和 create_time 字段
+```
+db.category_zh.update({},{$set:{"data_version":"20200103","create_time":"2020-01-03 18:30:30"}},{multi:true});
+db.category_en.update({},{$set:{"data_version":"20200103","create_time":"2020-01-03 18:30:30"}},{multi:true});
+
+db.category_zh.update({},{$set:{"second_category_id":""}},{multi:true});
+db.category_en.update({},{$set:{"second_category_id":""}},{multi:true});
+
+db.categorykwargs_zh.update({},{$set:{"data_version":"20200103","create_time":"2020-01-03 18:30:30"}},{multi:true});
+db.categorykwargs_en.update({},{$set:{"data_version":"20200103","create_time":"2020-01-03 18:30:30"}},{multi:true});
+```
+
+
+### 根据条件删除字段
+```
+把 from这个数组有hengduan这个值，并且zhLatin是空的数据的zhLatin字段删除
+db.getCollection('category_zh').update({"from":"hengduan","zhLatin":null},{$unset:{'zhLatin':''}}, false, true);
+```
 
 
 
@@ -803,55 +892,42 @@ db.user.drop();
 
 1. 超级用户相关： 
 #增加或修改用户密码 
-
 db.addUser('admin','pwd') 
 
 #查看用户列表 
-
 db.system.users.find() 
 
 #用户认证 
-
 db.auth('admin','pwd') 
 
-#删除用户 
-
+#删除用户
 db.removeUser('mongodb') 
 
 #查看所有用户 
-
 show users 
 
 #查看所有数据库 
-
 show dbs 
 
 #查看所有的collection 
-
 show collections 
 
 #查看各collection的状态 
-
 db.printCollectionStats() 
 
 #查看主从复制状态 
-
 db.printReplicationInfo() 
 
 #修复数据库 
-
 db.repairDatabase() 
 
 #设置记录profiling，0=off 1=slow 2=all 
-
 db.setProfilingLevel(1) 
 
 #查看profiling 
-
 show profile 
 
 #拷贝数据库（复制数据库）
-
 db.copyDatabase('mail_addr','mail_addr_tmp') 
 
 拷贝表(复制表)
@@ -863,11 +939,9 @@ db.category.find().forEach(function(x){
 });
 
 #删除collection 
-
 db.mail_addr.drop() 
 
 #删除当前的数据库 
-
 db.dropDatabase() 
 
 
@@ -877,94 +951,72 @@ db.dropDatabase()
 
 3. 增删改 
 #存储嵌套的对象 
-
 db.foo.save({'name':'ysz','address':{'city':'beijing','post':100096},'phone':[138,139]}) 
 
 #存储数组对象 
-
 db.user_addr.save({'Uid':'yushunzhi@sohu.com','Al':['NoDigikey-1@sohu.com','NoDigikey-2@sohu.com']}) 
 
 #根据query条件修改，如果不存在则插入，允许修改多条记录 
-
 db.foo.update({'yy':5},{'$set':{'xx':2}},upsert=true,multi=true) 
 
 #删除yy=5的记录 
-
 db.foo.remove({'yy':5}) 
 
-#删除所有的记录 
-
+#删除所有的记录
 db.foo.remove() 
 
 
 4. 索引 
 
 增加索引：1(ascending),-1(descending) 
-
 db.things.ensureIndex({firstname: 1, lastname: 1}, {unique: true}); 
 
 #索引子对象 
-
 db.user_addr.ensureIndex({'Al.Em': 1}) 
 
 #查看索引信息 
-
 db.deliver_status.getIndexes() 
-
 db.deliver_status.getIndexKeys() 
 
-#根据索引名删除索引 
-
+#根据索引名删除索引
 db.user_addr.dropIndex('Al.Em_1') 
 
 5. 查询 
 
 查找所有 
-
 db.foo.find() 
 
 #查找一条记录 
-
 db.foo.findOne() 
 
 #根据条件检索10条记录 
-
 db.foo.find({'msg':'Hello 1'}).limit(10) 
 
 #sort排序 
-
 db.deliver_status.find({'From':'yushunzhi@sohu.com'}).sort({'Dt',-1}) 
-
 db.deliver_status.find().sort({'Ct':-1}).limit(1) 
 
 #count操作 
-
 db.user_addr.count() 
 
 #distinct操作 
-
 db.foo.distinct('msg') 
 
 #>操作 
-
 db.foo.find({"timestamp": {"$gte" : 2}}) 
 
 #子对象的查找 
-
 db.foo.find({'address.city':'beijing'}) 
 
 6. 管理 
 
 查看collection数据的大小 
-
 db.deliver_status.dataSize() 
 
 #查看colleciont状态 
-
 db.deliver_status.stats() 
 
 #查询所有索引的大小 
-
 db.deliver_status.totalIndexSize() 
 ```
 
