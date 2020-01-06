@@ -222,6 +222,17 @@ alter table students add constraint students foreign key(subid) references subje
 ALTER TABLE `t_user` ADD unique(`username`);
 ```
 
+查看唯一性约束
+```
+show keys from `t_user`;
+```
+
+删除唯一性约束(移除唯一性约束)
+```
+drop index uk_students_id on students;
+alter table students drop index uk_students_id;
+```
+
 结构化查看数据
 ```
 select * from students\G;
