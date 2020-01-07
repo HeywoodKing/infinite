@@ -2391,13 +2391,21 @@ select cast(json_extract(json_keys(extra_data),'$[0]') as unsigned) as country_i
 
 
 ## 高级操作
+```
+lines terminated by 'string'
+fields terminated by 'string'
+enclosed by 'char'
+  有optionally，则只对字符串类型的字段使用encloed-by字符“包裹”；
+  无optionally，则对全部字段使用enclosed-by字符“包裹”。
+escaped by 'char'
+```
 
 ### mysql导出文件数据
 ```
-into outfile '导出的目录和文件名'       指定导出的目录和文件名
-fields terminated by '字段间分隔符'    定义字段间的分隔符
-optionally enclosed by '字段包围符'    定义包围字段的字符（数值型字段无效）
-lines terminated by '行间分隔符'       定义每行的分隔符 
+into outfile '导出的目录和文件名'        指定导出的目录和文件名
+fields terminated by '字段间分隔符'     定义字段间的分隔符
+optionally enclosed by '字段包围符'     定义包围字段的字符（数值型字段无效）
+lines terminated by '行间分隔符'        定义每行的分隔符 
 
 
 查看官方文档，secure_file_priv参数用于限制LOAD DATA, SELECT …OUTFILE, LOAD_FILE()传到哪个指定目录

@@ -102,6 +102,8 @@ Options:
 eg:
 ```
 统计/data/digikey/800/目录下的文件数量
+find /data/digikey/800/ -type f |wc -l
+
 vi start.sh
 
 for((i=1;i<=10000000000;i++)) ; do
