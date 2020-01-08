@@ -162,7 +162,7 @@ du -sh ./*   统计当前目录下各个目录以及子目录大小
 du -sh xmldb/ 统计总数大小
 du -sm * | sort -n 统计当前目录大小 并安大小 排序
 du -sk * | sort -n
-du -sk * | grep guojf 看一个人的大小
+du -sk * | grep 1919.csv 查看某一个文件的大小
 du -m | cut -d "/" -f 2 看第二个/ 字符前的文字
 
 du -h --max-depth=1 |grep 'G' |sort   #查看上G目录并排序
@@ -213,6 +213,7 @@ du -s * | sort -nr | tail 选出排在后面的10个
 
 
 查看某文件夹占用总的空间大小
+du -h --max-depth=1
 du -h --max-depth=1 /usr/local/
 ```
 
@@ -259,6 +260,7 @@ find ./ -name "591014.txt" -exec ls {} \;
 
 查看某目录下的文件数量(非链接文件数量)
 find /data/digikey/800/ -type f | wc -l
+find . -type f | wc -l
 
 查看某目录下的文件数量(链接文件数量)
 find /data/digikey/800/ -type l | wc -l
