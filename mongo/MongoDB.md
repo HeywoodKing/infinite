@@ -656,6 +656,9 @@ mongoexport --host 192.168.1.163 --port 27017 -d configs -c digikey3 -u king -p 
 -f：导出的列名
 -q：导出数据的过滤条件
 --csv：导出格式为csv
+
+eg:
+mongoexport -h 192.168.1.100 --port 27017 -d digikey -c category_zh --type=csv -f _id,zh_name,zh_url,second_category_id,second_zh_name,second_zh_url,third_category_id,third_zh_name,third_zh_url,data_version,0,create_time,create_time,'' -o D:\Flack\Work\database_script\from_mongo_to_mysql\2020-01-05\mongo_to_mysql_category_zh_reguanli.csv -q "{second_zh_name: '热管理'}"
 ```
 
 ### 导入文档
