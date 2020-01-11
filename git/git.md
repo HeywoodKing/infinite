@@ -336,7 +336,7 @@ $ git push origin :test              // 刚提交到远程的test将被删除，
 target
 bin
 *.db
- 
+```
 
 
 git删除文件
@@ -397,10 +397,10 @@ git 默认中文文件名是 \xxx\xxx 等八进制形式，是因为 对0x80以�
 只需要设置core.quotepath设为false，就不会对0x80以上的字符进行quote。中文显示正常
 git config --global core.quotepath false
 
-解决git指令更新远程仓库github时每次都要输入用户名和密码问题
 
+解决git指令更新远程仓库github时每次都要输入用户名和密码问题
 设置记住密码(默认15分钟)
-git config –global credential.helper cache
+git config --global credential.helper cache
 
 如果想自己设置时间，这样就设置一个小时之后失效，可以这样做
 git config credential.helper 'cache –timeout=3600'
@@ -428,8 +428,7 @@ git空文件夹不能提交的问题
 .idea //忽略.idea文件夹及文件夹下文件
 *.iml //忽略以.iml结尾的文件
 
-　　
-
+```
 【例子】
 # 忽略*.o和*.a文件
 *.[oa]
@@ -453,7 +452,7 @@ dbg
 * [abc]：代表a,b,c中任一字符即可
 * [ ^abc]：代表必须不是a,b,c中任一字符
 git update-index --assume-unchanged PATH    在PATH处输入要忽略的文件。
-
+```
 
 
 
@@ -997,7 +996,7 @@ Command line instructions
 
 Git global setup
 git config --global user.name "flack.chen"
-git config --global user.email "flack.chen@icmofang.com"
+git config --global user.email "flack.chen@infinigo.cn"
 
 Create a new repository
 git clone http://gitlab/icmofang/moli_cleaning_tools.git
@@ -1099,183 +1098,6 @@ git config core.sparseCheckout true
 echo "面试题1" >> .git/info/sparse-checkout
 git pull https://github.com/gunzigun/CodingInterviews.git master
 ```
-
-
-
-
-====================================================================================
-git中文显示乱码问题：
-git 默认中文文件名是 \xxx\xxx 等八进制形式，是因为 对0x80以上的字符进行quote
-只需要设置core.quotepath设为false，就不会对0x80以上的字符进行quote。中文显示正常
-git config --global core.quotepath false
-
-解决git指令更新远程仓库github时每次都要输入用户名和密码问题
-
-设置记住密码(默认15分钟)
-git config –global credential.helper cache
-
-如果想自己设置时间，这样就设置一个小时之后失效，可以这样做
-git config credential.helper 'cache –timeout=3600'
-
-长期存储密码
-git config -global credential.helper store
-
-
-使用ssh方式(推荐)
-在每次push 的时候，都要输入用户名和密码，是不是很麻烦?原因是使用了https方式 push，
-在git bash里边输入 git remote -v 可以查看到使用的是http or ssh
-
-
-git空文件夹不能提交的问题
-在该空文件夹下使用命令：touch .gitkeep文件即可提交，或者手动创建文件
-
-在根目录下最好添加要给忽略文件 touch .gitignore 或者直接vim .gitignore
-输入以下内容：
-# Ignore everything in this directory
-*
-# Except this file
-!.gitignore
-
-
-.idea //忽略.idea文件夹及文件夹下文件
-*.iml //忽略以.iml结尾的文件
-
-　　
-
-【例子】
-# 忽略*.o和*.a文件
-*.[oa]
-# 忽略*.b和*.B文件，my.b除外
-*.[bB]
-!my.b
-# 忽略dbg文件和dbg目录
-dbg
-# 只忽略dbg目录，不忽略dbg文件
-dbg/
-# 只忽略dbg文件，不忽略dbg目录
-dbg
-!dbg/
-# 只忽略当前目录下的dbg文件和目录，子目录的dbg不在忽略范围内
-/dbg
-# 以'#'开始的行，被视为注释.
-* ？：代表任意的一个字符
-* ＊：代表任意数目的字符
-* {!ab}：必须不是此类型
-* {ab,bb,cx}：代表ab,bb,cx中任一类型即可
-* [abc]：代表a,b,c中任一字符即可
-* [ ^abc]：代表必须不是a,b,c中任一字符
-git update-index --assume-unchanged PATH    在PATH处输入要忽略的文件。
-
-
-
-
-=============================================
-生成ssh 公钥和私钥
-打开git bash终端
-输入：
-ssh-keygen -t rsa -C "opencoding@hotmail.com"
-添加你的SSH公钥(email是你github注册账号的邮箱)
-
-第一次出现：Enter file in which to save the key (/root/.ssh/id_rsa): 直接按回车就行
-第二次出现：Enter passphrase (empty for no passphrase): 第一次输入公钥密码(推荐不用输入，直接回车，以便在clone、pull、push等不用输入公钥密码)
-第三次出现：Enter same passphrase again: 再次输入公钥密码：直接按回车就行
-公钥创建成功，位置在你使用 git bush 的当前项目目录下(xx.pub)
-公钥和私钥配对，接下来去C盘找你的私钥
-私钥一般在你的用户文件夹的 .ssh下，打开xx.pub,复制全部内容，在github中创建ssh keys
-
-
-
-生成多个私钥
-如果你已经有了一套名为 id_rsa 的公秘钥，将要生成另外一个公钥，比如 aysee ，你也可以使用任何你喜欢的名字。
-1、生成一个新的自定义名称的公钥和私钥：
-ssh-keygen -t rsa -C "YOUR_EMAIL@YOUREMAIL.COM" -f ~/.ssh/aysee
-执行完成后，会在 ~/.ssh/目录下生成一个 aysee 和 aysee.pub 文件。
-2、在 SSH 用户配置文件 ~/.ssh/config 中指定对应服务所使用的公秘钥名称，如果没有 config 文件的话就新建一个，并输入以下内容：
-Host github.com www.github.com
-IdentityFile ~/.ssh/aysee
-3、添加 aysee.pub 到你的git服务器网站上。
-4、测试配置文件是否正常工作
-ssh -T git@gitcafe.com
-如果，正常的话，会出现如下提示：
-Hi USERNAME! You've successfully authenticated, but github does not provide shell access.
-
-多用户时出现权限问题的原因：
-github使用SSH与客户端连接。如果是单用户（first），生成密钥对后，将公钥保存至 GitHub ，每次连接时SSH客户端发送本地私钥（默认~/.ssh/id_rsa）到服务端验证。单用户情况下，连接的服务器上保存的公钥和发送的私钥自然是配对的。但是如果是 多用户 （first，second），我们在连接到second的帐号时，second保存的是自己的公钥，但是SSH客户端依然发送默认私钥，即first的私钥，那么这个验证自然无法通过。
-
-解决ssh权限问题（）:
-通常一台电脑生成一个ssh不会有这个问题，当一台电脑生成多个ssh的时候，就可能遇到这个问题，解决步骤如下：
-1、查看系统ssh-key代理,执行如下命令
-ssh-add -l
-以上命令如果输出  The agent has no identities. 则表示没有代理。如果系统有代理，可以执行下面的命令清除代理:
-ssh-add -D
-
-2、然后依次将不同的ssh添加代理，执行命令如下：
-ssh-add ~/.ssh/id_rsa
-ssh-add ~/.ssh/aysee
-
-你会分别得到如下提示：
-2048 8e:71:ad:88:78:80:b2:d9:e1:2d:1d:e4:be:6b:db:8e /Users/aysee/.ssh/id_rsa (RSA)
-和
-2048 8e:71:ad:88:78:80:b2:d9:e1:2d:1d:e4:be:6b:db:8e /Users/aysee/.ssh/id_rsa (RSA)
-2048 a7:f4:0d:f1:b1:76:0b:bf:ed:9f:53:8c:3f:4c:f4:d6 /Users/aysee/.ssh/aysee (RSA)
-
-如果使用 ssh-add ~/.ssh/id_rsa的时候报如下错误，则需要先运行一下 ssh-agent bash 命令后再执行 ssh-add ...等命令
-Could not open a connection to your authentication agent.
-
-3、配置 ~/.ssh/config 文件
-如果没有就在~/.ssh/目录创建config文件，该文件用于配置私钥对应的服务器
-# Default github user(first@mail.com)
- 
-Host github.com
-HostName github.com
-User git
-IdentityFile C:/Users/username/.ssh/id_rsa
- 
-# aysee (company_email@mail.com)
-Host github-aysee
-HostName github.com
-User git
-IdentityFile C:/Users/username/.ssh/aysee
-
-Host随意即可，方便自己记忆，后续在添加remote是还需要用到。 配置完成后，在连接非默认帐号的github仓库时，远程库的地址要对应地做一些修改，比如现在添加second帐号下的一个仓库test，则需要这样添加：
-
-git remote add test git@github-aysee:ay-seeing/test.git
-#并非原来的git@github.com:ay-seeing/test.git
-
-ay-seeing 是github的用户名
-
-4、测试 ssh
-ssh -T git@github.com
-
-你会得到如下提示，表示这个ssh公钥已经获得了权限
-Hi USERNAME! You've successfully authenticated, but github does not provide shell access.
-
-=============================================
-
-结果示例展示：
-$ ssh-keygen -t rsa -C "chenhongwu@huachunnet.com"
-Generating public/private rsa key pair.
-Enter file in which to save the key (/c/Users/HC001/.ssh/id_rsa):
-Created directory '/c/Users/HC001/.ssh'.
-Enter passphrase (empty for no passphrase):
-Enter same passphrase again:
-Your identification has been saved in /c/Users/HC001/.ssh/id_rsa.
-Your public key has been saved in /c/Users/HC001/.ssh/id_rsa.pub.
-The key fingerprint is:
-SHA256:SMGmRw5bMwOQbkQk2P9jjzrhydruTwpVGlxytuFCtG0 chenhongwu@huachunnet.com
-The key's randomart image is:
-+---[RSA 2048]----+
-|o+++=o*          |
-|..+o.OO+         |
-| o .=OE+         |
-|  o +Bo.         |
-| .  oo. S        |
-|   .. +          |
-|  .o +.+         |
-|   o=o. .        |
-|  .+*+.          |
-+----[SHA256]-----+
-
 
 
 

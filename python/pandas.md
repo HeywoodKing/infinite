@@ -60,4 +60,16 @@ set([])也可以用大括号来构造：
 if {'A', 'C'}.issubset(df.columns):
 ```
 
+#### 7.ParserError：Error tokenizing data.C error:Expected 2 fields in line 407,saw 3
+```
+pandas.read_csv(filePath) 方法来读取csv文件时，可能会出现这种错误：
+ParserError：Error tokenizing data.C error:Expected 2 fields in line 407,saw 3
+是指在csv文件的第407行数据，期待2个字段，但在第407行实际发现了3个字段。
+
+原因：header只有两个字段名，但数据的第407行却出现了3个字段（可能是该行数据包含了逗号，或者确实有三个部分），导致pandas不知道该如何处理。
+
+解决办法:把第407行多出的字段删除，或者通过在read_csv方法中设置error_bad_lines=False来忽略这种错误：
+改为pandas.read_csv(filePath,error_bad_lines=False)
+来忽略掉其中出现错乱(例如，由于逗号导致多出一列)的行。
+```
 

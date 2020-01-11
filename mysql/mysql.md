@@ -502,8 +502,8 @@ replace into tb1( name, title, mood) select rname, rtitle, rmood from tb2;
 replace select的用法也类似于insert select，这种用法并不一定要求列名匹配，事实上，MYSQL甚至不关心select返回的列名，它需要的是列的位置。例如，replace into tb1( name, title, mood) select rname, rtitle, rmood from tb2;?这个例子使用replace into从?tb2中将所有数据导入tb1中。
 
 3. replace into tbl_name set col_name=value, ...
-第三种replace set用法类似于update set用法,使用一个例如“SET col_name = col_name + 1”的赋值，则对位于右侧的列名称的引用会被作为DEFAULT(col_name)处理。因此，该赋值相当于SET col_name = DEFAULT(col_name) + 1。
-前两种形式用的多些。其中 “into” 关键字可以省略，不过最好加上 “into”，这样意思更加直观。另外，对于那些没有给予值的列，MySQL 将自动为这些列赋上默认值
+第三种replace set用法类似于update set用法,使用一个例如"SET col_name = col_name + 1"的赋值，则对位于右侧的列名称的引用会被作为DEFAULT(col_name)处理。因此，该赋值相当于SET col_name = DEFAULT(col_name) + 1。
+前两种形式用的多些。其中 "into" 关键字可以省略，不过最好加上 "into"，这样意思更加直观。另外，对于那些没有给予值的列，MySQL 将自动为这些列赋上默认值
 ```
 
 
@@ -654,6 +654,29 @@ select id,name,gender,birthday from students where gender in
 
 select * from students order by birthday asc,gender desc;
 ```
+
+分组，将行数据转成列，连接起来
+```
+select kwargs_zh_name,GROUP_CONCAT(kwargs_zh_value) from db_crawler_digikey.tb_electron_category_kwargs_zh where kwargs_zh_name = '制造商' or kwargs_zh_name = '包装' group by kwargs_zh_name;
+
+select kwargs_zh_name,GROUP_CONCAT('"',kwargs_zh_value,'"') from db_crawler_digikey.tb_electron_category_kwargs_zh where kwargs_zh_name = '制造商' or kwargs_zh_name = '包装' group by kwargs_zh_name\G
+
+默认分隔符为","
+SELECT `name`,GROUP_CONCAT(score) AS score FROM scores GROUP BY `name`;
+
+使用"-"作为分隔符
+SELECT `name`,GROUP_CONCAT(score separator "-") AS score FROM scores GROUP BY `name`;
+
+对score进行排序
+SELECT `name`,GROUP_CONCAT(score ORDER BY score separator "-") AS score FROM scores GROUP BY `name`;
+
+连接多个字段
+SELECT `name`,GROUP_CONCAT(course,"-",score ORDER BY score separator "|") AS score FROM scores GROUP BY `name`;
+
+使用concat_ws函数
+SELECT `name`,GROUP_CONCAT(concat_ws("-",course,score) ORDER BY score separator "|") AS score FROM scores GROUP BY `name`;
+```
+
 
 查看表的索引
 ```
@@ -2395,8 +2418,8 @@ select cast(json_extract(json_keys(extra_data),'$[0]') as unsigned) as country_i
 lines terminated by 'string'
 fields terminated by 'string'
 enclosed by 'char'
-  有optionally，则只对字符串类型的字段使用encloed-by字符“包裹”；
-  无optionally，则对全部字段使用enclosed-by字符“包裹”。
+  有optionally，则只对字符串类型的字段使用encloed-by字符"包裹"；
+  无optionally，则对全部字段使用enclosed-by字符"包裹"。
 escaped by 'char'
 ```
 
@@ -2659,8 +2682,8 @@ create table if not exists `tb_extra_m_electron_kwargs_full`(
 -h : 数据库所在的主机。如果是本机，可以使用localhost，或者省略此项； 
 -u : 连接数据库用户名。 
 -p : 连接数据库密码。出于安全考虑，一般不在-p之后直接写出明文的密码。整个命令回车之后，数据库会要求输入密码，那个时候再输入密码将以**的形式显示出来。有一定的保护作用。 
-dbName : 要使用的具体的某个数据库。这个不是必须的，如果sql脚本中没有使用“use dbName”选择数据库，则此处必须制定数据库；如果使用了”use dbName”，则可以省略。 
-sqlFilePath : sql脚本的路径。如我将sql脚本放在了D盘，我的sql脚本的名字是”test_sql.sql”。则路径为”D:\test_sql.sql”。 
+dbName : 要使用的具体的某个数据库。这个不是必须的，如果sql脚本中没有使用"use dbName"选择数据库，则此处必须制定数据库；如果使用了"use dbName"，则可以省略。 
+sqlFilePath : sql脚本的路径。如我将sql脚本放在了D盘，我的sql脚本的名字是"test_sql.sql"。则路径为"D:\test_sql.sql"。 
 
 mysql -h 192.168.99.100 -uroot -p test2 < E:/mysql/2019_08_04_bak.sql
 mysql -h 192.168.99.100 -uroot -p test2 < /home/flack/bak/2019_08_04_bak.sql
@@ -2670,7 +2693,7 @@ mysql -h 192.168.99.100 -uroot -p test2 < /home/flack/bak/2019_08_04_bak.sql
 
 #### 方法二：已连接数据库时方法
 语法格式：source sqlFilePath（后面没有分号） 
-sqlFilePath : sql脚本的路径。如我将sql脚本放在了D盘，我的sql脚本的名字是”test_sql.sql”。则路径为”D:\test_sql.sql”。 
+sqlFilePath : sql脚本的路径。如我将sql脚本放在了D盘，我的sql脚本的名字是"test_sql.sql"。则路径为"D:\test_sql.sql"。 
 
 命令执行情况如下图所示：
 ![导入例子](https://img-blog.csdn.net/20160223105926651 "导入例子")
@@ -2765,7 +2788,7 @@ mysqldump -h localhost -u root -p --all-databases > /home/flack/bak/backdb_all.s
 只导出数据库结构，不带数据：
 ```
 mysqldump -u root -p -d dbName > sqlFilePath 
--d : 只备份结构，不备份数据。也可以使用”--no-data”代替”-d”，效果一样。
+-d : 只备份结构，不备份数据。也可以使用"--no-data"代替"-d"，效果一样。
 ```
 
 导出数据不导出结构
@@ -3092,11 +3115,11 @@ SELECT SUBSTRING('www.yuanrengu.com', -6, 2)
 substring_index
 按关键字进行读取
 用法：substring_index(str, delim, count)，即：substring_index(被截取字符串，关键字，关键字出现的次数)
-1.截取第二个“.”之前的所有字符
+1.截取第二个"."之前的所有字符
 SELECT SUBSTRING_INDEX('www.yuanrengu.com', '.', 2);
 结果为：www.yuanrengu
 
-2.截取倒数第二个“.”之后的所有字符
+2.截取倒数第二个"."之后的所有字符
 SELECT SUBSTRING_INDEX('www.yuanrengu.com', '.', -2);
 结果为：yuanrengu.com
 
@@ -3604,7 +3627,7 @@ mysql> flush privileges;
 ERROR 1130: Host '192.168.1.220' is not allowed to connect to this MySQL server
 
 解决方法：
-可能是帐号不允许从远程登陆，只能在localhost。这个时候只要在localhost的那台电脑，登入mysql后，更改 "mysql" 数据库里的 "user" 表里的 "host" 项，从"localhost"改称"%" 或添加一个用户为“%”  。    
+可能是帐号不允许从远程登陆，只能在localhost。这个时候只要在localhost的那台电脑，登入mysql后，更改 "mysql" 数据库里的 "user" 表里的 "host" 项，从"localhost"改称"%" 或添加一个用户为"%"  。    
 
 想让局域网中的所有机器都能连接MySQL数据库，首先要给MySQL开启远程连接的功能，在MySQL服务器控制台上执行MySQL命令：
 
@@ -3791,7 +3814,7 @@ max_allowed_packet = 10M(也可以设置自己需要的大小)
 
 max_allowed_packet 参数的作用是，用来控制其通信缓冲区的最大长度。
 
-最近做网站有一个站要用到WEB网页采集器功能，当一个PHP脚本在请求URL的时候，可能这个被请求的网页非常慢慢，超过了mysql的 wait-timeout时间，然后当网页内容被抓回来后，准备插入到MySQL的时候，发现MySQL的连接超时关闭了，于是就出现了“MySQL server has gone away”这样的错误提示，解决这个问题，我的经验有以下两点，或许对大家有用处：
+最近做网站有一个站要用到WEB网页采集器功能，当一个PHP脚本在请求URL的时候，可能这个被请求的网页非常慢慢，超过了mysql的 wait-timeout时间，然后当网页内容被抓回来后，准备插入到MySQL的时候，发现MySQL的连接超时关闭了，于是就出现了"MySQL server has gone away"这样的错误提示，解决这个问题，我的经验有以下两点，或许对大家有用处：
 
 第 一种方法：
 
