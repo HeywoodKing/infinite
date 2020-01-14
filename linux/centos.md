@@ -1722,7 +1722,6 @@ chown :mail test.txt
 
 
 ### centos 安装supservisor
-```
 CentOS安装Supervisor
 什么是Supervisor
 Supervisor是一个进程控制系统。 它是一个C/S系统,服务端是supervisord进程，控制端使用supervisorctl来进行控制启动进程。同时它也提供了一个web界面，来可以使我们方便的进行进程的控制和查看日志信息。 
@@ -1731,8 +1730,9 @@ Supervisor是一个进程控制系统。 它是一个C/S系统,服务端是super
 
 下载
 Supervisor是基于Python开发的，因此下载可以使用Python的pip命令（推荐使用pip方式安装）
-
+```
 pip3 install git+https://github.com/Supervisor/supervisor
+```
 如出现错误
 
 
@@ -1745,34 +1745,41 @@ pip3 install git+https://github.com/Supervisor/supervisor
 我个人习惯将所有自己安装的软件放至 /usr/lib 下面
 
 cd进入
-
+```
 cd /usr/lib
+```
 新建文件夹 supervisor
-
+```
 mkdir supervisor
+```
 进入 新建的文件夹
-
+```
 cd supervisor/
+```
 将 supervisor 的配置导入该目录
-
+```
 echo_supervisord_conf > /usr/lib/supervisor/supervisord.conf
+```
 如提示
 
 
 
 请指定supervisor的安装位置，如
-
+```
 /usr/lib/python3/bin/echo_supervisord_conf > /usr/lib/supervisor/supervisord.conf
+```
 命令完成后我们看到目录下多了 supervisord.conf 文件
 
 
 
 我们新建文件夹 config 存放以后的项目配置文件
-
+```
 mkdir config
+```
 我们使用vim编辑该配置文件
-
+```
 vim supervisord.conf
+```
 配置里有很多选项,更多的配置请网路搜索或查询官方文档（EN）
 
 修改以下选项
@@ -1780,11 +1787,13 @@ vim supervisord.conf
 然后我们保存，退出
 
 再启动 supervisord
-
+```
 /usr/lib/python3/bin/supervisord -c /usr/lib/supervisor/supervisord.conf
+```
 我们来启动查看是否成功
-
+```
 /usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf
+```
 出现以下界面而没有错误提示代表成功
 
 
@@ -1794,18 +1803,18 @@ vim supervisord.conf
 
 
 请关闭防火墙,然后确保每次都使用 -c 指定conf
-
+```
 systemctl stop firewalld.service
 systemctl disable firewalld.service
- 
+```
 
- 常用命令
-复制代码
+常用命令
+```
 /usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf reload //重启supervisor
 /usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf restart //重启某个conf，加 all 指重启全部
 /usr/lib/python3/bin/supervisorctl -c /usr/lib/supervisor/supervisord.conf update //更新全部conf文件
-
 ```
+
 centos 使用 supervisor 守护进程
 2019.10.23 22:37 409浏览
 程序运行稳定一直我们期望的结果，但是，我们不能期望它永远不出问题，一旦程序因为一些特殊原因终止运行，在实战中是一个可怕的事情。那么有什么好的办法可以对程序进行监控，如果退出就重启呢，这里我使用过一个线程守护工具supervisor。
@@ -1813,22 +1822,27 @@ centos 使用 supervisor 守护进程
 但其实这个supervisor 现在已经很老了，现在也应该有其他的方案可以替代，这里作为笔记还是记下来使用过程，毕竟使用了才有话语权。
 
 安装：
+```
 pip install supervisor
-
+```
 生成配置文件：
+```
 echo_supervisord_conf > /etc/supervisord.conf
-
+```
 启动
+```
 supervisord -c /etc/supervisord.conf
+```
 
 查看是否运行
 ps aux | grep supervisord
 
 配置
+```
 vim /etc/supervisord.conf
-
+```
 添加如下内容：
-
+```
 [include]
 files=/etc/supervisor/*.conf #若你本地无/etc/supervisor目录，请自建
 cd /etc/supervisor
@@ -1841,21 +1855,102 @@ vim /etc/supervisor/shadowsocks.conf
   autoresart = true
   stderr_logfile = /var/log/supervisor/ss.stderr.log
   stdout_logfile = /var/log/supervisor/ss.stdout.log
+```  
 重新加载配置：
+```
 supervisorctl reload
+```
 命令
+```
 supervisord : 启动
 supervisorctl reload :修改完配置文件后重新启动
 supervisorctl status :查看supervisor监管的进程状态
 supervisorctl start 进程名 ：启动XXX进程
 supervisorctl stop 进程名 ：停止XXX进程
 supervisorctl stop all：停止全部进程，注：start、restart、stop都不会载入最新的配置文件。
-```
 whereis nginx
 sudo netstat -anp | grep nginx
 ps -ef | grep nginx
-```
-```
 wget https://www.python.org/ftp/python/3.7.6/Python-3.7.6.tar.xz
 tar -xvJf  Python-3.7.0.tar.xz
+```
+
+centos7使用无线wifi连接
+看看有没有来自无线网卡的固件请求
+```
+dmesg | grep firmware
+```
+如需使用命令，只需将wls1直接更换成自己网口就行了
+iw：
+```
+iw dev(查找无线网卡口)
+iw wls1 link(查看wls1网口无线网络连接情况)
+iw wls1 scan | grep SSID(查看wls1网口可连接的wifi)
+```
+ip：
+```
+ip link set wls1 up(将无线网口wls1开启)
+ip link show wls1(显示无线网口wls1连接情况)
+ip addr  show wls1(显示分配的ip地址，特别适用于查看是否成功地通过dhcp自动获取了ip地址) 
+```
+wpa_supplican:
+```
+wpa_supplicant -B -i wlp3s0 -c <(wpa_passphrase "ssid" "psk") (连接无线网ssid，密码psk)
+```
+dhclient:
+```
+dhclient wls1(为wls1分配ip地址)
+```
+
+具体过程(8步骤):
+1. 查看是否需要安装固件
+大多无线网卡还需要固件。内核一般会自动探测并加载两者，如果您得到类似 SIOCSIFFLAGS: No such file or directory 的输出，意味着您得手动加载固件。若不确定，用 dmesg 查询内核日志，看看有没有来自无线网卡的固件请求。比如您有 Intel 芯片组，输出大概是这样：
+# dmesg | grep firmware
+firmware: requesting iwlwifi-5000-1.ucode
+若无输出，表明系统的无线芯片不需要固件。
+
+2. 查看无线网口
+```
+iw dev(interface后面即为无线网口号)
+```
+
+3. 激活无线网络接口
+```
+ip link set wls1 up 
+```
+为了检验接口是否激活成功，您可以查看以下命令的输出：
+```
+ip link show wls1
+
+3: wls1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state DOWN mode DORMANT group default qlen 1000 link/ether 00:11:22:33:44:55 brd ff:ff:ff:ff:ff:ff 
+<BROADCAST,MULTICAST,UP,LOWER_UP> 中的UP 表明该接口激活成功，后面的 state DOWN 无关紧要
+```
+
+4. 查看无线网络连接情况
+刚开始应该会显示无连接
+```
+iw wls1 link
+```
+
+5. 扫描可连接的wifi
+扫描可用的网络
+```
+iw wls1 scan | grep SSID
+```
+
+6. 连接指定的SSID
+将ssid 替换为实际的网络名称，psk 替换为无线密码，请保留引号
+```
+wpa_supplicant -B -i wlp3s0 -c <(wpa_passphrase "ssid" "psk") 
+```
+
+7. 用dhcp 获得 IP 分配
+```
+dhclient wlp3s0
+```
+
+8. 测试是否成功地从路由器获取了ip(重要)
+如果分配有ip，即可上网，也可以有ping直接测试
+```
+ip addr  show wls1
 ```
