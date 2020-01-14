@@ -1255,102 +1255,122 @@ sudo systemctl status mongod.service
 
 
 ### centos7安装python3
-```
+
 编译安装 Python 3
 Cent OS 预装了一个 Python 2，并且系统很多组件都依赖于 Python 2 ，笔者在安装和使用 Python 3 时就因为这些依赖情况遇到了很多问题，最后总结下来，正确的安装和使用 Python 3 的过程如下：
 
 远程连接云服务器实例，在本示例中将使用 root 用户通过编译安装方式全局安装 Python 3，你也可以选择单独为某个用户安装 Python 3 ，步骤上大同小异，详细编译安装文档参考 Using Python on Unix platforms 。
 使用 Yum 安装编译安装 Python 3 时依赖的包：
-
+```
 $ yum -y groupinstall "Development tools"
 $ yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel libffi-devel
+```
 下载 Python 3.6.7 版本的安装包，其它版本的请自行去 Download Python | Python.org 获取链接：
-
+```
 $ wget https://www.python.org/ftp/python/3.6.7/Python-3.6.7.tgz
+```
 在当前用户目录解压下载的 Python 安装包：
-
+```
 $ tar -zxvf Python-3.6.7.tgz
+```
 进入已解压的 Python 安装文件根目录：
-
+```
 $ cd Python-3.6.7
+```
 通过编译配置指定 Python 的安装位置：
-
+```
 $ ./configure --prefix=/usr/local/python3
+```
 使用 make 命令开始编译安装 Python：
-
+```
 $ make && make install
+```
 为了和系统自带的 python 和 pip 命令区分开来，给刚刚安装的 Python 建立软链接，并为其设置命令别名。分别取名为 python3 、pip3 ：
-
+```
 $ ln -s /usr/local/python3/bin/python3.6 /usr/bin/python3
 $ ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
+```
 测试 Python 3 是否正确安装，输入 python3 命令：
-
+```
 $ python3
+
 Python 3.6.7 (default, Feb  4 2019, 19:05:27)
 [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 >>>
+```
 测试 Pip 3 是否正确安装，输入 pip3 命令：
-
+```
 $ pip3 -V
 pip 10.0.0 from /usr/local/python3/lib/python3.6/site-packages/pip (python 3.6)
+```
 更新 Pip ：
-
+```
 $ pip3 install --upgrade pip
+```
 7. 使用 Pipenv 管理 Python 虚拟环境
 Pipenv 是 Pipfile 主要倡导者、requests 作者 Kenneth Reitz 写的一个命令行工具，主要包含了 Pipfile、pip、click、requests 和 virtualenv ，使用 Pipenv 可以方便的管理 Python 虚拟环境、管理依赖文件。Pipfile 和 Pipenv本来都是Kenneth Reitz 的个人项目，后来贡献给了 pypa 组织。Pipfile 是社区拟定的依赖管理文件，用于替代过于简陋的 requirements.txt 文件。
 
 执行下面命令，安装 Pipenv ：
-
+```
 $ pip3 install pipenv
+```
 执行下面命令，为 Pipenv 可执行文件设置软链接，之后可以通过 pipenv 命令来使用 Pipenv ：
-
+```
 $ ln -s /usr/local/python3/bin/pipenv /usr/bin/pipenv
+```
 切换到一个拥有 root 权限的用户，这里以 admin 用户为例：
-
+```
 $ su admin
+```
 在用户目录下为你的项目创建一个目录，并进入项目目录，项目名称以 FlaskApp 为例：
-
+```
 $ cd ~
 $ mkdir FlaskApp
 $ cd FlaskApp
+```
 执行下面命令，为项目创建 Python 虚拟环境，默认将虚拟环境保存在 ~/.local/share/virtualenvs：
-
+```
 $ pipenv install
+```
 如果想把虚拟环境保存至项目根目录，需要设置环境变量 PIPENV_VENV_IN_PROJECT=1 ，再执行创建命令：
-
+```
 $ export PIPENV_VENV_IN_PROJECT=1
 $ pipenv install
+```
 虚拟环境创建完成后，执行下面命令为虚拟环境安装 Flask 包：
-
+```
 $ pipenv install flask
+```
 在项目根目录编写一个简单的 Flask Demo 进行测试：
-
 # 新建并打开一个名为 app.py 的文件
+```
 $ vim app.py
+```
 输入下面的代码并保存：
-
+```
 from flask import Flask
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def hello_flask():
     return 'Hello Flask!'
+```
 使用 pipenv run 调用虚拟环境中的 Python 执行 flask run 命令可以运行编写的代码：
-
+```
 $ pipenv run flask run
+```
 也可以使用 pipenv shell 命令进入虚拟环境，然后再在虚拟环境执行 flask run 命令运行程序：
-
+```
 $ pipenv shell
 (venv)$ flask run
-Flask 默认运行的地址和端口为 http://127.0.0.1:5000 ，云服务器实例不包含桌面环境的话，你很难去浏览这个页面。你可以设置 flask 运行的地址和端口，然后尝试从外网访问该页面。先执行下面命令，让 flask 允许外网访问，并且监听 80 端口：
-
-$ pipenv run flask run --host 0.0.0.0 --port 80
-然后你可以通过你的服务器公网 IP 或 域名 直接访问到该页面。
 ```
-
+Flask 默认运行的地址和端口为 http://127.0.0.1:5000 ，云服务器实例不包含桌面环境的话，你很难去浏览这个页面。你可以设置 flask 运行的地址和端口，然后尝试从外网访问该页面。先执行下面命令，让 flask 允许外网访问，并且监听 80 端口：
+```
+$ pipenv run flask run --host 0.0.0.0 --port 80
+```
+然后你可以通过你的服务器公网 IP 或 域名 直接访问到该页面。
 ### centos7-修改默认python为3
 ```
 $ sudo yum install yum-utils
@@ -1383,14 +1403,12 @@ chmod 755 /etc/profile.d/python.sh
 重启会话使配置生效
 source /etc/profile.d/python.sh
 ```
-
 linux 路径映射
 ```
 /data/eddie/new_pdf：本机路径
 //192.168.1.62/new_pdf：远程路径
 mount -v -t cifs //192.168.1.62/new_pdf /data/eddie/new_pdf -o 'username=icmofang,password=icmofang,vers=1.0'
 ```
-
 ### centos7 安装 pyhanlp
 ```
 pip3 install pyhanlp -i https://pypi.tuna.tsinghua.edu.cn/simple
@@ -1406,8 +1424,6 @@ yum install gcc-c++
 然后再运行
 pip3 install pyhanlp -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
-
-
 ```
 JPype1 (0.7.0)
 
@@ -1419,8 +1435,6 @@ requests (2.22.0)
 scipy (1.3.2)
 sklearn (0.0)
 ```
-
-
 ### centos7 安装jdb1.8+
 1. jdk8下载参考，下载jdk-8u161-linux-x64.tar.gz
 https://blog.csdn.net/qq_21187515/article/details/84850814
@@ -1460,178 +1474,178 @@ java -version
 
 
 ### 解压缩
-```
+
 .tar 
-　　解包：tar xvf FileName.tar 
-　　打包：tar cvf FileName.tar DirName 
-　　（注：tar是打包，不是压缩！） 
-　　——————————————— 
-　　.gz 
-　　解压 1：gunzip FileName.gz 
-　　解压2：gzip -d FileName.gz 
-　　压缩：gzip FileName 
-　　.tar.gz 和 .tgz 
-　　解压：tar zxvf FileName.tar.gz 
-　　压缩：tar zcvf FileName.tar.gz DirName 
-　　——————————————— 
-　　.bz2 
-　　解压1：bzip2 -d FileName.bz2 
-　　解压2：bunzip2 FileName.bz2 
-　　压缩： bzip2 -z FileName 
-　　.tar.bz2 
-　　解压：tar jxvf FileName.tar.bz2        或tar --bzip xvf FileName.tar.bz2 
-　　压缩：tar jcvf FileName.tar.bz2 DirName 
-　　 ——————————————— 
-　　.bz 
-　　解压1：bzip2 -d FileName.bz 
-　　解压2：bunzip2 FileName.bz 
-　　压缩：未知 
-　　.tar.bz 
-　　解压：tar jxvf FileName.tar.bz 
-　　压缩：未知 
-　　——————————————— 
-　　.Z 
-　　解压：uncompress FileName.Z 
-　　压缩：compress FileName 
-　　.tar.Z 
-　　解压：tar Zxvf FileName.tar.Z 
-　　压缩：tar Zcvf FileName.tar.Z DirName 
-　　——————————————— 
-　　.zip 
-　　解压：unzip FileName.zip 
-　　压缩：zip FileName.zip DirName 
-　　压缩一个目录使用 -r 参数，-r 递归。例： $ zip -r FileName.zip DirName 
-　　——————————————— 
-　　.rar 
-　　解压：rar x FileName.rar 
-　　压缩：rar a FileName.rar DirName 
-　　 
-　　rar 请到：http://www.rarsoft.com/download.htm 下载！ 
-　　解压后请将rar_static拷贝到/usr /bin目录（其他由$PATH环境变量指定的目录也可以）： 
-　　[root@www2 tmp]# cp rar_static /usr/bin/rar 
-　　——————————————— 
-　　.lha 
-　　解压：lha -e FileName.lha 
-　　压缩：lha -a FileName.lha FileName 
-　　 
-　　lha请到：http://www.infor.kanazawa-it.ac.jp/~ishii/lhaunix/下载！ 
-　　>解压后请将 lha拷贝到/usr/bin目录（其他由$PATH环境变量指定的目录也可以）： 
-　　[root@www2 tmp]# cp lha /usr/bin/ 
-　　——————————————— 
-　　.rpm 
-　　解包：rpm2cpio FileName.rpm | cpio -div 
-　　——————————————— 
-　　.deb 
-　　解包：ar p FileName.deb data.tar.gz | tar zxf - 
-　　——————————————— 
-　　.tar .tgz .tar.gz .tar.Z .tar.bz .tar.bz2 .zip .cpio .rpm .deb .slp .arj .rar .ace .lha .lzh .lzx .lzs .arc .sda .sfx .lnx .zoo .cab .kar .cpt .pit .sit .sea 
-　　解压：sEx x FileName.* 
-　　压缩：sEx a FileName.* FileName 
-　　 
-　　sEx只是调用相关程序，本身并无压缩、解压功能，请注意！ 
-　　sEx请到： http://sourceforge.net/projects/sex下载！ 
-　　解压后请将sEx拷贝到/usr/bin目录（其他由$PATH环境变量指定的目录也可以）： 
-　　[root@www2 tmp]# cp sEx /usr/bin/　　Linux下常见文件解压方法及命令 
-　　系统·System 
-　　 
-　　1.以.a为扩展名的文件: 
-　　#tar xv file.a 
-　　2.以.z为扩展名的文件: 
-　　#uncompress file.Z 
-　　3.以.gz为扩展名的文件: 
-　　#gunzip file.gz 
-　　4.以.bz2为扩展名的文件: 
-　　#bunzip2 file.bz2 
-　　5.以.tar.Z为扩展名的文件: 
-　　#tar xvZf file.tar.Z 
-　　或 #compress -dc file.tar.Z | tar xvf 
-　　6.以.tar.gz/.tgz为扩展名的文件: 
-　　#tar xvzf file.tar.gz 
-　　或 gzip -dc file.tar.gz | tar xvf - 
-　　7.以.tar.bz2为扩展名的文件: 
-　　#tar xvIf file.tar.bz2 
-　　或 bzip2 -dc file.tar.bz2 | xvf - 
-　　8.以.cpio.gz/.cgz为扩展名的文件: 
-　　#gzip -dc file.cgz | cpio -div 
-　　9. 以.cpio/cpio为扩展名的文件: 
-　　#cpio -div file.cpio 
-　　或cpio -divc file.cpio 
-　　10.以.rpm为扩展名的文件安装: 
-　　#rpm -i file.rpm 
-　　11.以.rpm为扩展名的文件解压缩： 
-　　 #rpm2cpio file.rpm | cpio -div 
-　　12.以.deb为扩展名的文件安装： 
-　　#dpkg -i file.deb 
-　　13.以.deb为扩展名的文件解压缩: 
-　　#dpkg-deb -fsys-tarfile file.deb | tar xvf - ar p 
-　　file.deb data.tar.gz | tar xvzf - 
-　　14.以.zip为扩展名的文件: 
-　　#unzip file.zip 
-　　在linux下解压Winzip格式的文件 
-　　要是装了jdk的话，可以用 jar命令；还可以使用unzip命令。 
-　　直接解压.tar.gz文件 
-　　xxxx.tar.gz文件使用tar带zxvf参数，可以一次解压开。XXXX为文件名。 例如： 
-　　$tar zxvf xxxx.tar.gz 各种压缩文件的解压（安装方法） 
-　　 
-　　文件扩展名 解压（安装方法） 
-　　　 
-　　.a ar xv file.a 
-　　.Z uncompress file.Z 
-　　.gz gunzip file.gz 
-　　.bz2 bunzip2 file.bz2 
-　　.tar.Z tar xvZf file.tar.Z 
-　　compress -dc file.tar.Z | tar xvf - 
-　　.tar.gz/.tgz tar xvzf file.tar.gz 
-　　gzip -dc file.tar.gz | tar xvf - 
-　　.tar.bz2 tar xvIf file.tar.bz2 
-　　bzip2 -dc file.tar.bz2 | xvf - 
-　　.cpio.gz/.cgz gzip -dc file.cgz | cpio -div 
-　　.cpio/cpio cpio -div file.cpio 
-　　cpio -divc file.cpio 
-　　.rpm/install rpm -i file.rpm 
-　　.rpm/extract rpm2cpio file.rpm | cpio -div 
-　　.deb/install dpkg -i file.deb 
-　　.deb/exrtact dpkg-deb -fsys-tarfile file.deb | tar xvf - 
-　　ar p file.deb data.tar.gz | tar xvzf - 
-　　.zip unzip file.zip 
-　　 
-　　 
-　　bzip2 -d myfile.tar.bz2 | tar xvf 
-　　 
-　　 
-　　tar xvfz myfile.tar.bz2 
-　　 
-　　 
-　　x 是解压 
-　　v 是复杂输出 
-　　f 是指定文件 
-　　z gz格式 
-　　 
-　　 
-　　gzip 
-　　gzip[选项]要压缩（或解压缩）的文件名 
-　　-c将输出写到标准输出上，并保留原有文件。 
-　　-d将压缩文件压缩。 
-　　-l对每个压缩文件，显示下列字段：压缩文件的大小，未压缩文件的大小、压缩比、未压缩文件的名字 
-　　-r递归式地查找指定目录并压缩或压缩其中的所有文件。 
-　　-t测试压缩文件是正完整。 
-　　-v对每一个压缩和解压缩的文件，显示其文件名和压缩比。 
-　　-num-用指定的数字调整压缩的速度。 
-　　举例： 
-　　把/usr目录并包括它的子目录在内的全部文件做一备份，备份文件名为usr.tar 
-　　tar cvf usr.tar /home 
-　　把/usr 目录并包括它的子目录在内的全部文件做一备份并进行压缩，备份文件名是usr.tar.gz 
-　　tar czvf usr.tar.gz /usr 
-　　压缩一组文件，文件的后缀为tar.gz 
-　　#tar cvf back.tar /back/ 
-　　#gzip -q back.tar 
-　　or 
-　　#tar cvfz back.tar.gz /back/ 
-　　释放一个后缀为tar.gz 的文件。 
-　　#tar zxvf back.tar.gz 
-　　#gzip back.tar.gz 
-　　#tar xvf back.tar
-```
+解包：tar xvf FileName.tar 
+打包：tar cvf FileName.tar DirName 
+（注：tar是打包，不是压缩！） 
+——————————————— 
+.gz 
+解压 1：gunzip FileName.gz 
+解压2：gzip -d FileName.gz 
+压缩：gzip FileName 
+.tar.gz 和 .tgz 
+解压：tar zxvf FileName.tar.gz 
+压缩：tar zcvf FileName.tar.gz DirName 
+——————————————— 
+.bz2 
+解压1：bzip2 -d FileName.bz2 
+解压2：bunzip2 FileName.bz2 
+压缩： bzip2 -z FileName 
+.tar.bz2 
+解压：tar jxvf FileName.tar.bz2        或tar --bzip xvf FileName.tar.bz2 
+压缩：tar jcvf FileName.tar.bz2 DirName 
+ ——————————————— 
+.bz 
+解压1：bzip2 -d FileName.bz 
+解压2：bunzip2 FileName.bz 
+压缩：未知 
+.tar.bz 
+解压：tar jxvf FileName.tar.bz 
+压缩：未知 
+——————————————— 
+.Z 
+解压：uncompress FileName.Z 
+压缩：compress FileName 
+.tar.Z 
+解压：tar Zxvf FileName.tar.Z 
+压缩：tar Zcvf FileName.tar.Z DirName 
+——————————————— 
+.zip 
+解压：unzip FileName.zip 
+压缩：zip FileName.zip DirName 
+压缩一个目录使用 -r 参数，-r 递归。例： $ zip -r FileName.zip DirName 
+——————————————— 
+.rar 
+解压：rar x FileName.rar 
+压缩：rar a FileName.rar DirName 
+ 
+rar 请到：http://www.rarsoft.com/download.htm 下载！ 
+解压后请将rar_static拷贝到/usr /bin目录（其他由$PATH环境变量指定的目录也可以）： 
+[root@www2 tmp]# cp rar_static /usr/bin/rar 
+——————————————— 
+.lha 
+解压：lha -e FileName.lha 
+压缩：lha -a FileName.lha FileName 
+ 
+lha请到：http://www.infor.kanazawa-it.ac.jp/~ishii/lhaunix/下载！ 
+>解压后请将 lha拷贝到/usr/bin目录（其他由$PATH环境变量指定的目录也可以）： 
+[root@www2 tmp]# cp lha /usr/bin/ 
+——————————————— 
+.rpm 
+解包：rpm2cpio FileName.rpm | cpio -div 
+——————————————— 
+.deb 
+解包：ar p FileName.deb data.tar.gz | tar zxf - 
+——————————————— 
+.tar .tgz .tar.gz .tar.Z .tar.bz .tar.bz2 .zip .cpio .rpm .deb .slp .arj .rar .ace .lha .lzh .lzx .lzs .arc .sda .sfx .lnx .zoo .cab .kar .cpt .pit .sit .sea 
+解压：sEx x FileName.* 
+压缩：sEx a FileName.* FileName 
+ 
+sEx只是调用相关程序，本身并无压缩、解压功能，请注意！ 
+sEx请到： http://sourceforge.net/projects/sex下载！ 
+解压后请将sEx拷贝到/usr/bin目录（其他由$PATH环境变量指定的目录也可以）： 
+[root@www2 tmp]# cp sEx /usr/bin/　　Linux下常见文件解压方法及命令 
+系统·System 
+ 
+1.以.a为扩展名的文件: 
+#tar xv file.a 
+2.以.z为扩展名的文件: 
+#uncompress file.Z 
+3.以.gz为扩展名的文件: 
+#gunzip file.gz 
+4.以.bz2为扩展名的文件: 
+#bunzip2 file.bz2 
+5.以.tar.Z为扩展名的文件: 
+#tar xvZf file.tar.Z 
+或 #compress -dc file.tar.Z | tar xvf 
+6.以.tar.gz/.tgz为扩展名的文件: 
+#tar xvzf file.tar.gz 
+或 gzip -dc file.tar.gz | tar xvf - 
+7.以.tar.bz2为扩展名的文件: 
+#tar xvIf file.tar.bz2 
+或 bzip2 -dc file.tar.bz2 | xvf - 
+8.以.cpio.gz/.cgz为扩展名的文件: 
+#gzip -dc file.cgz | cpio -div 
+9. 以.cpio/cpio为扩展名的文件: 
+#cpio -div file.cpio 
+或cpio -divc file.cpio 
+10.以.rpm为扩展名的文件安装: 
+#rpm -i file.rpm 
+11.以.rpm为扩展名的文件解压缩： 
+ #rpm2cpio file.rpm | cpio -div 
+12.以.deb为扩展名的文件安装： 
+#dpkg -i file.deb 
+13.以.deb为扩展名的文件解压缩: 
+#dpkg-deb -fsys-tarfile file.deb | tar xvf - ar p 
+file.deb data.tar.gz | tar xvzf - 
+14.以.zip为扩展名的文件: 
+#unzip file.zip 
+在linux下解压Winzip格式的文件 
+要是装了jdk的话，可以用 jar命令；还可以使用unzip命令。 
+直接解压.tar.gz文件 
+xxxx.tar.gz文件使用tar带zxvf参数，可以一次解压开。XXXX为文件名。 例如： 
+$tar zxvf xxxx.tar.gz 各种压缩文件的解压（安装方法） 
+ 
+文件扩展名 解压（安装方法） 
+　 
+.a ar xv file.a 
+.Z uncompress file.Z 
+.gz gunzip file.gz 
+.bz2 bunzip2 file.bz2 
+.tar.Z tar xvZf file.tar.Z 
+compress -dc file.tar.Z | tar xvf - 
+.tar.gz/.tgz tar xvzf file.tar.gz 
+gzip -dc file.tar.gz | tar xvf - 
+.tar.bz2 tar xvIf file.tar.bz2 
+bzip2 -dc file.tar.bz2 | xvf - 
+.cpio.gz/.cgz gzip -dc file.cgz | cpio -div 
+.cpio/cpio cpio -div file.cpio 
+cpio -divc file.cpio 
+.rpm/install rpm -i file.rpm 
+.rpm/extract rpm2cpio file.rpm | cpio -div 
+.deb/install dpkg -i file.deb 
+.deb/exrtact dpkg-deb -fsys-tarfile file.deb | tar xvf - 
+ar p file.deb data.tar.gz | tar xvzf - 
+.zip unzip file.zip 
+ 
+ 
+bzip2 -d myfile.tar.bz2 | tar xvf 
+ 
+ 
+tar xvfz myfile.tar.bz2 
+ 
+ 
+x 是解压 
+v 是复杂输出 
+f 是指定文件 
+z gz格式 
+ 
+ 
+gzip 
+gzip[选项]要压缩（或解压缩）的文件名 
+-c将输出写到标准输出上，并保留原有文件。 
+-d将压缩文件压缩。 
+-l对每个压缩文件，显示下列字段：压缩文件的大小，未压缩文件的大小、压缩比、未压缩文件的名字 
+-r递归式地查找指定目录并压缩或压缩其中的所有文件。 
+-t测试压缩文件是正完整。 
+-v对每一个压缩和解压缩的文件，显示其文件名和压缩比。 
+-num-用指定的数字调整压缩的速度。 
+举例： 
+把/usr目录并包括它的子目录在内的全部文件做一备份，备份文件名为usr.tar 
+tar cvf usr.tar /home 
+把/usr 目录并包括它的子目录在内的全部文件做一备份并进行压缩，备份文件名是usr.tar.gz 
+tar czvf usr.tar.gz /usr 
+压缩一组文件，文件的后缀为tar.gz 
+#tar cvf back.tar /back/ 
+#gzip -q back.tar 
+or 
+#tar cvfz back.tar.gz /back/ 
+释放一个后缀为tar.gz 的文件。 
+#tar zxvf back.tar.gz 
+#gzip back.tar.gz 
+#tar xvf back.tar
+
 
 
 ### chmod
@@ -1820,7 +1834,6 @@ files=/etc/supervisor/*.conf #若你本地无/etc/supervisor目录，请自建
 cd /etc/supervisor
 以ss为例，写一个守护线程：
 vim /etc/supervisor/shadowsocks.conf
-
 [program:shadowsocks]
   command = ssserver -c /etc/shadowsocks.json
   user = root
@@ -1828,10 +1841,8 @@ vim /etc/supervisor/shadowsocks.conf
   autoresart = true
   stderr_logfile = /var/log/supervisor/ss.stderr.log
   stdout_logfile = /var/log/supervisor/ss.stdout.log
-  
 重新加载配置：
 supervisorctl reload
-
 命令
 supervisord : 启动
 supervisorctl reload :修改完配置文件后重新启动
@@ -1839,10 +1850,12 @@ supervisorctl status :查看supervisor监管的进程状态
 supervisorctl start 进程名 ：启动XXX进程
 supervisorctl stop 进程名 ：停止XXX进程
 supervisorctl stop all：停止全部进程，注：start、restart、stop都不会载入最新的配置文件。
-
-
 ```
 whereis nginx
 sudo netstat -anp | grep nginx
 ps -ef | grep nginx
+```
+```
+wget https://www.python.org/ftp/python/3.7.6/Python-3.7.6.tar.xz
+tar -xvJf  Python-3.7.0.tar.xz
 ```
