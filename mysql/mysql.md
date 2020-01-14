@@ -888,6 +888,18 @@ show variables like '%timeout%';
 show variables like '%secure%';
 ```
 
+查看group_concat_max_len长度的限制
+```
+show variables like 'group_concat_max_len';
+```
+
+设置group_concat_max_len长度
+```
+set global group_concat_max_len = 10240;
+SET SESSION group_concat_max_len=10240;
+```
+
+
 查询最近执行的sql语句
 ```
 先查看一下二进制的记录日志是否打开
