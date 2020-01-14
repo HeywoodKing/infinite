@@ -1925,6 +1925,15 @@ ip link show wls1
 3: wls1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state DOWN mode DORMANT group default qlen 1000 link/ether 00:11:22:33:44:55 brd ff:ff:ff:ff:ff:ff 
 <BROADCAST,MULTICAST,UP,LOWER_UP> 中的UP 表明该接口激活成功，后面的 state DOWN 无关紧要
 ```
+```
+将无线网口wls1开启 
+ip link set wlp4s0 up 
+显示无线网口wlp4s0连接情况 
+ip link show wlp4s0 
+显示分配的ip地址，特别适用于查看是否成功地通过dhcp自动获取了ip地址 
+ip addr show wlp4s0
+```
+
 
 4. 查看无线网络连接情况
 刚开始应该会显示无连接
@@ -1941,12 +1950,16 @@ iw wls1 scan | grep SSID
 6. 连接指定的SSID
 将ssid 替换为实际的网络名称，psk 替换为无线密码，请保留引号
 ```
-wpa_supplicant -B -i wlp3s0 -c <(wpa_passphrase "ssid" "psk") 
+wpa_supplicant -B -i wlp3s0 -c <(wpa_passphrase "ssid" "psk")
+连接无线网ssid，密码psk 
+wpa_supplicant -B -i wlp4s0-c <(wpa_passphrase "ssid" "psk") 
 ```
 
 7. 用dhcp 获得 IP 分配
 ```
 dhclient wlp3s0
+为wlp8s0自动分配ip地址 
+dhclient wlp4s0
 ```
 
 8. 测试是否成功地从路由器获取了ip(重要)
@@ -1954,3 +1967,41 @@ dhclient wlp3s0
 ```
 ip addr  show wls1
 ```
+
+centos7无法进入图形界面
+正常登陆后，输入init 5没有反应，无法进入图形界面
+输入vi /etc/inittab查看有两种模式
+```
+multi-user.target：analogous to runlevel 3
+graphical.target: analogous to runlevel 5
+```
+
+输入:wq（注意有个冒号）退出vi
+退出vi模式后，输入命令systemctl get-default 查看当前系统启动模式
+```
+graphical.target
+```
+
+若当前系统启动模式为multi-user.target
+```
+systemctl set-default graphical.target
+```
+之后再输入reboot重启
+
+```
+1.设置NetworkManager自动启动 
+chkconfig NetworkManager on 
+2.安装NetworkManager-wifi 
+yum -y install NetworkManager-wifi 
+3.开启WiFi 
+nmcli r wifi on 
+4.测试（扫描信号） 
+nmcli dev wifi 
+5.连接 
+nmcli dev wifi connect password
+接着使用yum grouplist 查看可安装软件 
+出现GNOME Desktop软件
+yum groupinstall "GNOME Desktop"进行安装
+```
+
+
