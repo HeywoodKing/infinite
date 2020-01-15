@@ -10,8 +10,7 @@ git rm <file> ... 删除代码库的文件。
 git commit -m <message> 提交更改，在修改了文件以后，使用这个命令提交修改。
 git pull 从远程同步代码库到本地。相当于是从远程获取最新版本并merge到本地
 git pull origin dev 本地分支与远程分支相关联
-git pull origin master (该命令其实相当于git fetch 和 git merge
-在实际使用中，git fetch更安全一些)
+git pull origin master (该命令其实相当于git fetch 和 git merge在实际使用中，git fetch更安全一些)
 git push 推送代码到远程代码库。
 git push origin test 这样远程仓库中也就创建了一个test分支
 git push origin dev:dev # 同步dev分支的代码到远程服务器
@@ -248,7 +247,6 @@ git remote add upstream 项目地址
 （3）再次查看远程目录的位置：
 git remote -v
 
-
 （4）抓取原仓库的修改文件：
 git fetch upstream
 
@@ -455,12 +453,11 @@ git update-index --assume-unchanged PATH    在PATH处输入要忽略的文件�
 ```
 
 
-
 =============================================
 生成ssh 公钥和私钥
 打开git bash终端
 输入：
-ssh-keygen -t rsa -C "opencoding@hotmail.com"
+ssh-keygen -t rsa -C "opencoding@hotmail.com" -f ~/.ssh/id_rsa
 添加你的SSH公钥(email是你github注册账号的邮箱)
 
 第一次出现：Enter file in which to save the key (/root/.ssh/id_rsa): 直接按回车就行
@@ -479,7 +476,6 @@ ssh-keygen -t rsa -C "opencoding@hotmail.com"
 ssh-keygen -t rsa -C "YOUR_EMAIL@YOUREMAIL.COM" -f ~/.ssh/aysee
 eg:
 $ ssh-keygen -t rsa -C "opencoding@hotmail.com" -f D:/Flack/Work/.ssh/aysee
-$ ssh-keygen -t rsa -C "flack.chen" -f D:/flack/work/.ssh/110.43.50.188
 ```
 执行完成后，会在 ~/.ssh/目录下生成一个 aysee 和 aysee.pub 文件。
 2、在 SSH 用户配置文件 ~/.ssh/config 中指定对应服务所使用的公秘钥名称，如果没有 config 文件的话就新建一个，并输入以下内容：
@@ -487,7 +483,7 @@ Host github.com www.github.com
 IdentityFile ~/.ssh/aysee
 3、添加 aysee.pub 到你的git服务器网站上。
 4、测试配置文件是否正常工作
-ssh -T git@gitcafe.com
+ssh -T git@github.com
 如果，正常的话，会出现如下提示：
 Hi USERNAME! You've successfully authenticated, but github does not provide shell access.
 
@@ -507,13 +503,12 @@ ssh-add ~/.ssh/aysee
 和
 2048 8e:71:ad:88:78:80:b2:d9:e1:2d:1d:e4:be:6b:db:8e /Users/aysee/.ssh/id_rsa (RSA)
 2048 a7:f4:0d:f1:b1:76:0b:bf:ed:9f:53:8c:3f:4c:f4:d6 /Users/aysee/.ssh/aysee (RSA)
-如果使用 ssh-add ~/.ssh/id_rsa的时候报如下错误，则需要先运行一下 ssh-agent bash 命令后再执行 ssh-add ...等命令
+如果使用 ssh-add ~/.ssh/id_rsa的时候报如下错误，则需要先运行一下 ssh-agent bash 命令后再执行ssh-add ...命令
 Could not open a connection to your authentication agent.
 
 3、配置 ~/.ssh/config 文件
 如果没有就在~/.ssh/目录创建config文件，该文件用于配置私钥对应的服务器
-# Default github user(first@mail.com)
- 
+# Default github user(first@mail.com) 
 Host github.com
 HostName github.com
 User git
@@ -539,8 +534,9 @@ ssh -T git@github.com
 Hi USERNAME! You've successfully authenticated, but github does not provide shell access.
 
 =============================================
-
+```
 结果示例展示：
+```
 $ ssh-keygen -t rsa -C "chenhongwu@huachunnet.com"
 Generating public/private rsa key pair.
 Enter file in which to save the key (/c/Users/HC001/.ssh/id_rsa):
@@ -563,12 +559,7 @@ The key's randomart image is:
 |   o=o. .        |
 |  .+*+.          |
 +----[SHA256]-----+
-
-
-
-
-
-
+```
 Git global setup
 git config --global user.name "flack.chen"
 git config --global user.email "flack.chen@icmofang.com"
@@ -595,7 +586,7 @@ git remote rename origin old-origin
 git remote add origin git@gitlab:icmofang/moli_restapi.git
 git push -u origin --all
 git push -u origin --tags
-
+```
 
 
 #git常用命令
@@ -625,13 +616,11 @@ git status 当前修改的状态，是否修改了还没提交，或者那些文
 git reset <log> 恢复到历史版本。
 git reset <log> --hard 恢复到制定的版本
 git reset HEAD 恢复到上一个提交的版本
-
 git push origin :dev # 删除远程dev分支，危险命令哦
 git remote -v 查看远程仓库
 git fetch origin master:temp 从远程的origin仓库的master分支下载到本地，并新建一个temp分支
 git diff temp 查看temp分支与本地原有分支的不同
 git merge temp 将temp分支和本地分支合并
-
 相当于是从远程获取最新版本到本地，不会自动merge
 git fetch 更新git remote 中所有的远程仓库所包含分支的最新commit-id, 将其记录到.git/FETCH_HEAD文件中
 git fetch remote_repo 更新名称为remote_repo 的远程repo上的所有branch的最新commit-id，将其记录。
