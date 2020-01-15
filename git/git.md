@@ -475,12 +475,11 @@ ssh-keygen -t rsa -C "opencoding@hotmail.com"
 生成多个私钥
 如果你已经有了一套名为 id_rsa 的公秘钥，将要生成另外一个公钥，比如 aysee ，你也可以使用任何你喜欢的名字。
 1、生成一个新的自定义名称的公钥和私钥：
-ssh-keygen -t rsa -C "YOUR_EMAIL@YOUREMAIL.COM" -f ~/.ssh/aysee
 ```
+ssh-keygen -t rsa -C "YOUR_EMAIL@YOUREMAIL.COM" -f ~/.ssh/aysee
 eg:
 $ ssh-keygen -t rsa -C "opencoding@hotmail.com" -f D:/Flack/Work/.ssh/aysee
 $ ssh-keygen -t rsa -C "flack.chen" -f D:/flack/work/.ssh/110.43.50.188
-
 ```
 执行完成后，会在 ~/.ssh/目录下生成一个 aysee 和 aysee.pub 文件。
 2、在 SSH 用户配置文件 ~/.ssh/config 中指定对应服务所使用的公秘钥名称，如果没有 config 文件的话就新建一个，并输入以下内容：
