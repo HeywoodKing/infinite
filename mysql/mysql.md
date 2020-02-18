@@ -442,11 +442,66 @@ desc information_schema.innodb_trx ;
 +—————————-+———————+——+—–+———————+——-+
 ```
 
-mysql查询某一个字段是否包含中文字符
+mysql查询某一个字段是否包含中文字符（中英文字符，中文，英文）
 在使用mysql时候，某些字段会存储中文字符，或是包含中文字符的串，查询出来的方法是：
 ```
 SELECT col FROM table WHERE length(col)!=char_length(col);
+
+select char_length('aaa'),length('aaa'),char_length("我们"),length("我们");
++--------------------+---------------+-----------------------+------------------+
+| char_length('aaa') | length('aaa') | char_length("我们")   | length("我们")   |
++--------------------+---------------+-----------------------+------------------+
+|                  3 |             3 |                     2 |                6 |
++--------------------+---------------+-----------------------+------------------+
 ```
+
+判断一个字段是否为纯数字
+```
+select * from tt where length(0+name)=length(name);
+
+sql语句                                           运行结果
+select LENGTH('test') as test1;                   4
+select LENGTH(0+'test') as test2;                 1
+select 0+'test' as test3;                         0
+select LENGTH('30') as test4;                     2
+select LENGTH('30'+0) as test5;                   2
+select '30'+0 as test6;                           30
+
+判断一个字段是否为纯数字
+SELECT * FROM TEST WHERE RESULT REGEXP '(^[0-9]+.[0-9]+$)|(^[0-9]$)'
+```
+
+二进制转十进制
+```
+select conv(1011,2,10);
+```
+
+八进制转十进制
+```
+select conv(72,8,10);
+```
+
+十六进制转十进制
+```
+select conv(165,16,10);
+```
+
+
+十进制转二进制
+```
+select bin(95);
+```
+
+十进制转八进制
+```
+select oct(95);
+```
+
+十进制转十六进制
+```
+select hex(95);
+```
+
 
 插入表数据
 ```
@@ -887,6 +942,18 @@ show full processlist;
 show variables like '%timeout%';
 show variables like '%secure%';
 ```
+
+查看group_concat_max_len长度的限制
+```
+show variables like 'group_concat_max_len';
+```
+
+设置group_concat_max_len长度
+```
+set global group_concat_max_len = 10240;
+SET SESSION group_concat_max_len=10240;
+```
+
 
 查询最近执行的sql语句
 ```
