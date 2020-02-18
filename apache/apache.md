@@ -51,7 +51,9 @@ sudo systemctl restart apache2
 ```
 
 ### 卸载apache
-`sudo apt-get remove apache*`
-`sudo apt-get --purge remove apache2`
-`sudo apt-get --purge remove apache2.2-common`
-`sudo apt-get autoremove`
+```
+sudo apt-get remove apache*
+sudo apt-get --purge remove apache2
+sudo apt-get --purge remove apache2.2-common
+sudo apt-get autoremove
+```
