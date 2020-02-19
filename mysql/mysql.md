@@ -3195,6 +3195,19 @@ SELECT SUBSTRING_INDEX('www.yuanrengu.com', 'sprite', 1);
 结果为：www.yuanrengu.com
 
 
+
+提取以http://开头的url的域名
+select if(length(substr(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), 1, instr(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), ':')-1)) > 0,substr(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), 1, instr(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), ':')-1),if(length(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1)) > 0 ,substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), if(length(substr(datasheets, 8))>0,substr(datasheets, 8),'UNKNOWN'))) as `domain` from db_crawler_digikey.tb_electron_zh_685;
+
+
+提取以https://开头的url的域名  需要完善
+select if(length(substr(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), 1, instr(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), ':')-1)) > 0,substr(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), 1, instr(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), ':')-1),if(length(substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1)) > 0 ,substr(substr(datasheets, 8), 1, instr(substr(datasheets, 8), '/')-1), if(length(substr(datasheets, 8))>0,substr(datasheets, 8),'UNKNOWN'))) as `domain` from db_crawler_digikey.tb_electron_zh_685;
+
+
+将获取到/www.infineon.com/dgdl/DS-v01_06-EN.pdf结果为www.infineon.com
+select substring_index(trim(leading '/' from replace(replace('/www.infineon.com/dgdl/DS-v01_06-EN.pdf','http://',''),'https://','')),'/',1) as res;
+
+
 substring_index
 字符串截取：substring_index(str,delim,count)
 4.1 截取第二个 '.' 之前的所有字符。
@@ -3232,7 +3245,7 @@ condition 可选，当条件为false值返回的值
 eg:
 SELECT IF(500<1000, 5, 10);
 SELECT IF(STRCMP("hello","bye") = 0, "YES", "NO");
-
+select if(length(packaging)=char_length(packaging),packaging,'') as packaging from tb_electron_zh_685 limit 1;
 
 
 常用的字符串函数：
