@@ -1032,7 +1032,7 @@ https://www.jianshu.com/p/1e1847cdf3b9
 
 docker run --name mongodb_foxy -v /data/mongodb:/data/db -p 27017:27017 -d mongodb --auth
 
-docker exec -it mongo_foxy /bin/bash
+docker exec -it mongodb_foxy /bin/bash
 
 mongo 192.168.31.206:27017/admin
 
