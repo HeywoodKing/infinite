@@ -35,7 +35,43 @@ cp -r mysite /opt/project/
 # 移动aaa文件夹及内容到/home/development下
 mv aaa /home/development
 tree
+
+查看前10行内容
+head -n 10 filename
+查看后5行内容
+tail -n 5 filename
+
+如果想同时查看可以将前10行和后5行的显示信息通过输出重定向的方法保存到一个文档
+将内容输出到/home/test文件中
+head -n 10 filename >> /home/test
+tail -n 5 filename >> /home/test
+cat /home/test
+
+
+显示前面1000行
+head -n 1000
+从1000行开始显示，显示1000行以后的
+tail -n +1000
+
+
 cat a.txt
+
+查看前10行
+cat filename | head -n 10
+查看后10行
+cat filename | tail -n 10
+从100 行开始显示以后的所有行
+cat filename | tail -n +100
+查看前500行，后100行以后的所有行
+cat filename | head -n 500 | tail -n +100
+从第3000行开始，显示1000行。即显示3000~3999行
+cat filename | tail -n +3000 | head -n 1000
+显示1000行到3000行
+cat filename| head -n 3000 | tail -n +1000 
+
+查看文件的第5行到第10行
+sed -n '5,10p' filename
+
 
 查询MySQL安装目录
 find / -name mysql
