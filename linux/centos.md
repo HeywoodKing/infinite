@@ -2005,3 +2005,12 @@ yum groupinstall "GNOME Desktop"进行安装
 ```
 
 
+## 疑难杂症
+### 在用Oracle VirtualBox安装CentOS8的过程中，在安装引导程序过程中就突然变成花屏了.... 分辨率还特小，只能看到整个屏幕的左上角，鼠标能动
+![截图](http://imgsrc.baidu.com/forum/w%3D580/sign=4115e77bc95c1038247ececa8210931c/21abd933c895d143050e03427cf082025aaf0767.jpg "截图")
+```
+修改一下2项配置就可以
+1.VitualBox中，该虚拟机版本从RedHat-64Bit 改为 Linux2.6/3.x/4.x-64Bit
+2.安装CentOS8过程中，选择的语言从 中文 改为 英文
+```
+
