@@ -471,6 +471,38 @@ select '30'+0 as test6;                           30
 SELECT * FROM TEST WHERE RESULT REGEXP '(^[0-9]+.[0-9]+$)|(^[0-9]$)'
 ```
 
+查询字段中包含某个字符串的记录
+```
+mysql判断是否包含某个字符的方法
+方法一：locate(字符,字段名) 它的别名是 position in
+用locate 是最快的，like 最慢。position一般
+select * from 表名 where locate(字符,字段)
+select * from 表名 where position(字符 in 字段);
+
+select * from tb_electron where locate('tshra',part_number) limit 1 \G
+
+select * from tb_electron where position('tshra' in part_number) limit 1 \G
+
+判断site表中的url是否包含'http://'子串,如果不包含则拼接在url字符串开头
+update site set url =concat('http://',url) where locate('http://',url)=0;
+
+方法二：like
+SELECT * FROM 表名 WHERE 字段名 like "%字符%";
+
+方法三：find_in_set(str1,str2)
+函数是返回str2中str1所在的位置索引，str2必须以","分割开
+注：当str2为NO1："3,6,13,24,33,36"，NO2："13,33,36,39"时，判断两个数据中str2字段是否包含'3'
+SELECT * FROM users WHERE find_in_set('字符', 字段名);
+
+SELECT find_in_set()('3','3,6,13,24,33,36') as test;
+
+SELECT find_in_set()('3','13,33,36,39') as test;
+
+方法四：INSTR(字段,字符)
+select * from 表名 where INSTR(字段,字符)
+```
+
+
 二进制转十进制
 ```
 select conv(1011,2,10);
@@ -839,9 +871,18 @@ show profiles;
 
 查看当前表的自动增长id是多少
 ```
+SELECT * FROM information_schema.tables WHERE TABLE_NAME = 'tbl_language' \G
+
 select auto_increment from information_schema.tables 
-where table_schema = 'db_electron_property' and table_name = 'tb_electron_area';
+where table_schema = 'db_electron_property' 
+and table_name = 'tb_electron_area';
 ```
+
+```
+use information_schema;
+show columns from tables;
+```
+
 
 修改表students自动序列值
 ```
@@ -1416,8 +1457,15 @@ select min(id) as id,part_number,factory_id,min(unit_price) as unit_price,packag
 
 查询结果中增加序号
 ```
+第一种：
 select (@i:=@i+1) as i, first_zh_name,first_en_name from tb_category_index,(select @i:=0) as it where first_zh_name != first_en_name;
+
+第二种：
+set @rownum=0;
+select @rownum:=@rownum+1 as rownum, t.* from tb_category_index t order by t.id desc limit 10;
 ```
+
+
 
 查看支持的引擎
 ```
@@ -1981,12 +2029,13 @@ select timestampadd(hour, -8, '2008-08-08 12:00:00'); -- 2008-08-08 04:00:00
 
 ### mysql json
 ```
-分类  函数  描述
-创建json  json_array  创建json数组
-  json_object 创建json对象
-  json_quote  将json转成json字符串类型
+创建json  
+  json_array  创建json数组
+  json_object 创建json对象
+  json_quote  将json转成json字符串类型
 
-查询json  json_contains 判断是否包含某个json值
+查询json  
+  json_contains 判断是否包含某个json值
   json_contains_path  判断某个路径下是否包json值
   json_extract  提取json值
   column->path  json_extract的简洁写法，MySQL 5.7.9开始支持
@@ -2013,14 +2062,16 @@ select timestampadd(hour, -8, '2008-08-08 12:00:00'); -- 2008-08-08 04:00:00
 
 
 
-创建表
+1.创建表
 CREATE TABLE teacher_json(id INT PRIMARY KEY, NAME VARCHAR(20) , info  JSON);
 
-插入记录
+2.插入记录
 INSERT INTO teacher_json(id,sname,info) VALUES(1 ,'test','{"time":"2017-01-01 13:00:00","ip":"192.168.1.1","result":"fail"}');
 INSERT INTO teacher_json(id,sname,info) VALUES(2 ,'my',JSON_OBJECT("time",NOW(),'ip','192.168.1.1','result','fail'));
 
-查询IP键
+INSERT INTO teacher_json(id,sname,info) VALUES(3, 'name1', JSON_ARRAY(1, "abc", NULL, TRUE, CURTIME()));
+
+3.查询IP键
 SELECT sname,JSON_EXTRACT(info,'$.ip') FROM teacher_json;
 
 查询有多少个键
@@ -2028,6 +2079,7 @@ SELECT id,json_keys(info) AS "keys" FROM teacher_json;
 
 
 json_keys()
+SELECT id,json_keys(info) AS "keys" FROM teacher_json;
 
 
 json_set()
@@ -2040,6 +2092,12 @@ UPDATE teacher_json SET info = json_set(info,'$.ip','192.168.1.1');
 
 变更值
 UPDATE teacher_json SET info = json_set(info,'$.ip','192.168.1.2');
+
+删除键
+UPDATE teacher_json SET info = json_remove(info,'$.ip') WHERE id = 2;
+
+
+
 
 
 json_insert()
@@ -2145,7 +2203,7 @@ json_type 返回json值得类型
 json_valid 判断是否为合法json文档
 
 
-
+#### =====================================================================
 一,对记录的操作
 1.创建有json字段的表
 
@@ -2363,7 +2421,6 @@ MySQL [db_test]> select * from fk_message where id = 6 and json_contains(tags,js
 
 
 
-
 2.JSON_ARRAY_INSERT 指定位置插入数组元素
 
 -- JSON_ARRAY_INSERT(json_doc, path, val[, path, val] ...)
@@ -2523,8 +2580,9 @@ JSON_VALID()  JSON值是否是有效的
   
 
 mysql官方文档:https://dev.mysql.com/doc/refman/5.7/en/json-utility-functions.html
-
 参考:https://www.cnblogs.com/waterystone/p/5626098.html
+
+#### ========================================================================================
 
 
 eg:
