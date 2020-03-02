@@ -2850,11 +2850,99 @@ create table if not exists `tb_extra_m_electron_kwargs_full`(
 
 
 
+### mysql导出（备份）
+导出（备份）某个数据库：
+```
+mysqldump -u root -p dbName > sqlFilePath
+mysqldump -uroot -p test > E:/mysql/bak/2019_08_04.sql
+mysqldump -uroot -p test > /home/flack/bak/aaa.sql
+mysqldump -h 192.168.99.100 -uroot -p test > E:/mysql/2019_08_04_bak.sql
+mysqldump -h 192.168.99.100 -uroot -p test > /home/flack/bak/aaa.sql
 
 
+从meteo数据库的sdata表中导出sensorid=11 且 fieldid=0的数据到 /home/xyx/Temp.sql 这个文件中
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11" > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
+```
+
+导出多个数据库：
+```
+mysqldump -u root -p --add-drop-database --databases dbName1 dbName2 … > sqlFilePath 
+–add-drop-database ： 该选项表示在创建数据库的时候先执行删除数据库操作 
+–database : 该选项后面跟着要导出的多个数据库，以空格分隔
+
+mysqldump -h localhost -u root -p --databases dbname1,dbname2 > /home/flack/bak/backdb.sql
+```
+
+导出某个数据库的某个表：
+```
+mysqldump -hlocalhost -u root -p db_electron students1,students2 > /home/flack/bak/aaa.sql
+mysqldump -h121.201.107.32 -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
+mysqldump -h121.201.107.32 -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/flack/bak/aaa.sql
+mysqldump -h121.201.107.32 -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
+mysqldump -h121.201.107.32 -uroot -p123456 magic m_electron --where=" category_id=34 and factory='Texas Instruments'" > /home/flack.chen/ti.log
+
+```
+
+到处（备份）系统中所有数据库
+```
+mysqldump -h localhost -u root -p --all-databases > /home/flack/bak/backdb_all.sql
+```
+
+导出结构不导出数据
+只导出数据库结构，不带数据：
+```
+mysqldump -u root -p -d dbName > sqlFilePath 
+-d : 只备份结构，不备份数据。也可以使用"--no-data"代替"-d"，效果一样。
+```
+
+导出数据不导出结构
+```
+mysqldump -t 数据库名 -uroot -p > xxx.sql
+```
+
+导出数据和表结构
+```
+mysqldump 数据库名 -uroot -p > xxx.sql
+```
+
+导出特定表的结构
+```
+mysqldump -uroot -p -B数据库名 --table 表名 > xxx.sql
+#mysqldump [OPTIONS] database [tables]
+```
+
+直接复制整个数据库目录
+```
+mysql data 目录
+windowns: installpath/mysql/data
+linux: /var/lib/mysql
+
+在复制前需要先执行如下命令：
+MYSQL> LOCK TABLES;
+在复制过程中允许客户继续查询表，
+MYSQL> FLUSH TABLES;
+将激活的索引页写入硬盘。
+
+cp -R /var/lib/mysql/chf /home/flack/bak/chf
+cp -R /var/lib/mysql/king /home/flack/bak/king
+```
+
+mysqlhotcopy工具备份
+```
+备份数据库或表最快的途径，只能运行在数据库目录所在的机器上，并且只能备份MyISAM类型的表。
+要使用该备份方法必须可以访问备份的表文件。
+$> mysqlhotcopy -u root -p dbname /path/to/new_directory;
+将数据库复制到new_directory目录。
+```
 
 
-### mysql导入(还原)
+导出命令执行情况如下图所示： 
+![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
+
+
+### mysql导入（还原）
 #### 方法一：未连接数据库时方法
 >语法格式：mysql -h ip -u userName -p dbName < sqlFilePath (最后没有分号) 
 ```
@@ -2922,97 +3010,6 @@ $> mysqlbinlog --stop-date="2013-03-30 15:27:47" D:\MySQL\log\binlog\binlog.0000
 ```
 
 
-### mysql导出（备份）
-导出（备份）某个数据库：
-```
-mysqldump -u root -p dbName > sqlFilePath
-mysqldump -uroot -p test > E:/mysql/bak/2019_08_04.sql
-mysqldump -uroot -p test > /home/flack/bak/aaa.sql
-mysqldump -h 192.168.99.100 -uroot -p test > E:/mysql/2019_08_04_bak.sql
-mysqldump -h 192.168.99.100 -uroot -p test > /home/flack/bak/aaa.sql
-
-
-从meteo数据库的sdata表中导出sensorid=11 且 fieldid=0的数据到 /home/xyx/Temp.sql 这个文件中
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11" > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
-```
-
-导出多个数据库：
-```
-mysqldump -u root -p --add-drop-database --databases dbName1 dbName2 … > sqlFilePath 
-–add-drop-database ： 该选项表示在创建数据库的时候先执行删除数据库操作 
-–database : 该选项后面跟着要导出的多个数据库，以空格分隔
-
-mysqldump -h localhost -u root -p --databases dbname1,dbname2 > /home/flack/bak/backdb.sql
-```
-
-导出某个数据库的某个表：
-```
-mysqldump -u root -p dbName students1,students2 > sqlFilePath
-mysqldump -h localhost -u root -p db_electron students1,students2 > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
-mysqldump -umagic_ro -h121.201.107.32 -pMagic_ro.mofang123 magic m_electron --where=" category_id=34 and factory='Texas Instruments'" > /home/flack.chen/ti.log
-
-```
-
-到处（备份）系统中所有数据库
-```
-mysqldump -h localhost -u root -p --all-databases > /home/flack/bak/backdb_all.sql
-```
-
-导出结构不导出数据
-只导出数据库结构，不带数据：
-```
-mysqldump -u root -p -d dbName > sqlFilePath 
--d : 只备份结构，不备份数据。也可以使用"--no-data"代替"-d"，效果一样。
-```
-
-导出数据不导出结构
-```
-mysqldump -t 数据库名 -uroot -p > xxx.sql
-```
-
-导出数据和表结构
-```
-mysqldump 数据库名 -uroot -p > xxx.sql
-```
-
-导出特定表的结构
-```
-mysqldump -uroot -p -B数据库名 --table 表名 > xxx.sql
-#mysqldump [OPTIONS] database [tables]
-```
-
-直接复制整个数据库目录
-```
-mysql data 目录
-windowns: installpath/mysql/data
-linux: /var/lib/mysql
-
-在复制前需要先执行如下命令：
-MYSQL> LOCK TABLES;
-在复制过程中允许客户继续查询表，
-MYSQL> FLUSH TABLES;
-将激活的索引页写入硬盘。
-
-cp -R /var/lib/mysql/chf /home/flack/bak/chf
-cp -R /var/lib/mysql/king /home/flack/bak/king
-```
-
-mysqlhotcopy工具备份
-```
-备份数据库或表最快的途径，只能运行在数据库目录所在的机器上，并且只能备份MyISAM类型的表。
-要使用该备份方法必须可以访问备份的表文件。
-$> mysqlhotcopy -u root -p dbname /path/to/new_directory;
-将数据库复制到new_directory目录。
-```
-
-
-导出命令执行情况如下图所示： 
-![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
 
 
 ### 相同版本数据库之间迁移
