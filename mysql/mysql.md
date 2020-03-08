@@ -471,6 +471,38 @@ select '30'+0 as test6;                           30
 SELECT * FROM TEST WHERE RESULT REGEXP '(^[0-9]+.[0-9]+$)|(^[0-9]$)'
 ```
 
+查询字段中包含某个字符串的记录
+```
+mysql判断是否包含某个字符的方法
+方法一：locate(字符,字段名) 它的别名是 position in
+用locate 是最快的，like 最慢。position一般
+select * from 表名 where locate(字符,字段)
+select * from 表名 where position(字符 in 字段);
+
+select * from tb_electron where locate('tshra',part_number) limit 1 \G
+
+select * from tb_electron where position('tshra' in part_number) limit 1 \G
+
+判断site表中的url是否包含'http://'子串,如果不包含则拼接在url字符串开头
+update site set url =concat('http://',url) where locate('http://',url)=0;
+
+方法二：like
+SELECT * FROM 表名 WHERE 字段名 like "%字符%";
+
+方法三：find_in_set(str1,str2)
+函数是返回str2中str1所在的位置索引，str2必须以","分割开
+注：当str2为NO1："3,6,13,24,33,36"，NO2："13,33,36,39"时，判断两个数据中str2字段是否包含'3'
+SELECT * FROM users WHERE find_in_set('字符', 字段名);
+
+SELECT find_in_set()('3','3,6,13,24,33,36') as test;
+
+SELECT find_in_set()('3','13,33,36,39') as test;
+
+方法四：INSTR(字段,字符)
+select * from 表名 where INSTR(字段,字符)
+```
+
+
 二进制转十进制
 ```
 select conv(1011,2,10);
@@ -839,9 +871,18 @@ show profiles;
 
 查看当前表的自动增长id是多少
 ```
+SELECT * FROM information_schema.tables WHERE TABLE_NAME = 'tbl_language' \G
+
 select auto_increment from information_schema.tables 
-where table_schema = 'db_electron_property' and table_name = 'tb_electron_area';
+where table_schema = 'db_electron_property' 
+and table_name = 'tb_electron_area';
 ```
+
+```
+use information_schema;
+show columns from tables;
+```
+
 
 修改表students自动序列值
 ```
@@ -1363,6 +1404,67 @@ show columns from employees from employees;
 
 desc employeees.employees;
 ```
+
+
+去掉重复记录得到价格大于0的最小值，如果价格相等则取id最小值的记录
+```
+原记录
++-------+---------------------+------------+------------+-----------+-------+
+| id    | part_number         | factory_id | unit_price | packaging | state |
++-------+---------------------+------------+------------+-----------+-------+
+| 20824 | ATSAM4E16CB-AN      |        582 |      58.68 | 散装      |     0 |
+| 60447 | ATSAM4E16CB-CN      |        582 |       0.00 | 散装      |     4 |
+| 31591 | ATSAM4E16CB-CN      |        582 |      57.62 | 散装      |     0 |
+| 31985 | ATSAM4E16EB-CN      |        582 |      69.77 | 散装      |     0 |
+| 24423 | ATSAMD11D14A-UUT    |        582 |      10.51 | 散装      |     0 |
+| 13056 | MB95F263KPFT-G-SNE2 |        244 |       5.95 | 散装      |     0 |
+| 58147 | MB95F263KPFT-G-SNE2 |        244 |       0.00 | 散装      |     4 |
+| 36223 | S912ZVLA12F0MLC     |        662 |      27.33 | 散装      |     0 |
+| 36296 | S912ZVLA12F0MLC     |        662 |      27.33 | 散装      |     1 |
++-------+---------------------+------------+------------+-----------+-------+
++-------+---------------------+------------+------------+-----------+-------+
+| id    | part_number         | factory_id | unit_price | packaging | state |
++-------+---------------------+------------+------------+-----------+-------+
+| 49861 | AT32UC3A0256AU-ALUT |        582 |       0.00 | 托盘      |     2 |
+| 43397 | AT32UC3A0256AU-ALUT |        582 |      18.99 | 托盘      |     2 |
+| 32020 | AT32UC3A3128-CTUT   |        582 |      71.15 | 托盘      |     2 |
+| 17095 | AT32UC3A3128-CTUT   |        582 |      39.12 | 托盘      |     2 |
+| 17254 | AT32UC3A3128S-ALUT  |        582 |      41.40 | 托盘      |     2 |
+| 32124 | AT32UC3A3128S-ALUT  |        582 |      75.31 | 托盘      |     2 |
+| 32155 | AT32UC3A3128S-CTUT  |        582 |      76.37 | 托盘      |     2 |
+| 17291 | AT32UC3A3128S-CTUT  |        582 |      42.06 | 托盘      |     2 |
+| 31772 | AT32UC3A364-CTUT    |        582 |      63.33 | 托盘      |     2 |
+| 16752 | AT32UC3A364-CTUT    |        582 |      34.88 | 托盘      |     2 |
++-------+---------------------+------------+------------+-----------+-------+
+
+select min(id) as id,part_number,factory_id,min(unit_price) as unit_price,packaging from db_proofread_digikey.tb_electron_685 where unit_price > 0 and state > 1 group by part_number,factory_id having count(part_number) > 1 limit 10;
++-------+--------------------+------------+------------+-----------+
+| id    | part_number        | factory_id | unit_price | packaging |
++-------+--------------------+------------+------------+-----------+
+| 17095 | AT32UC3A3128-CTUT  |        582 |      39.12 | 托盘      |
+| 17254 | AT32UC3A3128S-ALUT |        582 |      41.40 | 托盘      |
+| 17291 | AT32UC3A3128S-CTUT |        582 |      42.06 | 托盘      |
+| 16752 | AT32UC3A364-CTUT   |        582 |      34.88 | 托盘      |
+| 16887 | AT32UC3A364S-CTUT  |        582 |      36.76 | 托盘      |
+| 19524 | AT89C4051-12SU     |        582 |       4.32 | 管件      |
+|  5314 | AT89C5115-SISUM    |        582 |      26.00 | 管件      |
+|  4924 | AT89C5131A-RDTUL   |        582 |      21.92 | 托盘      |
+| 23077 | AT89C5131A-S3SUL   |        582 |      23.15 | 管件      |
+| 23086 | AT89C51IC2-SLSUL   |        582 |      24.29 | 管件      |
++-------+--------------------+------------+------------+-----------+
+```
+
+
+查询结果中增加序号
+```
+第一种：
+select (@i:=@i+1) as i, first_zh_name,first_en_name from tb_category_index,(select @i:=0) as it where first_zh_name != first_en_name;
+
+第二种：
+set @rownum=0;
+select @rownum:=@rownum+1 as rownum, t.* from tb_category_index t order by t.id desc limit 10;
+```
+
 
 
 查看支持的引擎
@@ -1927,12 +2029,13 @@ select timestampadd(hour, -8, '2008-08-08 12:00:00'); -- 2008-08-08 04:00:00
 
 ### mysql json
 ```
-分类  函数  描述
-创建json  json_array  创建json数组
-  json_object 创建json对象
-  json_quote  将json转成json字符串类型
+创建json  
+  json_array  创建json数组
+  json_object 创建json对象
+  json_quote  将json转成json字符串类型
 
-查询json  json_contains 判断是否包含某个json值
+查询json  
+  json_contains 判断是否包含某个json值
   json_contains_path  判断某个路径下是否包json值
   json_extract  提取json值
   column->path  json_extract的简洁写法，MySQL 5.7.9开始支持
@@ -1959,14 +2062,16 @@ select timestampadd(hour, -8, '2008-08-08 12:00:00'); -- 2008-08-08 04:00:00
 
 
 
-创建表
+1.创建表
 CREATE TABLE teacher_json(id INT PRIMARY KEY, NAME VARCHAR(20) , info  JSON);
 
-插入记录
+2.插入记录
 INSERT INTO teacher_json(id,sname,info) VALUES(1 ,'test','{"time":"2017-01-01 13:00:00","ip":"192.168.1.1","result":"fail"}');
 INSERT INTO teacher_json(id,sname,info) VALUES(2 ,'my',JSON_OBJECT("time",NOW(),'ip','192.168.1.1','result','fail'));
 
-查询IP键
+INSERT INTO teacher_json(id,sname,info) VALUES(3, 'name1', JSON_ARRAY(1, "abc", NULL, TRUE, CURTIME()));
+
+3.查询IP键
 SELECT sname,JSON_EXTRACT(info,'$.ip') FROM teacher_json;
 
 查询有多少个键
@@ -1974,6 +2079,7 @@ SELECT id,json_keys(info) AS "keys" FROM teacher_json;
 
 
 json_keys()
+SELECT id,json_keys(info) AS "keys" FROM teacher_json;
 
 
 json_set()
@@ -1986,6 +2092,12 @@ UPDATE teacher_json SET info = json_set(info,'$.ip','192.168.1.1');
 
 变更值
 UPDATE teacher_json SET info = json_set(info,'$.ip','192.168.1.2');
+
+删除键
+UPDATE teacher_json SET info = json_remove(info,'$.ip') WHERE id = 2;
+
+
+
 
 
 json_insert()
@@ -2091,7 +2203,7 @@ json_type 返回json值得类型
 json_valid 判断是否为合法json文档
 
 
-
+#### =====================================================================
 一,对记录的操作
 1.创建有json字段的表
 
@@ -2309,7 +2421,6 @@ MySQL [db_test]> select * from fk_message where id = 6 and json_contains(tags,js
 
 
 
-
 2.JSON_ARRAY_INSERT 指定位置插入数组元素
 
 -- JSON_ARRAY_INSERT(json_doc, path, val[, path, val] ...)
@@ -2469,8 +2580,9 @@ JSON_VALID()  JSON值是否是有效的
   
 
 mysql官方文档:https://dev.mysql.com/doc/refman/5.7/en/json-utility-functions.html
-
 参考:https://www.cnblogs.com/waterystone/p/5626098.html
+
+#### ========================================================================================
 
 
 eg:
@@ -2738,11 +2850,99 @@ create table if not exists `tb_extra_m_electron_kwargs_full`(
 
 
 
+### mysql导出（备份）
+导出（备份）某个数据库：
+```
+mysqldump -u root -p dbName > sqlFilePath
+mysqldump -uroot -p test > E:/mysql/bak/2019_08_04.sql
+mysqldump -uroot -p test > /home/flack/bak/aaa.sql
+mysqldump -h 192.168.99.100 -uroot -p test > E:/mysql/2019_08_04_bak.sql
+mysqldump -h 192.168.99.100 -uroot -p test > /home/flack/bak/aaa.sql
 
 
+从meteo数据库的sdata表中导出sensorid=11 且 fieldid=0的数据到 /home/xyx/Temp.sql 这个文件中
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11" > /home/flack/bak/aaa.sql
+mysqldump -uroot -p123456 meteo sdata --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
+```
+
+导出多个数据库：
+```
+mysqldump -u root -p --add-drop-database --databases dbName1 dbName2 … > sqlFilePath 
+–add-drop-database ： 该选项表示在创建数据库的时候先执行删除数据库操作 
+–database : 该选项后面跟着要导出的多个数据库，以空格分隔
+
+mysqldump -h localhost -u root -p --databases dbname1,dbname2 > /home/flack/bak/backdb.sql
+```
+
+导出某个数据库的某个表：
+```
+mysqldump -hlocalhost -u root -p db_electron students1,students2 > /home/flack/bak/aaa.sql
+mysqldump -h121.201.107.32 -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
+mysqldump -h121.201.107.32 -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/flack/bak/aaa.sql
+mysqldump -h121.201.107.32 -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
+mysqldump -h121.201.107.32 -uroot -p123456 magic m_electron --where=" category_id=34 and factory='Texas Instruments'" > /home/flack.chen/ti.log
+
+```
+
+到处（备份）系统中所有数据库
+```
+mysqldump -h localhost -u root -p --all-databases > /home/flack/bak/backdb_all.sql
+```
+
+导出结构不导出数据
+只导出数据库结构，不带数据：
+```
+mysqldump -u root -p -d dbName > sqlFilePath 
+-d : 只备份结构，不备份数据。也可以使用"--no-data"代替"-d"，效果一样。
+```
+
+导出数据不导出结构
+```
+mysqldump -t 数据库名 -uroot -p > xxx.sql
+```
+
+导出数据和表结构
+```
+mysqldump 数据库名 -uroot -p > xxx.sql
+```
+
+导出特定表的结构
+```
+mysqldump -uroot -p -B数据库名 --table 表名 > xxx.sql
+#mysqldump [OPTIONS] database [tables]
+```
+
+直接复制整个数据库目录
+```
+mysql data 目录
+windowns: installpath/mysql/data
+linux: /var/lib/mysql
+
+在复制前需要先执行如下命令：
+MYSQL> LOCK TABLES;
+在复制过程中允许客户继续查询表，
+MYSQL> FLUSH TABLES;
+将激活的索引页写入硬盘。
+
+cp -R /var/lib/mysql/chf /home/flack/bak/chf
+cp -R /var/lib/mysql/king /home/flack/bak/king
+```
+
+mysqlhotcopy工具备份
+```
+备份数据库或表最快的途径，只能运行在数据库目录所在的机器上，并且只能备份MyISAM类型的表。
+要使用该备份方法必须可以访问备份的表文件。
+$> mysqlhotcopy -u root -p dbname /path/to/new_directory;
+将数据库复制到new_directory目录。
+```
 
 
-### mysql导入(还原)
+导出命令执行情况如下图所示： 
+![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
+
+
+### mysql导入（还原）
 #### 方法一：未连接数据库时方法
 >语法格式：mysql -h ip -u userName -p dbName < sqlFilePath (最后没有分号) 
 ```
@@ -2810,97 +3010,6 @@ $> mysqlbinlog --stop-date="2013-03-30 15:27:47" D:\MySQL\log\binlog\binlog.0000
 ```
 
 
-### mysql导出（备份）
-导出（备份）某个数据库：
-```
-mysqldump -u root -p dbName > sqlFilePath
-mysqldump -uroot -p test > E:/mysql/bak/2019_08_04.sql
-mysqldump -uroot -p test > /home/flack/bak/aaa.sql
-mysqldump -h 192.168.99.100 -uroot -p test > E:/mysql/2019_08_04_bak.sql
-mysqldump -h 192.168.99.100 -uroot -p test > /home/flack/bak/aaa.sql
-
-
-从meteo数据库的sdata表中导出sensorid=11 且 fieldid=0的数据到 /home/xyx/Temp.sql 这个文件中
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11" > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 meteo sdata --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
-```
-
-导出多个数据库：
-```
-mysqldump -u root -p --add-drop-database --databases dbName1 dbName2 … > sqlFilePath 
-–add-drop-database ： 该选项表示在创建数据库的时候先执行删除数据库操作 
-–database : 该选项后面跟着要导出的多个数据库，以空格分隔
-
-mysqldump -h localhost -u root -p --databases dbname1,dbname2 > /home/flack/bak/backdb.sql
-```
-
-导出某个数据库的某个表：
-```
-mysqldump -u root -p dbName students1,students2 > sqlFilePath
-mysqldump -h localhost -u root -p db_electron students1,students2 > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11 and fieldid=0" > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid=11" > /home/flack/bak/aaa.sql
-mysqldump -uroot -p123456 db_electron tb_electron --where=" sensorid in (1,2,3) " > /home/flack/bak/aaa.sql
-mysqldump -umagic_ro -h121.201.107.32 -pMagic_ro.mofang123 magic m_electron --where=" category_id=34 and factory='Texas Instruments'" > /home/flack.chen/ti.log
-
-```
-
-到处（备份）系统中所有数据库
-```
-mysqldump -h localhost -u root -p --all-databases > /home/flack/bak/backdb_all.sql
-```
-
-导出结构不导出数据
-只导出数据库结构，不带数据：
-```
-mysqldump -u root -p -d dbName > sqlFilePath 
--d : 只备份结构，不备份数据。也可以使用"--no-data"代替"-d"，效果一样。
-```
-
-导出数据不导出结构
-```
-mysqldump -t 数据库名 -uroot -p > xxx.sql
-```
-
-导出数据和表结构
-```
-mysqldump 数据库名 -uroot -p > xxx.sql
-```
-
-导出特定表的结构
-```
-mysqldump -uroot -p -B数据库名 --table 表名 > xxx.sql
-#mysqldump [OPTIONS] database [tables]
-```
-
-直接复制整个数据库目录
-```
-mysql data 目录
-windowns: installpath/mysql/data
-linux: /var/lib/mysql
-
-在复制前需要先执行如下命令：
-MYSQL> LOCK TABLES;
-在复制过程中允许客户继续查询表，
-MYSQL> FLUSH TABLES;
-将激活的索引页写入硬盘。
-
-cp -R /var/lib/mysql/chf /home/flack/bak/chf
-cp -R /var/lib/mysql/king /home/flack/bak/king
-```
-
-mysqlhotcopy工具备份
-```
-备份数据库或表最快的途径，只能运行在数据库目录所在的机器上，并且只能备份MyISAM类型的表。
-要使用该备份方法必须可以访问备份的表文件。
-$> mysqlhotcopy -u root -p dbname /path/to/new_directory;
-将数据库复制到new_directory目录。
-```
-
-
-导出命令执行情况如下图所示： 
-![导出例子](https://img-blog.csdn.net/20160223111231109 "导出例子")
 
 
 ### 相同版本数据库之间迁移
