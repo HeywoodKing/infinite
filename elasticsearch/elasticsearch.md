@@ -167,6 +167,39 @@ PUT /my-index
   }
 ```
 
+```
+简单搜索
+http://192.168.1.100:9200/megacorp/employee/_search?q=last_name:smith
+
+dsl
+GET http://192.168.1.100:9200/megacorp/employee/_search
+{
+  "query": {
+    "match": {
+      "last_name": "smith"
+    }
+  }
+}
+
+{
+  "query": {
+    "filtered":{
+      "filter": {
+        "range": {
+          "age": {"gt": 30}
+        }
+      },
+      "query": {
+        "match": {
+          "last_name": "smith"
+        }
+      }
+    }
+    
+  }
+}
+
+```
 
 
 
