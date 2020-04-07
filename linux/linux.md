@@ -35,7 +35,43 @@ cp -r mysite /opt/project/
 # 移动aaa文件夹及内容到/home/development下
 mv aaa /home/development
 tree
+
+查看前10行内容
+head -n 10 filename
+查看后5行内容
+tail -n 5 filename
+
+如果想同时查看可以将前10行和后5行的显示信息通过输出重定向的方法保存到一个文档
+将内容输出到/home/test文件中
+head -n 10 filename >> /home/test
+tail -n 5 filename >> /home/test
+cat /home/test
+
+
+显示前面1000行
+head -n 1000
+从1000行开始显示，显示1000行以后的
+tail -n +1000
+
+
 cat a.txt
+
+查看前10行
+cat filename | head -n 10
+查看后10行
+cat filename | tail -n 10
+从100 行开始显示以后的所有行
+cat filename | tail -n +100
+查看前500行，后100行以后的所有行
+cat filename | head -n 500 | tail -n +100
+从第3000行开始，显示1000行。即显示3000~3999行
+cat filename | tail -n +3000 | head -n 1000
+显示1000行到3000行
+cat filename| head -n 3000 | tail -n +1000 
+
+查看文件的第5行到第10行
+sed -n '5,10p' filename
+
 
 查询MySQL安装目录
 find / -name mysql
@@ -482,5 +518,262 @@ sudo apt remove 软件名
 sudo apt update
 ```
 
+### linux系统管理---好用的一些开源工具
+#### htop
+htop是一款运行于Linux系统上的监控与进程管理软件，取代传统UNIX的top。
+可以通过F1获取帮助，了解其细节
+```
+sudo apt-get install htop
+htop
+```
 
+#### dstat
+dstat是一个用Python语言实现的系统资源统计生成工具。可以基本取代vmstat,iostat,netstat和ifstat工具。
+收集网络，硬盘，CPU等系统资源情况
+```
+sudo apt-get install dstat
+dstat -cdng
+-c 表示CPU占用信息。idl代表idle空闲资源，wai代表等待I/O设备的响应情况，usr用户进程占用情况，sys是系统进程占用情况。
+-d 表示磁盘的读写操作。
+-n 表示网络发送和接受数据包的情况。
+-g 表示分页(page)情况，一个较大的分页代表使用了大量的交换空间。
+
+dstat -lym
+其中:int代表中断，csw代表上下文切换，通常来说，值越大说明进程切换和中断频繁，可能造成一定的拥塞。
+
+找出cpu，内存，io占用最高的进程和用户
+dstat --proc-count --top-cpu --top-mem --top-io
+```
+
+
+#### Glances
+Glances是一个局域psutil的跨平台的系统监控工具。
+```
+sudo apt-get install glances
+
+单机启动:
+glances
+
+web启动:
+glances -w
+web启动，需要安装bottle这个包
+```
+
+
+#### iftop
+iftop是一个类似top命令实时流量监控工具
+```
+sudo apt-get install iftop
+iftop
+
+TX：发送流量
+RX：接收流量
+TOTAL：总流量
+Cumm：运行iftop到目前时间的总流量
+peak：流量峰值
+rates：分别表示过去 2s 10s 40s 的平均流量
+```
+
+#### nethogs
+nethogs查看进程占用的带宽使用情况
+```
+sudo apt-get install nethogs
+nethogs eth0
+```
+
+#### iotop
+iotop类似于top命令的查看占用硬盘I/O的进程
+```
+sudo apt-get install iotop
+iotop
+```
+
+#### 超级系统工具Sysdig，比 strace、tcpdump、lsof 加起来还强大
+可以用sysdig命令做很多很酷的事情
+##### 网络
+```
+查看占用网络带宽最多的进程
+sysdig -c topprocs_net
+显示主机192.168.0.1的网络传输数据
+as binary:
+sysdig -s2000 -X -c echo_fds fd.cip=192.168.0.1
+as ASCII:
+sysdig -s2000 -A -c echo_fds fd.cip=192.168.0.1
+查看连接最多的服务器端口
+in terms of established connections:
+sysdig -c fdcount_by fd.sport "evt.type=accept"
+in terms of total bytes:
+sysdig -c fdbytes_by fd.sport
+查看客户端连接最多的ip
+in terms of established connections
+sysdig -c fdcount_by fd.cip "evt.type=accept"
+in terms of total bytes
+sysdig -c fdbytes_by fd.cip
+列出所有不是访问apache服务的访问连接
+sysdig -p"%proc.name %fd.name" "evt.type=accept and proc.name!=httpd"
+```
+
+##### 容器
+```
+查看机器上运行的容器列表及其资源使用情况
+sudo csysdig -vcontainers
+查看容器上下文的进程列表
+sudo csysdig -pc
+查看运行在wordpress1容器里CPU的使用率
+sudo sysdig -pc -c topprocs_cpu container.name=wordpress1
+查看运行在wordpress1容器里网络带宽的使用率
+sudo sysdig -pc -c topprocs_net container.name=wordpress1
+查看在wordpress1容器里使用网络带宽最多的进程
+sudo sysdig -pc -c topprocs_net container.name=wordpress1
+查看在wordpress1 容器里占用 I/O 字节最多的文件
+sudo sysdig -pc -c topfiles_bytes container.name=wordpress1
+查看在wordpress1 容器里网络连接的排名情况
+sudo sysdig -pc -c topconns container.name=wordpress1
+显示wordpress1容器里所有命令执行的情况
+sudo sysdig -pc -c spy_users container.name=wordpress1
+```
+
+##### 应用
+```
+查看机器所有的HTTP请求
+sudo sysdig -s 2000 -A -c echo_fds fd.port=80 and evt.buffer contains GET
+查看机器所有的SQL select查询
+sudo sysdig -s 2000 -A -c echo_fds evt.buffer contains SELECT
+See queries made via apache to an external MySQL server happening in real time
+sysdig -s 2000 -A -c echo_fds fd.sip=192.168.30.5 and proc.name=apache2 and evt.buffer contains SELECT
+```
+
+##### 硬盘 I/O
+```
+查看使用硬盘带宽最多的进程
+sysdig -c topprocs_file
+列出使用大量文件描述符的进程
+sysdig -c fdcount_by proc.name "fd.type=file"
+See the top files in terms of read+write bytes
+sysdig -c topfiles_bytes
+Print the top files that apache has been reading from or writing to
+sysdig -c topfiles_bytes proc.name=httpd
+Basic opensnoop: snoop file opens as they occur
+sysdig -p "%12user.name %6proc.pid %12proc.name %3fd.num %fd.typechar %fd.name" evt.type=open
+See the top directories in terms of R+W disk activity
+sysdig -c fdbytes_by fd.directory "fd.type=file"
+See the top files in terms of R+W disk activity in the /tmp directory
+sysdig -c fdbytes_by fd.filename "fd.directory=/tmp/"
+Observe the I/O activity on all the files named 'passwd'
+sysdig -A -c echo_fds "fd.filename=passwd"
+Display I/O activity by FD type
+sysdig -c fdbytes_by fd.type
+```
+
+##### 进程和CPU使用率
+```
+See the top processes in terms of CPU usage
+sysdig -c topprocs_cpu
+See the top processes for CPU 0
+sysdig -c topprocs_cpu evt.cpu=0
+Observe the standard output of a process
+sysdig -s4096 -A -c stdout proc.name=cat
+```
+
+##### 性能和错误
+```
+See the files where most time has been spent
+sysdig -c topfiles_time
+See the files where apache spent most time
+sysdig -c topfiles_time proc.name=httpd
+See the top processes in terms of I/O errors
+sysdig -c topprocs_errors
+See the top files in terms of I/O errors
+sysdig -c topfiles_errors
+See all the failed disk I/O calls
+sysdig fd.type=file and evt.failed=true
+See all the failed file opens by httpd
+sysdig "proc.name=httpd and evt.type=open and evt.failed=true"
+See the system calls where most time has been spent
+sysdig -c topscalls_time
+See the top system calls returning errors
+sysdig -c topscalls "evt.failed=true"
+snoop failed file opens as they occur
+sysdig -p "%12user.name %6proc.pid %12proc.name %3fd.num %fd.typechar %fd.name" evt.type=open and evt.failed=true
+Print the file I/O calls that have a latency greater than 1ms:
+sysdig -c fileslower 1
+```
+
+##### 安全
+```
+Show the directories that the user "root" visits
+sysdig -p"%evt.arg.path" "evt.type=chdir and user.name=root"
+Observe ssh activity
+sysdig -A -c echo_fds fd.name=/dev/ptmx and proc.name=sshd
+Show every file open that happens in /etc
+sysdig evt.type=open and fd.name contains /etc
+Show the ID of all the login shells that have launched the "tar" command
+sysdig -r file.scap -c list_login_shells tar
+Show all the commands executed by the login shell with the given ID
+sysdig -r trace.scap.gz -c spy_users proc.loginshellid=5459 
+```
+
+### Grafana
+```
+安装
+wget https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_5.1.3_amd64.deb
+sudo apt-get install -y adduser libfontconfig
+sudo dpkg -i grafana_5.1.3_amd64.deb
+
+启动Grafana服务
+sudo service grafana-server start
+启动grafana
+systemctl start grafana-server
+systemctl enable grafana-server
+
+web登录,输入服务器IP地址，grafana默认端口为3000，默认用户名和密码都是admin
+Web登录Grafana
+http://ip:3000
+默认账号密码 admin admin
+
+
+安装Zabbix及图形样式插件
+命令：
+grafana-cli plugins install 软件包
+添加一个zabbix的监控插件
+其中的URL，填写http://10.x.x.21/zabbix/api_jsonrpc.php ，即之前在zabbix上执行过的json代码中的链接
+
+
+Add Package Cloud key
+curl https://packagecloud.io/gpg.key | sudo apt-key add -
+
+Update&apt-transport-https package
+apt-get update
+apt-get install -y apt-transport-https
+
+Service
+systemctl daemon-reload
+systemctl start grafana-server
+systemctl status grafana-server
+
+
+Grafana需要和zabbix_api接口进行交互并且获取数据展示
+curl -i -X POST -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","method":"user.login","params":{"user":"Admin","password":"admin"},"auth":null,"id":0}' http://10.x.x.21/zabbix/api_jsonrpc.php
+
+
+HTTP/1.1 200 OK
+Date: Wed, 15 Feb 2017 13:33:26 GMT
+Server: Apache/2.4.6 (CentOS) PHP/5.4.16
+X-Powered-By: PHP/5.4.16
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Allow-Methods: POST
+Access-Control-Max-Age: 1000
+Content-Length: 68
+Content-Type: application/json
+
+#返回result如下这种sessionid表述访问是ok的
+{"jsonrpc":"2.0","result":"800b578c7409de36aba0cd69704985dafa","id":0}
+
+
+curl -i -X POST -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","method":"user.login","params":{"user":"Admin","password":"admin"},"auth":null,"id":0}' http://10.x.x.21/zabbix/api_jsonrpc.php
+
+
+
+```
 

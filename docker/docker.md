@@ -205,7 +205,7 @@ docker run -v host/machine/dir:container/path/dir --name <container_name> centos
 
 启动mysql容器：
 -d:后台进程
-docker run --name mysql_foxy -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7 
+docker run --name mysql_foxy -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7 
 默认用户为root，密码123456
 
 mysql容器启动后，其他容器就可以来连接使用了，方法如下：
@@ -1032,7 +1032,7 @@ https://www.jianshu.com/p/1e1847cdf3b9
 
 docker run --name mongodb_foxy -v /data/mongodb:/data/db -p 27017:27017 -d mongodb --auth
 
-docker exec -it mongo_foxy /bin/bash
+docker exec -it mongodb_foxy /bin/bash
 
 mongo 192.168.31.206:27017/admin
 
@@ -1099,6 +1099,10 @@ docker run -p 3306:3306 -v /data/mysql/:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=12
 
 docker run -p 3306:3306 -v $PWD/conf:/etc/mariadb/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mariadb -e MYSQL_ROOT_PASSWORD=123456 --privileged=true --restart unless-stopped 
 --name mariadb_foxy -d mariadb:latest
+
+
+docker run --name mysql_foxy -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7 
+
 
 进入容器
 docker exec -it 62349aa31687 /bin/bash
@@ -1208,8 +1212,6 @@ docker run -d --name=ubuntu_server -v /etc/www:/var/www ubuntu:latest
 
 ```
 一、问题描述：安装过Docker Toolbox，卸载后，重新安装，无法正常使用，提示
-
-
 Running pre-create checks...
 Error with pre-create check: "Hyper-V is installed. VirtualBox won't boot a 64bits VM when Hyper-V is activated. If it's installed but deactivated, you can use --virtualbox-no-vtx-check to try anyways"
 Looks like something went wrong in step ´Checking if machine default exists´

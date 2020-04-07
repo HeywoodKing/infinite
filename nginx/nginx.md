@@ -31,6 +31,22 @@ Ubuntu安装之后的文件结构大致为：
 5. 默认的虚拟主机的目录设置在了/var/www/nginx-default (有的版本 默认的虚拟主机的目录设置在了/var/www, 请参考/etc/nginx/sites-available里的配置)
 ```
 
+### 安装成功后nginx的几个默认目录
+```
+whereis nginx
+
+执行目录：/usr/sbin/nginx
+模块所在目录：/usr/lib64/nginx/modules
+配置所在目录：/etc/nginx/
+默认站点目录：/usr/share/nginx/html
+
+主要配置文件：/etc/nginx/nginx.conf 指向：/etc/nginx/conf.d/default.conf
+
+PID目录：/var/run/nginx.pid
+错误日志：/var/log/nginx/error.log
+访问日志：/var/log/nginx/access.log
+```
+
 ### 卸载Nginx
 ```
 sudo apt-get uninstall nginx
@@ -585,3 +601,50 @@ server{
 }
 
 ```
+
+## 相关文件和目录的说明
+```
+路径  类型  作用
+配置文件    Nginx日志轮转，用于logrotate服务的日志切割
+/etc/logrotate.d/nginx
+
+目录、配置文件 Nginx主配置文件
+/etc/nginx
+/etc/nginx/nginx.conf
+/etc/nginx/conf.d
+/etc/nginx/conf.d/default.conf
+
+配置文件    cgi配置相关，fastcgi配置
+/etc/nginx/fastcgi_params
+/etc/nginx/uwsgi_params
+/etc/nginx/scgi_params
+
+配置文件    编码转换映射文件
+/etc/nginx/koi-utf
+/etc/nginx/koi-win
+/etc/nginx/win-utf
+
+配置文件    设置http协议的Content-Type与扩展名对应关系
+/etc/nginx/mime.types
+
+配置文件    (centos7)配置出系统守护进程管理器的管理方式
+/usr/lib/systemd/system/nginx-debug.service
+/usr/lib/systemd/system/nginx.service
+/etc/sysconfig/nginx
+/etc/sysconfig/nginx-debug
+
+目录  nginx模块目录
+/usr/lib64/nginx/modules
+/etc/nginx/modules
+
+命令  nginx服务的启动终端管理命令
+/usr/sbin/nginx
+/usr/sbin/nginx-debug
+
+目录  Nginx的缓存目录
+/var/cache/nginx
+
+目录  nginx的日志目录
+/var/log/nginx
+```
+

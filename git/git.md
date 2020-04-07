@@ -4,95 +4,110 @@
 ### git常用命令
 命令行里git的命令列表以及解释 
 ```
-git clone <address> 复制代码库到本地。
+克隆项目(复制代码库到本地)
+git clone <address> 
+git clone https://github.com/512439130/512439130.github.io.git
+git clone git@xxx.com:model/xxx.git
+git clone git@github.com:512439130/512439130.github.io.git
+
+
+增加文件
+git add . //当前仓库下所有更新的文件
+git add . | git add a.txt
 git add <file> ... 添加文件到代码库中。
 git rm <file> ... 删除代码库的文件。
 git commit -m <message> 提交更改，在修改了文件以后，使用这个命令提交修改。
+git commit -m "add a.txt"
+
+
+增加并提交
+git commit -am "描述"
+
+拉取
 git pull 从远程同步代码库到本地。相当于是从远程获取最新版本并merge到本地
 git pull origin dev 本地分支与远程分支相关联
-git pull origin master (该命令其实相当于git fetch 和 git merge在实际使用中，git fetch更安全一些)
+git pull origin master (该命令其实相当于git fetch 和 git merge 在实际使用中，git fetch更安全一些)
+
+推送项目
+git push git@xxx.com:model/xxx.git master
 git push 推送代码到远程代码库。
 git push origin test 这样远程仓库中也就创建了一个test分支
 git push origin dev:dev # 同步dev分支的代码到远程服务器
+
+git push origin :dev # 删除远程dev分支，危险命令哦
+
+更新远程分支dev但不合并
+git fetch origin dev
+
+合并分支
+git merge origin/dev --on-ff
+
+
 git branch 查看当前分支。带*是当前分支。
 git branch <branch-name> 新建一个分支。
 git branch -d <branch-name> #删除一个本地分支。（首先要切换到其他分支，然后进行删除操作）
-git branch -a 查看远程分支  git branch --all 查看远程分支
+git branch -a 查看远程分支
+git branch --all 查看远程分支
+修改分支名称将dev2修改为dev
+git branch -m oldname newname
+git branch -m dev2 dev
+查看与远程的对应关系
+git branch -r
+
+
+git remote remove origin
+git remote -v
+git remote add origin url
+git remote -v
+
+git remote rename oldurl newurl
+
+
+将当前分支的代码封存起来
+git stash
+将封存起来的代码还原(栈顶的封存代码还原)
+git stash pop
+将封存起来的代码还原(栈顶的封存代码还原，如果封存了多次有多个封存版本)
+git stash apply stash@{0}
+
+查看封存列表
+git stash list
+
 git checkout <branch-name> 切换到指定分支。
 git checkout -b feature-catelog origin/feature-catelog 新建并切换到本地feature-catelog分支
+git checkout -b branchName
 git checkout -b test 在本地创建test分支
 git checkout master 切换回master分支
+
 git log 查看提交记录（即历史的 commit 记录）。
 git status 当前修改的状态，是否修改了还没提交，或者那些文件未使用。
+
 git reset <log> 恢复到历史版本。
 git reset <log> --hard 恢复到制定的版本
 git reset HEAD 恢复到上一个提交的版本
 
-git push origin :dev # 删除远程dev分支，危险命令哦
 git remote -v 查看远程仓库
-git fetch origin master:temp 从远程的origin仓库的master分支下载到本地，并新建一个temp分支
+
 git diff temp 查看temp分支与本地原有分支的不同
 git merge temp 将temp分支和本地分支合并
-
-相当于是从远程获取最新版本到本地，不会自动merge
-git fetch 更新git remote 中所有的远程仓库所包含分支的最新commit-id, 将其记录到.git/FETCH_HEAD文件中
-git fetch remote_repo 更新名称为remote_repo 的远程repo上的所有branch的最新commit-id，将其记录。
-git fetch remote_repo remote_branch_name 更新名称为remote_repo 的远程repo上的分支： remote_branch_name
-git fetch remote_repo remote_branch_name:local_branch_name 更新名称为remote_repo 的远程repo上的分支： remote_branch_name ，并在本地创建local_branch_name 本地分支保存远端分支的所有数据。
-
-eg:
-git fetch origin master 远程的origin的master主分支下载最新的版本到origin/master分支上
-git log -p master..origin/master 比较本地的master分支和origin/master分支的差别
 git merge origin/master 进行合并
-
 git merge br1 br2
-git rebase br1 br2 
-以上命令本地将几个分支合并到一个临时分支tmp 
+git merge dev --no-ff -m "merge dev --on-off"
 
+git rebase br1 br2
 
-```
+比较两个分支之间的区别
+git diff master..dev
 
-FETCH_HEAD： 是一个版本链接，记录在本地的一个文件中，指向着目前已经从远程仓库取下来的分支的末端版本。
-
-
-##第一个 如果功能开发完成了，可以合并主分支
-原来在开发分支上开发的
->git checkout master # 切换到主分支
->git merge dev # 把dev分支的更改和master合并
->git push # 提交主分支代码远程
->git checkout dev # 切换到dev分支
->git push # 提交dev分支到远程 || git push origin master:master
-
-##第二个 如果功能没有完成，可以直接推送
-在当前开发分支上
->git push # 提交到dev远程分支
-##### 注意 在分支切换之前最好先commit全部的改变，除非你真的知道自己在做什么
-
-清除本地废弃或者不用的分支
-git remote prune origin
-
-cd project_directory
-git init
-
-克隆项目
-git clone git@xxx.com:model/xxx.git
-推送项目
-git push git@xxx.com:model/xxx.git master
-
-查看项目状态
-git status
-
-增加文件
-git add . | git add a.txt
-git commit –m "add a.txt"
 
 修改文件
 git add a.txt
-git commit –m "xx" | git commit –am "xx"
+git commit -m "xx" | git commit -am "xx"
 
 将文件从本地删除
 git rm a.txt
-git commit –m "delete a.txt"
+git commit -m "delete a.txt"
+
 将文件从版本库删除
 git rm --cached a.txt
 git commit -m "xx"
@@ -101,9 +116,8 @@ git commit -m "xx"
 git reset HEAD a.txt
 
 将文件从版本库中删除,保留本地文件
-git rm –-cached a.txt
-git commit –m "delete a.txt"
-git status
+git rm --cached a.txt
+git commit -m "delete a.txt"
 
 查看分支
 git branch | git branch -a
@@ -117,27 +131,17 @@ git checkout master
 
 
 从当前分支创建同时切换分支
-git checkout –b branchName
-git checkout –b developer
+git checkout -b branchName
+git checkout -b developer
 
 删除分支
-git branch –d branchName
-
+git branch -d branchName
 
 
 直接拉取并合并最新代码
 git pull <remote> <branch>
 git pull origin master [示例1：拉取远端origin/master分支并合并到当前分支]
 git pull origin developer [示例2：拉取远端origin/developer分支并合并到当前分支]
-
-
-合并分支到当前分支
-1.切换分支到master
-git checkout master
-2.合并developer分支到master分支
-git merge developer
-3.切换到developer分支上继续开发
-git checkout developer
 
 
 将本地当前分支提交到服务器的origin/dev分支
@@ -150,137 +154,341 @@ git branch --merged
 查看尚未并入当前分支的分支
 git branch --no-merged
 
+
+相当于是从远程获取最新版本到本地，不会自动merge
+git fetch 更新git remote 中所有的远程仓库所包含分支的最新commit-id, 将其记录到.git/FETCH_HEAD文件中
+git fetch remote_repo 更新名称为remote_repo 的远程repo上的所有branch的最新commit-id，将其记录。
+git fetch remote_repo remote_branch_name 更新名称为remote_repo 的远程repo上的分支： remote_branch_name
+git fetch remote_repo remote_branch_name:local_branch_name 
+更新名称为remote_repo 的远程repo上的分支： remote_branch_name ，并在本地创建local_branch_name 本地分支保存远端分支的所有数据。
+git fetch origin master:temp 从远程的origin仓库的master分支下载到本地，并新建一个temp分支
+git fetch origin master 远程的origin的master主分支下载最新的版本到origin/master分支上
+git log -p master..origin/master 比较本地的master分支和origin/master分支的差别
+
+
+设置用户名和邮箱
+git config --global user.name "flack"
+git config --global user.email "opencoding@hotmail.com"
+如果设置错了的话，重新修改设置
+git config --unset --global user.name "flack"
+
+查看所有可用配置
+git config --list
+```
+FETCH_HEAD： 是一个版本链接，记录在本地的一个文件中，指向着目前已经从远程仓库取下来的分支的末端版本。
+
+HEAD 指当前版本
+回撤当前版本
+```
+git revert HEAD
+```
+回撤当前版本的上一版本
+```
+git revert HEAD^
+```
+回撤当前版本的上两个版本
+```
+git revert HEAD^^
+```
+回撤当前版本的第100个版本
+```
+git revert HEAD~100
+```
+
+查看日志
+```
+git log --oneline
+git log --oneline --decorate --all --graph
+```
+
+
+### reset
+```
+将提交的版本撤回到暂存区
+git reset HEAD^ --soft
+git reset HEAD^ --mixed
+
+重置版本到指定版本
+git reset fb09a7c
+查看日志
+git log --oneline
+```
+
+
+
+
+### 第一个 如果功能开发完成了，可以合并主分支
+原来在开发分支上开发的
+```
+git checkout master # 切换到主分支
+git merge dev # 把dev分支的更改和master合并
+git push # 提交主分支代码远程
+git checkout dev # 切换到dev分支
+git push # 提交dev分支到远程 == git push origin master:master
+```
+
+### 第二个 如果功能没有完成，可以直接推送
+在当前开发分支上
+```
+git push # 提交到dev远程分支
+```
+##### 注意 在分支切换之前最好先commit全部的改变，除非你真的知道自己在做什么
+
+
+### 合并分支到当前分支
+```
+1.切换分支到master
+git checkout master
+2.合并developer分支到master分支
+git merge developer
+3.切换到developer分支上继续开发
+git checkout developer
+```
+
+### 清除本地废弃或者不用的分支
+```
+git remote prune origin
+```
+
+
 图形化界面查看
 gitk
 
-设置远程跟踪分支
-git branch --set-upstream-to=origin/<branch> develop
 
-解决冲突的办法：
+### 设置远程跟踪分支
+```
+git branch --set-upstream-to=origin/<branch> develop
+```
+
+### 解决冲突
 查找处于冲突状态的文件，逐一进行修改
+```
 git status
 git add [conflictFiles]
-git commit –m "resolve conflict resulting from merging A and B"
+git commit -m "resolve conflict resulting from merging A and B"
+```
 
-
-查看历史根据commit message找commit对象的SHA1
+### 查看历史根据commit message找commit对象的SHA1
+```
 git log
 git checkout SHA1（历史不可重写）
-git checkout –b newBranch（可以从历史中新建分支重写）
+git checkout -b newBranch（可以从历史中新建分支重写）
+```
 
-
-查看标签
+### 查看标签
+```
 git tag
+```
 
-创建附注型标签
-git tag –a "v1.0.0" –m "basic version"
+### 创建附注型标签
+```
+git tag -a "v1.0.0" -m "basic version"
+```
 
-创建轻量型标签
+### 创建轻量型标签
+```
 git tag "v1.0.0"
+```
 
-回溯到指定标签
+### 回溯到指定标签
+```
 git checkout v1.0.0
+```
 
-从当前分支创建分支
-git checkout –b branchName
+### 一键获取自某标签开始到现在的所有提交消息
+```
+git shortlog master --not v1.0.5
+```
 
+### 查看远程库
+```
+git remote -v
+```
 
-一键获取自某标签开始到现在的所有提交消息
-git shortlog master –-not v1.0.5
-
-
-会自动将git@xxx.com:model/xxx.git 加入本地库的远端分支并起名为origin
-以后可以git push origin [branchName]
-
-查看远程库
-git remote –v
-
-添加远程库
+### 添加远程库
+```
 git remote add [shortName] [url]
+```
 
-删除远程库
+### 删除远程库
+```
 git remote rm [shortName]
+```
 
-重命名远程库
+### 重命名远程库
+```
 git remote rename [oldName] [newName]
+```
 
-
-推送指定分支
+### 推送指定分支
+```
 git push [remoteLib] [branchName]
+```
 
-推送指定tag
+### 推送指定tag
+```
 git push [remoteLib] [tag]
+```
 
-推送所有tag
-git push [remoteLib] –-tags
+### 推送所有tag
+```
+git push [remoteLib] --tags
+```
 
-删除远程分支
+### 删除远程分支
+```
 git push [remoteLib] :[remoteBranch]
-
+```
 远程master分支无法删除，除非服务端做特殊配置
-删除远程tag
-git push [remoteLib] :[remoteTag]
 
-一键推送多个远端库：
+
+### 删除远程tag
+```
+git push [remoteLib] :[remoteTag]
+```
+
+### 一键推送多个远端库：
 编辑本地仓库的.git/config文件
+```
 [remote "all"]
 url = [url1]
 url = [url2]
 git push all [branchName]
+```
+
+### 别名
+```
+git config --global alias.ci commit 
+git config --global alias.co checkout
+git config --global alias.st status
+git config --global alias.bc branch
+git config --global alias.lg 'log --oneline'
+
+git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit"
+
+git ci -am "aaa"
+git co master
+git st
+git bc
+git lg
+
+添加全局忽略文件
+git config --global core.excludesfile ~/.gitignore_global
+```
+
+
+### git服务器搭建
+```
+mkdir git
+cd git
+git init --bare test.git
+ls
+
+更新文件和目录的组权限
+chown git:git test.git
+
+关联git服务器项目
+git remote add origin ssh://root@192.168.1.100/opt/git/test.git
+git remote -v
+
+第一次push的话
+git push -u origin master
+
+```
 
 
 
-===============================================================
 我的GitHub仓库A，朋友的GitHub仓库B，B fork A的项目
 然后在B上配置：
-（1）首先在终端中配置原仓库的位置，进入项目目录，执行一下命令：
+1. 首先在终端中配置原仓库的位置，进入项目目录，执行一下命令：
+```
 git remote -v
 输出：
 origin  https://github.com/HeywoodKing/chf-project.git (fetch)
 origin  https://github.com/HeywoodKing/chf-project.git (push)
+```
 
-（2）配置原仓库的路径：
+2. 配置原仓库的路径：
 添加主repo为上游代码库
 注意一定要cd到你自己fork出来的库里面去，比如工程名叫luoluo，那要先cd到luoluo中去，然后才能操作
+```
 git remote add upstream 项目地址
+```
 
-（3）再次查看远程目录的位置：
+3. 再次查看远程目录的位置：
+```
 git remote -v
+```
 
-（4）抓取原仓库的修改文件：
+4. 抓取原仓库的修改文件：
+```
 git fetch upstream
+```
 
-（5）切换到master分支。
-切换到master分支。
+5. 切换到master分支
+切换到master分支
+```
 git checkout master
+```
 
-（6）合并远程的master分支：
+6. 合并远程的master分支：
 下面这行代码执行结束之后，本地代码会立刻和主库保持同步，非常神奇
+```
 git merge upstream/master
+```
 
-（7）此时，你的本地库已经和原仓库已经完全同步了。但是注意，此时只是你电脑上的本地库和远程的github原仓库同步了，你自己的github仓库还没有同步，此时需要使用“git push”命令把你本地的仓库提交到github中。
+7. 此时，你的本地库已经和原仓库已经完全同步了。但是注意，此时只是你电脑上的本地库和远程的github原仓库同步了，你自己的github仓库还没有同步，此时需要使用“git push”命令把你本地的仓库提交到github中。
+```
 git push origin master
+```
 
-
-其实(4)(5)(6)可以合并成一条命令
+其实4,5,6可以合并成一条命令
+```
 git pull upstream master
 第一个参数upstream 表示远程主repo
 第二个参数master 表示自己fork库的master分支
-
-===============================================================
-
+```
 
 
 将gitLab 上的dev分支拉取到本地
-1》与远程仓库建立连接：git remote add origin XXXXX.git
-2》使用git branch 查看本地是否具有dev分支
-3》如果没有 git fetch origin dev
-4》git checkout -b dev origin/dev在本地创建分支dev并切换到该分支
-5》git pull origin dev就可以把gitLab上dev分支上的内容都拉取到本地了
+1. 与远程仓库建立连接：git remote add origin XXXXX.git
+2. 使用git branch 查看本地是否具有dev分支
+3. 如果没有 git fetch origin dev
+4. git checkout -b dev origin/dev在本地创建分支dev并切换到该分支
+5. git pull origin dev就可以把gitLab上dev分支上的内容都拉取到本地
 
 
+### Create a new repository
+```
+git clone git@gitlab:icmofang/moli_restapi.git
+cd moli_restapi
+touch README.md
+git add README.md
+git commit -m "add README"
+git push -u origin master
+```
 
-t常用操作命令收集：
+### Existing folder
+```
+cd existing_folder
+git init
+git remote add origin git@gitlab:icmofang/moli_restapi.git
+git add .
+git commit -m "Initial commit"
+git push -u origin master
+```
+
+### Existing Git repository
+```
+cd existing_repo
+git remote rename origin old-origin
+git remote add origin git@gitlab:icmofang/moli_restapi.git
+git push -u origin --all
+git push -u origin --tags
+```
+
+## git常用操作命令收集
+```
 1) 远程仓库相关命令
 检出仓库：$ git clone git://github.com/jquery/jquery.git
 查看远程仓库：$ git remote -v
@@ -337,82 +545,32 @@ bin
 ```
 
 
-git删除文件
-rm add2.txt
-
-git rm add2.txt
-git commit -m "rm test"
-git push web
-
- 
-
------------at server
-cd /var/www/foo.git;sudo git update-server-info
-
- 
-
-------------检查删除效果
-cd;rm foo3 -rf;git clone http://[某ip]/foo.git foo3
-
- 
-
-------------更新已经存在的local code
-cd;cd foo2
-git remote add web [某user]@[某ip]:/var/www/foo.git/
-git pull web master
-
-
-
-git clone git@github.com:512439130/512439130.github.io.git (http,在你的download下复制)
-git clone https://github.com/512439130/512439130.github.io.git (ssh，同理)
-
-//将工作文件修改提交到本地暂存区
-git add <文件名.后缀>
-git add . //当前仓库下所有更新的文件
-//删除本地，并将任务提交到缓存区
-git rm <文件名.后缀>
-
-//查看项目状态(未提交)
-git status
-
-//准备提交
-git commit -m "更新记录(此处随便写，就是记录你更新的日志)"
-
-//正式提交
-git push
-
-//查看更新日志
-git log
-
-//更新远程仓库到本地
-git pull
-
-
-
-====================================================================================
-git中文显示乱码问题：
+### git中文显示乱码问题：
+```
 git 默认中文文件名是 \xxx\xxx 等八进制形式，是因为 对0x80以上的字符进行quote
 只需要设置core.quotepath设为false，就不会对0x80以上的字符进行quote。中文显示正常
 git config --global core.quotepath false
+```
 
-
-解决git指令更新远程仓库github时每次都要输入用户名和密码问题
+### 解决git指令更新远程仓库github时每次都要输入用户名和密码问题
+```
 设置记住密码(默认15分钟)
 git config --global credential.helper cache
-
 如果想自己设置时间，这样就设置一个小时之后失效，可以这样做
-git config credential.helper 'cache –timeout=3600'
+git config credential.helper 'cache -timeout=3600'
 
 长期存储密码
 git config -global credential.helper store
+```
 
-
-使用ssh方式(推荐)
+### 使用ssh方式(推荐)
+```
 在每次push 的时候，都要输入用户名和密码，是不是很麻烦?原因是使用了https方式 push，
 在git bash里边输入 git remote -v 可以查看到使用的是http or ssh
+```
 
-
-git空文件夹不能提交的问题
+### git空文件夹不能提交的问题
+```
 在该空文件夹下使用命令：touch .gitkeep文件即可提交，或者手动创建文件
 
 在根目录下最好添加要给忽略文件 touch .gitignore 或者直接vim .gitignore
@@ -421,13 +579,11 @@ git空文件夹不能提交的问题
 *
 # Except this file
 !.gitignore
-
-
 .idea //忽略.idea文件夹及文件夹下文件
 *.iml //忽略以.iml结尾的文件
+```
 
 ```
-【例子】
 # 忽略*.o和*.a文件
 *.[oa]
 # 忽略*.b和*.B文件，my.b除外
@@ -453,10 +609,12 @@ git update-index --assume-unchanged PATH    在PATH处输入要忽略的文件�
 ```
 
 
+### 生成ssh 公钥和私钥
 =============================================
 生成ssh 公钥和私钥
 打开git bash终端或者cmd终端
 输入：
+<<<<<<< HEAD
 ```
 linux:
 ssh-keygen -t rsa -C "opencoding@hotmail.com" -f ~/.ssh/github
@@ -466,16 +624,24 @@ ssh-keygen -t rsa -C "opencoding@hotmail.com" -f C:/Users/ching/.ssh/github.pub
 ```
 email是你github注册账号的邮箱
 
+=======
+ssh-keygen -t rsa -C "opencoding@hotmail.com" -f ~/.ssh/id_rsa
+添加你的SSH公钥(email是你github注册账号的邮箱)
+>>>>>>> 79ce494e5a83b4eb8387fd0f504e7c8a7df4f36d
 第一次出现：Enter file in which to save the key (/root/.ssh/id_rsa): 直接按回车就行
 第二次出现：Enter passphrase (empty for no passphrase): 第一次输入公钥密码(推荐不用输入，直接回车，以便在clone、pull、push等不用输入公钥密码)
 第三次出现：Enter same passphrase again: 再次输入公钥密码：直接按回车就行
 公钥创建成功，位置在你使用 git bush 的当前项目目录下(xx.pub)
 公钥和私钥配对，接下来去C盘找你的私钥
+<<<<<<< HEAD
 私钥一般在你的用户文件夹的.ssh下，打开公钥xx.pub,复制全部内容，
 在github中创建ssh keys
 
 
 
+=======
+私钥一般在你的用户文件夹的 .ssh下，打开xx.pub,复制全部内容，在github中创建ssh keys
+>>>>>>> 79ce494e5a83b4eb8387fd0f504e7c8a7df4f36d
 生成多个私钥
 如果你已经有了一套名为 id_rsa 的公秘钥，将要生成另外一个公钥，比如 aysee ，你也可以使用任何你喜欢的名字。
 1、生成一个新的自定义名称的公钥和私钥：
@@ -566,6 +732,8 @@ The key's randomart image is:
 |   o=o. .        |
 |  .+*+.          |
 +----[SHA256]-----+
+git config --global user.name "flack.chen"
+git config --global user.email "flack.chen@icmofang.com"
 ```
 
 ```
@@ -595,10 +763,8 @@ git remote rename origin old-origin
 git remote add origin git@gitlab:icmofang/moli_restapi.git
 git push -u origin --all
 git push -u origin --tags
-```
 
-
-#git常用命令
+# git常用命令
 命令行里git的命令列表以及解释 
 ```
 git clone <address> 复制代码库到本地。
@@ -647,7 +813,6 @@ git rebase br1 br2
 
 
 ```
-
 FETCH_HEAD： 是一个版本链接，记录在本地的一个文件中，指向着目前已经从远程仓库取下来的分支的末端版本。
 
 
@@ -680,15 +845,15 @@ git status
 
 增加文件
 git add . | git add a.txt
-git commit –m "add a.txt"
+git commit -m "add a.txt"
 
 修改文件
 git add a.txt
-git commit –m "xx" | git commit –am "xx"
+git commit -m "xx" | git commit -am "xx"
 
 将文件从本地删除
 git rm a.txt
-git commit –m "delete a.txt"
+git commit -m "delete a.txt"
 将文件从版本库删除
 git rm --cached a.txt
 git commit -m "xx"
@@ -697,8 +862,8 @@ git commit -m "xx"
 git reset HEAD a.txt
 
 将文件从版本库中删除,保留本地文件
-git rm –-cached a.txt
-git commit –m "delete a.txt"
+git rm --cached a.txt
+git commit -m "delete a.txt"
 git status
 
 查看分支
@@ -713,11 +878,11 @@ git checkout master
 
 
 从当前分支创建同时切换分支
-git checkout –b branchName
-git checkout –b developer
+git checkout -b branchName
+git checkout -b developer
 
 删除分支
-git branch –d branchName
+git branch -d branchName
 
 
 
@@ -756,20 +921,20 @@ git branch --set-upstream-to=origin/<branch> develop
 查找处于冲突状态的文件，逐一进行修改
 git status
 git add [conflictFiles]
-git commit –m "resolve conflict resulting from merging A and B"
+git commit -m "resolve conflict resulting from merging A and B"
 
 
 查看历史根据commit message找commit对象的SHA1
 git log
 git checkout SHA1（历史不可重写）
-git checkout –b newBranch（可以从历史中新建分支重写）
+git checkout -b newBranch（可以从历史中新建分支重写）
 
 
 查看标签
 git tag
 
 创建附注型标签
-git tag –a "v1.0.0" –m "basic version"
+git tag -a "v1.0.0" -m "basic version"
 
 创建轻量型标签
 git tag "v1.0.0"
@@ -778,18 +943,18 @@ git tag "v1.0.0"
 git checkout v1.0.0
 
 从当前分支创建分支
-git checkout –b branchName
+git checkout -b branchName
 
 
 一键获取自某标签开始到现在的所有提交消息
-git shortlog master –-not v1.0.5
+git shortlog master --not v1.0.5
 
 
 会自动将git@xxx.com:model/xxx.git 加入本地库的远端分支并起名为origin
 以后可以git push origin [branchName]
 
 查看远程库
-git remote –v
+git remote -v
 
 添加远程库
 git remote add [shortName] [url]
@@ -808,7 +973,7 @@ git push [remoteLib] [branchName]
 git push [remoteLib] [tag]
 
 推送所有tag
-git push [remoteLib] –-tags
+git push [remoteLib] --tags
 
 删除远程分支
 git push [remoteLib] :[remoteBranch]

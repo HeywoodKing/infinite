@@ -1,7 +1,6 @@
-# Django2+uwsgi+nginx部署详解（Ubuntu18.04）
+# Ubuntu18+Django2.2+uwsgi+nginx部署详解
 
 ## 相关软件版本：
->
 ```
 Django 2.1.3
 Python 3.7
@@ -34,144 +33,6 @@ uname -r
 ifconfig -a
 ```
 
-## 安装之前首先更新系统依赖包
-```
-sudo apt-get update
-sudo apt-get upgrade
-```
-
-## 安装python3
-## 安装pip
-```
-建议使用非root用户，部署时最好使用python虚拟环境,系统自带Python3.6、vim和git，所以不用装,
-安装python3-pip、python3-setuptools、gcc、python3-dev、wheel：
-（缺一不可，不然之后用pip安装uwsgi会有各种各样的报错）
-```
-sudo apt-get install python3 (如果有python环境可以不装)
-sudo apt-get install python3-pip  (如果有pip可以不装)
-sudo apt-get install python3-dev #类库和头文件单独的包
-sudo apt-get install python-setuptools 
-sudo apt-get install wheel
-
-以下如果项目中用不到可以不用安装
-sudo apt-get install libxml* #解析xml文件的库
-sudo apt-get install net-tools #网络管理命令如:ifconfig是查看本地ip
-sudo apt-get install lsof #列出打开文件工具
-```
-
-## 安装python3.7
-```
-1. 直接使用apt-get安装python3.7失败:
-sudo apt-get install python3.7
-
-2. 改为手动安装
-步骤1：在python官网找到python-3.7.1.tgz的地址：https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
-
-步骤2：下载安装包
-wget https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz
-
-步骤3：解压安装包
-tar -zxvf Python-3.7.1.tgz
-
-步骤4：切换到解压后的目录下
-cd Python-3.7.1
-
-步骤5：./configure（也可以./configure --prefix=/usr/local/python3.7.1）
-./configure
-# 或者
-./configure --prefix=/usr/local/python3.7.1
-
-步骤6：编译make（没有安装make的安装一下）
-make
-
-步骤7：测试make test
-make test
-关于make test命令出现ModuleNotFoundError: No module named ‘_ctypes’ 错误，请移步我的另外一篇博文https://blog.csdn.net/u014775723/article/details/85224447
-
-步骤8：安装sudo make install
-sudo make install
-
-若步骤5执行的是 ./configure，则安装后可执行文件默认放在/usr /local/bin，库文件默认放在/usr/local/lib，配置文件默认放在/usr/local/include，其它的资源文件放在/usr /local/share。
-
-若步骤5执行的是./configure --prefix=/usr/local/python3.7.1，则可执行文件放在/usr /local/python3.7.1/bin，库文件放在/usr/local/python3.7.1/lib，配置文件放在/usr/local/python3.7.1/include，其它的资源文件放在/usr /local/python3.7.1/share
-
-步骤9：若步骤5执行./configure --prefix=/usr/local/python3.7.1，则需要添加环境变量。步骤5是./configure的跳过此步骤
-
-添加环境变量
-PATH=$PATH:$HOME/bin:/usr/local/python3.7.1/bin
-
-查看环境变量
-echo $PATH
-
-步骤10：查看安装目录
-可以看到此时python3.7安装到了/usr/local/lib/（若步骤5执行./configure --prefix=/usr/local/python3.7.1，python3.7安装到了/usr/local/python3.7.1/lib/）
-
-步骤11：测试，输入python3.7
-```
-## 更新python默认指向为python3.7
-```
-步骤1：查看python命令指向
-ls -l /usr/bin | grep python
-
-步骤2：若如步骤1的图，若要安装python3.4则，由于python3.4为系统自带的，直接使用以下命令并跳过步骤3：
-删除原有链接
-rm /usr/bin/python 
-
-建立新链接
-ln -s /usr/bin/python3.4 /usr/bin/python
-
-步骤3：由于python3.7是自己安装的，不在/usr/bin下，而在usr/local/bin或者/usr/local/python3.7.1/bin下（取决于前面执行的./configure还是./configure --prefix=/usr/local/python3.7.1。因此需要先加一条软链接并且把之前的python命令改为python.bak，同时pip也需要更改。依次执行以下命令
-
-若python3.7安装时，执行的是./configure，则：
-mv /usr/bin/python /usr/bin/python.bak
-ln -s /usr/local/bin/python3 /usr/bin/python
-mv /usr/bin/pip /usr/bin/pip.bak
-ln -s /usr/local/bin/pip3 /usr/bin/pip
-
-若python3.7安装时，执行的是./configure --prefix=/usr/local/python3.7.1，则为：
-mv /usr/bin/python /usr/bin/python.bak
-ln -s /usr/local/python3.7.1/bin/python3.7 /usr/bin/python
-mv /usr/bin/pip /usr/bin/pip.bak
-ln -s /usr/local/python3.7.1/bin/pip3 /usr/bin/pip
-
-步骤4：此时输入python验证
-```
-
-## 测试python是否安装完成，如果原来是python但是版本低，需要设置python默认优先级
-```
-查看python指向
-ls -l /usr/bin | grep python
-
-调整优先级
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
-sudo update-alternatives --config python3
-```
-
-## 以上安装python3.7版本太麻烦，为了更好的管理python多个版本，推荐使用pyenv版本管理工具
-```
-参考地址：https://github.com/pyenv/pyenv#basic-github-checkout
-
-1.Check out pyenv where you want it installed. A good place to choose is $HOME/.pyenv (but you can install it somewhere else).
-$ git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-
-2.Define environment variable PYENV_ROOT to point to the path where pyenv repo is cloned and add $PYENV_ROOT/bin to your $PATH for access to the pyenv command-line utility.
-$ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-$ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-
-3.Add pyenv init to your shell to enable shims and autocompletion. Please make sure eval "$(pyenv init -)" is placed toward the end of the shell configuration file since it manipulates PATH during the initialization.
-$ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
-
-4.Restart your shell so the path changes take effect. You can now begin using pyenv.
-$ exec "$SHELL" -l
-
-接下来你就可以自如的安装你想要的版本了
-$ pyenv install 3.7.3
-```
-
-## 查看已经安装的python版本：
-`pyenv versions`
-
 ## 安装数据库（默认安装了就不用安装了）
 ```
 sudo apt-get install mysql-server
@@ -193,20 +54,27 @@ sudo apt-get install libmysqlclient-dev
 ## 安装pipenv
 `pip3 install pipenv`
 
-我的项目是在本机的home/flack/myproject/
-下,而且我的项目本身用的就是pipenv虚拟环境，会在根目录下存在pipfile 和 pipfile.lock两个文件
-这两个文件的生成是这样的
-首先进入到你的django项目根目录，然后输入以下命令（确保已经安装了pipenv虚拟环境）
-
-### 手动部署
+### 创建虚拟环境
 ```
+cd /home/flack/myproject/djangotwo
+
 pipenv --three 
 或者
 pipenv --python 3.7
+```
 
-然后激活pipenv环境
+### 激活pipenv环境
+```
 pipenv shell
+```
 
+### 上传你的项目到服务器，我们要将项目上传到/var/www/下面
+在开发环境下保证你的项目能够使用django内置的web服务器跑起来(python manage.py runserver 9090)，然后上传，
+这里您可以使用pycharm自带的ssh上传也可以使用ftp(filezilla)工具都可以
+
+
+### 手动部署
+```
 在激活的虚拟环境中运行一下命令
 pipenv install django
 pipenv install django-simpleui
@@ -215,7 +83,7 @@ pipenv install pytz
 pipenv install sqlparse
 pipenv install mysqlclient
 安装mysqlclients时可能会报错，
->
+
 1. 首先在虚拟环境pipenv下卸载刚才报错的mysqlclient,命令：
 pipenv uninstall mysqlclient
 2. 推出虚拟环境再次安装以下依赖
@@ -228,7 +96,7 @@ pipenv install mysqlclient
 
 ### 自动部署
 ```
-1. git clone project.git
+1. git clone git@xxx/xxx/project.git
 
 2. cd project
 
@@ -243,10 +111,10 @@ pipenv install
 ```
 
 #### 注：确保以上组件或者您的项目所需要的第三方包都已安装
-在开发环境下保证你的项目能够使用django内置的web服务器跑起来(python manage.py runserver 9090)
 
-那么此时要做的使用就是lock,将pipfile第三方包lock住，运行以下命令
+那么此时要做的就是lock,将pipfile第三方包lock住，运行以下命令
 `pipenv lock`
+
 此时会将项目所需要的包lock到pipfile.lock里面，接下来收集项目的静态文件命令
 `sudo python manage.py collectstatic --noinput`
 或者
@@ -258,7 +126,7 @@ pipenv install
 [uwsgi]
 
 # the socket use the full path to be safe
-# socket = /opt/project/chf-project/chfweb/chfweb.sock
+# socket = /var/www/chfweb/chfweb.sock
 # 使用nginx连接时使用
 socket = 127.0.0.1:9000
 # 直接做web服务器使用
@@ -266,7 +134,7 @@ socket = 127.0.0.1:9000
 
 # django-related settings
 # the base directory full path
-chdir = /opt/project/chf-project/chfweb
+chdir = /var/www/chfweb
 # 项目目录
 # chdir = E:/MyWork/Project/chf-project/chfweb
 # django's wsgi file
@@ -293,29 +161,15 @@ daemonize = uwsgi.log
 
 ```
 
-
-
-## 安装django
-`sudo pip3 install django`
-
-以上安装完都是安装到ubuntu系统上的组件
-
-这里我需要部署到ubuntu上的虚拟环境下，我这里使用的是pipenv虚拟环境
-## 安装pipenv
-`pip install pipenv`
-
-## 安装django
-`pipenv install django`
-
-## 上传你的项目，我们要将项目上传到/opt/下面
+### 测试项目能否正常运行
 首先在该目录下创建一个用于存放项目的文件夹
-`sudo mkdir /opt/project`
+`sudo mkdir /var/www/project`
 此时就可以将项目上传或者拷贝到发布目录，我们复制项目到发布路径（其实只要拷贝项目代码+pipfile.lock即可）
-`sudo cp -r /home/flack/myproject/chf-project /opt/project/`
+`sudo cp -r /home/flack/myproject/chfweb /var/www/chfweb/`
 
-进入/opt/project/chf-project/chfweb/目录
+进入/var/www/chfweb/目录
 ```
-cd /opt/project/chf-project/chfweb/
+cd /var/www/chfweb/
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
@@ -326,13 +180,19 @@ python manage.py runserver 9000
 
 到这一步说明你的代码已经上传OK,接下来要安装uwsgi和nginx
 
-安装 uwsgi
+### 安装uwsgi
 `sudo apt-get install uwsgi`
 
-测试uwsgi 在/opt/project/下创建一个test
+### 虚拟环境中安装uwsgi
 ```
-sudo mkdir /opt/project/test
-cd /opt/project/test
+pipenv install uwsgi
+```
+
+### 测试uwsgi 
+在/var/www/下创建一个test
+```
+sudo mkdir /var/www/test
+cd /var/www/test
 touch helloworld.py
 sudo vim helloworld.py
 
@@ -354,7 +214,7 @@ uwsgi --http :9000 --wsgi-file helloworld.py --master --processes 4 --threads 2 
 
 ```
 接着直接测试项目示例：
-uwsgi --http :9000 --chdir /opt/project/chf-project/chfweb/ --wsgi-file chfweb/wsgi.py --master --processes 4 --threads 2 --stats 127.0.0.1:9100
+uwsgi --http :9000 --chdir /var/www/chfweb/ --wsgi-file chfweb/wsgi.py --master --processes 4 --threads 2 --stats 127.0.0.1:9100
 ```
 在浏览器里面输入：http://localhost:9000/admin即可看到django后台管理页面
 ```
@@ -385,17 +245,22 @@ chfweb/
 ```
 在我们通过Django创建chfweb项目时，在子目录chfweb下已经帮我们生成的 wsgi.py文件,所以，我们只需要再创建my_uwsgi.ini配置文件即可，当然，uwsgi支持多种类型的配置文件，如xml，ini等。此处，使用ini类型的配置。这一步我们开始的时候已经创建完成了，这个配置，其实就相当于在上一步中通过wsgi命令，后面跟一堆参数的方式，给文件化了。
 
-在项目目录下/opt/project/chf-project/chfweb/运行命令启动uwigs,看是否成功,注意查看uwsgi的启动信息，如果有错，就要检查配置文件的参数是否设置有误
+在项目目录下/var/www/chfweb/运行命令启动uwsgi,看是否成功,注意查看uwsgi的启动信息，如果有错，就要检查配置文件的参数是否设置有误
 
 
 用ini文件启动uwsgi
+```
 uwsgi --ini chfweb_uwsgi.ini
+```
 
-## 这里容易犯两个错误:
+##### 这里容易犯两个错误:
 1. 项目文件没放对地方
 2. http和socket弄混了(socket是搭配nginx用的,用uwsgi单独测试要用http)
 
-成功之后安装nginx
+成功之后
+
+
+### 安装nginx
 ```
 sudo apt-get install nginx
 sudo nginx -v # 查看版本
@@ -409,7 +274,7 @@ sudo vim /etc/nginx/nginx.conf # 打开此文件
 一定要把以下代码放在http{}中,不然会报错,还要特别注意分号(;)
 
 upstream django{
-    # server unix:///opt/project/chf-project/chfweb/chfweb.sock;
+    # server unix:///var/www/chfweb/chfweb.sock;
     server 127.0.0.1:9000; # 这里要和chfweb_uwsgi.ini中的socket = 127.0.0.1:9000保持一致
 }
 
@@ -422,14 +287,14 @@ server{
     client_max_body_size    75M;
 
     location /media {
-        alias   /opt/project/chf-project/chfweb/uploads;
+        alias   /var/www/chfweb/uploads;
     }
 
     location /static {
         expires 30d;
         autoindex on; 
         add_header Cache-Control private;
-        alias   /opt/project/chf-project/chfweb/static;
+        alias   /var/www/chfweb/static;
     }
 
     # finally, send all non-media requests to the django server
@@ -442,9 +307,9 @@ server{
 
 ```
 
-除了上述要修改nginx.conf文件之外，我们有更好的方式，不需要修改nginx.conf文件，而是在/etc/nginx/sites-available/下创建一个chinslickingweb_nginx.conf
+除了上述要修改nginx.conf文件之外，我们有更好的方式，不需要修改nginx.conf文件，而是在/etc/nginx/sites-available/下创建一个chfweb_nginx.conf
 
-`sudo vim /etc/nginx/sites-available/chinslickingweb_nginx.conf # 打开此文件`
+`sudo vim /etc/nginx/sites-available/chfweb_nginx.conf # 打开此文件`
 增加如下内容：
 ```
 server{
@@ -454,11 +319,11 @@ server{
         client_max_body_size 75M;
 
         location /static {
-                alias /var/www/chinslickingweb/static;
+                alias /var/www/chfweb/static;
         }
 
         location /media {
-                alias /var/www/chinslickingweb/uploads;
+                alias /var/www/chfweb/uploads;
         }
 
         location / {
@@ -471,7 +336,7 @@ server{
 ```
 sudo ln -s ~/path/to/your/mysite/mysite_nginx.conf /etc/nginx/sites-enabled/
 或者
-sudo ln -s /etc/nginx/sites-available/chinslickingweb_nginx.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/chfweb_nginx.conf /etc/nginx/sites-enabled/
 ```
 
 ```
@@ -492,9 +357,9 @@ sudo systemctl restart nginx # 重启
 
 最后要给你的项目目录复制权限
 ```
-sudo chmod 777 /opt/project/chf-project/chfweb
-sudo chmod 777 /opt/project/chf-project/chfweb/uwsgi.pid
-sudo chmod 777 /opt/project/chf-project/chfweb/uwsgi.log
+sudo chmod 777 /var/www/chfweb
+sudo chmod 777 /var/www/chfweb/uwsgi.pid
+sudo chmod 777 /var/www/chfweb/uwsgi.log
 ```
 
 这时就完美成功
@@ -521,21 +386,6 @@ for pid in line;
 do
     kill -9 $pid;
 done
-```
-
-```
-vim的使用方法:
-光标：j 下   k 上  H 左 L右
-    i --当前光标下进入编辑模式  
-    ESC --退出编辑模式
-    a --当前光标下一个字符进入编辑模式
-    A --尾行进入编辑模式
-    dd --删除整行
-    dG --删除光标所在行到文件最后一行所有内容
-    dgg --删除光标所在行到文件第一行所有内容
-    u --返回上一次修改状态
-    wq --保存退出
-    q! --放弃打开文件后的所有修改退出
 ```
 
 ### django项目国际化

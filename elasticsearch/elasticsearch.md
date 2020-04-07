@@ -79,6 +79,130 @@ Shards & Replicas
  提供一个操作的方法，就是本机搭建个es集群然后部署一个kibana，通过kibana熟悉http api就可以了，这篇文章就专注下cat和cluster相关的api。
 
 
+### 数据类型（7.4.2）
+
+ElasticSearch 7.x 默认不在支持指定索引类型
+
+1. 字符串
+
+  + 文本类型 text
+    当一个字段需要用于全文搜索(会被分词), 比如产品名称、产品描述信息, 就应该使用text类型.
+    text的内容会被分词, 可以设置是否需要存储: "index": "true|false".
+    text类型的字段不能用于排序, 也很少用于聚合.
+  + 关键字类型 keyword
+    当一个字段需要按照精确值进行过滤、排序、聚合等操作时, 就应该使用keyword类型.
+    keyword的内容不会被分词, 可以设置是否需要存储: "index": "true|false".
+
+2. 数字类型：
+
+  + byte  有符号的8位整数, 范围: [-128 ~ 127]
+  + short 有符号的16位整数, 范围: [-32768 ~ 32767]
+  + integer 有符号的32位整数, 范围: [$-2^{31}$ ~ $2^{31}$-1]
+  + long  有符号的32位整数, 范围: [$-2^{63}$ ~ $2^{63}$-1]
+  + float 32位单精度浮点数
+  + double  64位双精度浮点数
+  + half_float  16位半精度IEEE 754浮点类型
+  + scaled_float  缩放类型的的浮点数, 比如price字段只需精确到分, 57.34缩放因子为100, 存储结果为5734
+  尽可能选择范围小的数据类型, 字段的长度越短, 索引和搜索的效率越高;
+  优先考虑使用带缩放因子的浮点类型.
+
+3. 日期类型 - date
+
+      JSON没有日期数据类型, 所以在ES中, 日期可以是:
+      包含格式化日期的字符串, "2018-10-01", 或"2018/10/01 12:10:30".
+      代表时间毫秒数的长整型数字.
+      代表时间秒数的整数.
+      如果时区未指定, 日期将被转换为UTC格式, 但存储的却是长整型的毫秒值.
+      可以自定义日期格式, 若未指定, 则使用默认格式: strict_date_optional_time||epoch_millis
+
+4. 布尔类型
+      真值: true, "true", "on", "yes", "1"...
+      假值: false, "false", "off", "no", "0", ""(空字符串), 0.0, 0
+
+5. 二进制类型
+      二进制类型是Base64编码字符串的二进制值, 不以默认的方式存储, 且不能被搜索. 有2个设置项:
+
+      (1) doc_values: 该字段是否需要存储到磁盘上, 方便以后用来排序、聚合或脚本查询. 接受true和false(默认);
+
+      (2) store: 该字段的值是否要和_source分开存储、检索, 意思是除了_source中, 是否要单独再存储一份. 接受true或false(默认).
+6. 范围类型：
+      range类型支持以下几种:
+
+      类型  范围
+      integer_range $-2^{31}$ ~ $2^{31}-1$
+      long_range  $-2^{63}$ ~ $2^{63}-1$
+      float_range 32位单精度浮点型
+      double_range  64位双精度浮点型
+      date_range  64位整数, 毫秒计时
+      ip_range  IP值的范围, 支持IPV4和IPV6, 或者这两种同时存在
+
+7. 复合数据类型
+  
+    一、数组类型
+
+    二、对象类型
+
+    三、嵌套类型 nested
+
+8. 地理数据类型
+   一、地理点类型 - geo point
+   二、地理形状类型 - geo_shape
+
+9. 专业领域数据类型
+  IP类型
+  计数数据类型 - token_count
+
+
+创建指定Mapping type的索引库 （一个Mapping Type包括两部分，Meta-fields、Fields or properties）
+PUT /my-index
+```
+  {
+    "mappings": {
+      "properties": {
+        "age":    { "type": "integer" },  
+        "email":  { "type": "keyword"  }, 
+        "name":   { "type": "text"  }     
+      }
+    }
+  }
+```
+
+```
+简单搜索
+http://192.168.1.100:9200/megacorp/employee/_search?q=last_name:smith
+
+dsl
+GET http://192.168.1.100:9200/megacorp/employee/_search
+{
+  "query": {
+    "match": {
+      "last_name": "smith"
+    }
+  }
+}
+
+{
+  "query": {
+    "filtered":{
+      "filter": {
+        "range": {
+          "age": {"gt": 30}
+        }
+      },
+      "query": {
+        "match": {
+          "last_name": "smith"
+        }
+      }
+    }
+    
+  }
+}
+
+```
+
+
+
 
 ### 安装
 ```
@@ -111,6 +235,16 @@ http://192.168.1.169:9201/electron_with_kwargs_*/_count
 
 查询某个索引的文档记录
 http://192.168.1.169:9201/electron_with_kwargs_00/_search
+http://192.168.1.169:9201/electron_with_kwargs_00/_search?pretty
+
+
+查询某个索引文档参数part_number包含123的记录
+http://192.168.1.169:9201/electron_with_kwargs_00/_search?pretty&q=part_number:123
+精确查询某个索引文档参数part_number=123的记录
+http://192.168.1.169:9201/electron_with_kwargs_00/_search?pretty -d {"query":{"term":{"part_number":"123"}}}
+查询某个索引的文档记录只显示3条
+http://192.168.1.169:9201/electron_with_kwargs_00/_search?pretty -d {"query":{},"size":3}
+
 
 查询某个索引文档的category_id=05050的记录
 http://192.168.1.169:9201/category_with_kwargs/_search?q=category_id:05050
@@ -118,6 +252,88 @@ http://192.168.1.169:9201/category_with_kwargs/_search?q=category_id:05050
 查询某个索引文档的en_parameter:Thermoplastic+200kHz的记录
 http://192.168.1.169:9201/electron_with_kwargs_0d/_search?q=en_parameter:Thermoplastic+200kHz
 
+
+======================================================================
+获取或操作索引的别名
+http://192.168.1.100:9200/_aliases?pretty
+
+获取或操作索引的列
+http://192.168.1.100:9200/electron_with_010010009?pretty
+
+创建或操作类型
+http://192.168.1.100:9200/electron_with_010010009/type?pretty
+
+创建或操作mapping
+http://192.168.1.100:9200/electron_with_010010009/_mapping?pretty
+
+创建或操作设置(number_of_shards是不可更改的)
+http://192.168.1.100:9200/electron_with_010010009/_settings?pretty
+
+打开被关闭的索引
+http://192.168.1.100:9200/electron_with_010010009/_open?pretty
+
+关闭索引
+http://192.168.1.100:9200/electron_with_010010009/_close?pretty
+
+刷新索引（使新加内容对搜索可见）
+http://192.168.1.100:9200/electron_with_010010009/_refresh?pretty
+
+刷新索引(将变动提交到lucene索引文件中,并清空elasticsearch的transaction log)
+http://192.168.1.100:9200/electron_with_010010009/_flush?pretty
+
+优化segement，个人认为主要是对segement进行合并
+http://192.168.1.100:9200/electron_with_010010009/_optimize
+
+获得索引的状态信息
+http://192.168.1.100:9200/electron_with_010010009/_status
+
+获得索引的segments的状态信息
+http://192.168.1.100:9200/electron_with_010010009/_segments
+
+不执行实际搜索，而返回解释信息
+http://192.168.1.100:9200/electron_with_010010009/_explain
+
+不执行实际搜索，根据输入的参数进行文本分析
+http://192.168.1.100:9200/electron_with_010010009/_analyze
+
+操作指定文档，不解释
+http://192.168.1.100:9200/electron_with_010010009/type/id
+
+创建一个文档，如果该文件已经存在，则返回失败
+http://192.168.1.100:9200/electron_with_010010009/type/id/_create
+
+更新一个文件，如果改文件不存在，则返回失败
+http://192.168.1.100:9200/electron_with_010010009/type/id/_update
+   
+
+Distributed
+URL 说明
+/_cluster/nodes 获得集群中的节点列表和信息
+/_cluster/health  获得集群信息
+/_cluster/state 获得集群里的所有信息（集群信息、节点信息、mapping信息等）
+
+Nodes
+URL 说明
+/_nodes/process 我主要看file descriptor 这个信息
+/_nodes/process/stats 统计信息（内存、CPU能）
+/_nodes/jvm 获得各节点的虚拟机统计和配置信息
+/_nodes/jvm/stats 更详细的虚拟机信息
+/_nodes/http  获得各个节点的http信息（如ip地址）
+/_nodes/http/stats  获得各个节点处理http请求的统计情况
+/_nodes/thread_pool 
+获得各种类型的线程池
+
+（elasticsearch分别对不同的操作提供不同的线程池）的配置信息
+
+/_nodes/thread_pool/stats 获得各种类型的线程池的统计信息
+   
+以上这些操作和可以通过如
+
+/_nodes/${nodeId}/jvm/stats
+
+/_nodes/${nodeip}/jvm/stats
+
+/_nodes/${nodeattribute}/jvm/stats
 ```
 
 
@@ -756,7 +972,7 @@ eg:
 curl --user [your-admin]:[your-password] http://192.168.1.169:9201/electron_with_kwargs_00/_count?pretty=true
 
 插入数据
-curl -POST IP:9201/索引名称/索引类型 -d '{
+curl -POST 127.0.0.1:9201/electron_with_kwargs_00/索引类型 -d '{
   "title": "test title 001",
   "description": "this is a random desc ",
   "price": 22.6,
@@ -764,6 +980,42 @@ curl -POST IP:9201/索引名称/索引类型 -d '{
   "type": 2,
   "createDate": "2018-01-12"
 }'
+
+查询index下文档的数量
+curl --user elastic:password -XGET http://10.0.3.16:9201/electron_with_010010009/_count
+curl --user elastic:password -XGET http://10.0.3.16:9201/electron_with_010010009/_count?pretty
+
+查询index下文档的记录
+curl --user elastic:password -H "Content-Type: application/json" -XGET http://10.0.3.16:9201/electron_with_010010009/_search
+curl --user elastic:password -H "Content-Type: application/json" -XGET http://10.0.3.16:9201/electron_with_010010009/_search?pretty
+curl --user elastic:password -H "Content-Type: application/json" -XGET http://10.0.3.16:9201/electron_with_010010009/_search?pretty -d "{\"query\": {\"match_all\": {} },\"size\": 10}"
+
+curl --user elastic:password -H "Content-Type: application/json" -XGET http://10.0.3.16:9201/electron_with_010010009/_search?pretty -d "{\"query\": {\"match\": {\"summary\": \"IC MCU 8BIT 1KB\"} },\"size\": 5}"
+
+使用jieba分词器查询
+测试
+curl --user elastic:password -H "Content-Type: application/json" -XPUT http://10.0.3.16:9201/test -d '{
+  "settings" : {
+      "number_of_shards" : 1,
+      "number_of_replicas" : 0
+  },
+  "mappings" : {
+    "properties" : {
+      "name" : { "type" : "text", "analyzer" : "jieba_index", "search_analyzer" : "jieba_search" }
+    }
+  }
+}';echo
+
+curl --user elastic:password -XGET http://10.0.3.16:9201/test/_count?pretty
+curl --user elastic:password -XGET http://10.0.3.16:9201/test/_search?pretty
+curl --user elastic:password -H "Content-Type: application/json" -XGET http://10.0.3.16:9201/test/_analyze?pretty&analyzer=jieba_index -d '中华人民共和国';echo
+curl --user elastic:password -H "Content-Type: application/json" -XGET http://10.0.3.16:9201/test/_analyze?analyzer=jieba_search -d '中华人民共和国';echo
+curl --user elastic:password -H "Content-Type: application/json" -XGET http://10.0.3.16:9201/test/_analyze?analyzer=jieba_other -d '中华人民共和国 HelLo';echo
+
+
+curl --user elastic:password -H "Content-Type: application/json" -XGET http://10.0.3.16:9201/electron_with_010010009/_search?pretty -d "{\"query\": {\"match\": {\"summary\": \"IC MCU 8BIT 1KB\"} },\"size\": 5}"
+
+
 
 查询数据
 curl -XPOST http://127.0.0.1:9209/electron_with_kwargs_00/_search
@@ -788,19 +1040,19 @@ curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\"
 curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match\": {\"name\": \"student60\" } }}"
 
 查询 name=test
-curl -XPOST IP:9201/索引名称/_search?pretty -d "{\"query\": {\"match\": {\"title\": \"test\" } }}"
+curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match\": {\"title\": \"test\" } }}"
 
 返回 title=005 or name=007
-curl -XPOST IP:9201/索引名称/_search?pretty -d "{\"query\": {\"match\": {\"title\": \"005 007\" } }}"
+curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match\": {\"title\": \"005 007\" } }}"
 
 返回 title=007 or title=005
-curl -XPOST IP:9201/索引名称/_search?pretty -d "{\"query\": {\"bool\": {\"should\": [{\"match\": {\"title\": \"007\" }},{\"match\": {\"title\": \"005\" }}]}}}"
+curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"bool\": {\"should\": [{\"match\": {\"title\": \"007\" }},{\"match\": {\"title\": \"005\" }}]}}}"
 
 返回 不匹配title=007 & title=005
-curl -XPOST IP:9201/索引名称/_search?pretty -d "{\"query\": {\"bool\": {\"must_not\": [{\"match\": {\"title\": \"007\" }},{\"match\": {\"title\": \"005\" }}]}}}"
+curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"bool\": {\"must_not\": [{\"match\": {\"title\": \"007\" }},{\"match\": {\"title\": \"005\" }}]}}}"
 
 返回 type=2 & title!=005
-curl -XPOST IP:9201/索引名称/_search?pretty -d "{\"query\": {\"bool\": {\"must\": [{\"match\": {\"type\": 2 }}],\"must_not\": [{\"match\": {\"title\": \"005\" }}]}}}"
+curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"bool\": {\"must\": [{\"match\": {\"type\": 2 }}],\"must_not\": [{\"match\": {\"title\": \"005\" }}]}}}"
 
 搜索商品名称中包含yagao的商品，而且按照售价降序排序
 http://121.201.107.56:9209/electron_with_kwargs_00/_search?q=name:yagao&sort=price:desc
@@ -810,10 +1062,10 @@ http://121.201.107.56:9209/electron_with_kwargs_00/_count
 
 
 返回 短语匹配 title=title 007
-curl -XPOST IP:9201/索引名称/_search?pretty -d "{\"query\": {\"match_phrase\": {\"title\": \"title 007\" } }}"
+curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"match_phrase\": {\"title\": \"title 007\" } }}"
 
 布尔值(bool)查询 返回 title=title & title=007
-curl -XPOST IP:9201/索引名称/_search?pretty -d "{\"query\": {\"bool\": {\"must\": [{\"match\": {\"title\": \"title\" }},{\"match\": {\"title\": \"007\" }}]}}}"
+curl -XPOST 127.0.0.1:9201/electron_with_kwargs_00/_search?pretty -d "{\"query\": {\"bool\": {\"must\": [{\"match\": {\"title\": \"title\" }},{\"match\": {\"title\": \"007\" }}]}}}"
 
 
 
@@ -825,7 +1077,7 @@ curl -XPOST 127.0.0.1:9201/bank/account/_bulk?pretty --data-binary @accounts.jso
 curl -XDELETE http://127.0.0.1:9201/bank
 
 
-不指定索引
+不指定索引及分析器
 curl -XPOST http://127.0.0.1:9201/_analyze
 
 
@@ -980,6 +1232,130 @@ GET /_search
 ```
 
 
+```
+{ 
+  "settings" : {
+    "index" : {
+      "creation_date" : "1474989052008",
+      "uuid" : "Ae-7aFrLT466ZJL4U9QGLQ",
+      "number_of_replicas" : "0",
+      "analysis" : {
+        "char_filter" : {
+          "quotes" : {
+            "type" : "mapping",
+            "mappings" : [ "=>'", "=>'", "‘=>'", "’=>'", "‛=>'" ]
+          }
+        },
+        "filter" : {
+          "nGram_filter" : {
+            "max_gram" : "400",
+            "type" : "nGram",
+            "min_gram" : "1",
+            "token_chars" : [ "letter", "digit", "punctuation", "symbol" ]
+          }
+        },
+        "analyzer" : {
+          "quotes_analyzer" : {
+            "char_filter" : [ "quotes" ],
+            "tokenizer" : "standard"
+          },
+          "nGram_analyzer" : {
+            "type" : "custom",
+            "filter" : [ "lowercase", "asciifolding", "nGram_filter" ],
+            "tokenizer" : "whitespace"
+          },
+          "whitespace_analyzer" : {
+            "type" : "custom",
+            "filter" : [ "lowercase", "asciifolding" ],
+            "tokenizer" : "whitespace"
+          }
+        }
+      },
+      "cache" : {
+        "query_result" : {
+          "enable" : "true"
+        }
+      },
+      "number_of_shards" : "1", 
+      "version" : {
+        "created" : "2030099"
+      } 
+    }
+  },
+
+  "mappings" : {
+    "package" : {
+      "properties" : {
+        "autosuggestionpackagedetail" : {
+          "type" : "string",
+          "index" : "not_analyzed"
+        },
+        "availability" : {
+          "type" : "nested",
+          "include_in_all" : false,
+          "properties" : {
+            "displaysequence" : {
+              "type" : "long",
+              "include_in_all" : false
+            },
+            "isquantityavailable" : {
+              "type" : "boolean"
+            },
+          }
+        }
+        "metatags" : {
+          "type" : "string",
+          "include_in_all" : false
+        },
+        "minadultage" : {
+          "type" : "long",
+          "include_in_all" : false
+        },
+        "newmemberrewardpoints" : {
+          "type" : "long",
+          "include_in_all" : false
+        },
+        "packagealbum" : {
+          "include_in_all" : false,
+          "properties" : {
+            "albumdetailid" : {
+              "type" : "string",
+              "include_in_all" : false,
+              "dynamic": true
+            }, 
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+
+### 分词器，分析器
+```
+PUT news
+{
+  "settings": {
+    "index.analysis.analyzer.default.type": "ik_max_word"
+    }
+  },
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "tags": {
+          "type":     "text",
+          "analyzer": "whitespace"
+        }
+      }
+    }
+  }
+}
+
+
+```
+
+
 
 
 ### 疑难杂症
@@ -994,3 +1370,89 @@ GET /_search
 
 ```
 
+#### The mapping definition cannot be nested under a type ...
+```
+The mapping definition cannot be nested under a type [_doc] unless include_type_name is set to true.
+
+
+```
+
+#### Root mapping definition has unsupported parameters
+```
+
+```
+
+#### No handler for type [string] declared on field
+```
+
+```
+
+#### Failed to parse mapping ...
+```
+Failed to parse mapping [_doc]: Could not convert [factory_zh_name.index] to boolean
+Failed to parse value [not_analyzed] as only [true] or [false] are allowed
+现在index这个只能用true或者false了，如果想要不被分词就把数据类型设置为keyword
+
+PUT /newwebsite
+{
+  "mappings": {
+    "article": {
+      "properties": {
+        "author_id": {
+          "type": "long"
+        },
+        "title": {
+          "type": "text",
+          "analyzer": "english"
+        },
+        "content": {
+          "type": "text"
+        },
+        "post_date": {
+          "type": "date"
+        },
+        "publisher_id": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+
+测试
+GET /newwebsite/_analyze
+{
+  "field": "publisher_id",
+  "text": "my-dogs" 
+}
+
+返回结果:
+{
+  "tokens": [
+    {
+      "token": "my-dogs",
+      "start_offset": 0,
+      "end_offset": 7,
+      "type": "word",
+      "position": 0
+    }
+  ]
+}
+```
+
+#### Mapping definition for [zh_parameter] has unsupported parameters:  [index : false]
+```
+
+```
+
+
+#### Content-Type header [application/x-www-form-urlencoded] is not supported
+```
+curl -XGET http://localhost:9200/tmdb/_search?pretty  -d ' {"query": {"match_all": ""}}'
+{
+  "error" : "Content-Type header [application/x-www-form-urlencoded] is not supported",
+  "status" : 406
+}
+添加请求头即可正常查询
+curl -H "Content-Type: application/json" http://localhost:9200/tmdb/_search?pretty  -d '{"query": {"match_all": {}}}'
+```

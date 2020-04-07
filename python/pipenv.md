@@ -660,3 +660,35 @@ python3 -m pip install --upgrade pip
 ```
 
 
+### 疑难杂症
+
+#### pipenv check 报错
+```
+ImportError: cannot import name 'get_installed_distributions' from 'pip'
+解决办法：
+python -m pip install --upgrade pip -i https://pypi.douban.com/simple
+python -m pip install --upgrade pipenv -i https://pypi.douban.com/simple
+
+pip install ImportError: cannot import name 'SourceDistribution'
+问题原因: pip v20.0的bug
+解决办法:手动升级pip
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python get-pip.py
+```
+
+#### pipenv install flake8 --dev 报错
+```
+pipenv.patched.notpip._internal.exceptions.InstallationError: Command "python setup.py egg_info" failed with error code 1 in C:\Users\ADMINI~1\AppData\Local\Temp\tmpm0y8xkacbuild\turtle\
+解决办法：
+
+```
+
+#### vscode 无法加载文件 xxx/activate.ps1 因为在此系统上禁止运行脚本
+```
+vscode 无法加载文件 D:\workspace\virtualenv\MyTest-DJXFXntF\Scripts\activate.ps1，因为在此系统上禁止运行脚本
+解决办法：
+报错中其实已经有解决办法https:/go.microsoft.com/fwlink/?LinkID=135170
+简而言之，就是为了安全起见，power shell不能运行脚本，运行以下命令即可开启脚本运行权限
+Set-ExecutionPolicy -ExecutionPolicy UNRESTRICTED
+```
+
