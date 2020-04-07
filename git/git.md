@@ -462,7 +462,7 @@ linux:
 ssh-keygen -t rsa -C "opencoding@hotmail.com" -f ~/.ssh/github
 
 windows:
-ssh-keygen -t rsa -C "opencoding@hotmail.com" -f C:\Users\xxx\.ssh\github
+ssh-keygen -t rsa -C "opencoding@hotmail.com" -f C:/Users/ching/.ssh/github.pub
 ```
 email是你github注册账号的邮箱
 
