@@ -19,7 +19,7 @@ pip install SomePackage
 pip install package_name -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 安装使用豆瓣源
-pip install package_name --trusted-host pypi.douban.com -i http://pypi.douban.com/simple
+pip install package_name --trusted-host pypi.douban.com -i https://pypi.douban.com/simple
 
 pip --default-timeout=100 install package_name
 ```

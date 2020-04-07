@@ -455,17 +455,24 @@ git update-index --assume-unchanged PATH    在PATH处输入要忽略的文件�
 
 =============================================
 生成ssh 公钥和私钥
-打开git bash终端
+打开git bash终端或者cmd终端
 输入：
-ssh-keygen -t rsa -C "opencoding@hotmail.com" -f ~/.ssh/id_rsa
-添加你的SSH公钥(email是你github注册账号的邮箱)
+```
+linux:
+ssh-keygen -t rsa -C "opencoding@hotmail.com" -f ~/.ssh/github
+
+windows:
+ssh-keygen -t rsa -C "opencoding@hotmail.com" -f C:\Users\xxx\.ssh\github
+```
+email是你github注册账号的邮箱
 
 第一次出现：Enter file in which to save the key (/root/.ssh/id_rsa): 直接按回车就行
 第二次出现：Enter passphrase (empty for no passphrase): 第一次输入公钥密码(推荐不用输入，直接回车，以便在clone、pull、push等不用输入公钥密码)
 第三次出现：Enter same passphrase again: 再次输入公钥密码：直接按回车就行
 公钥创建成功，位置在你使用 git bush 的当前项目目录下(xx.pub)
 公钥和私钥配对，接下来去C盘找你的私钥
-私钥一般在你的用户文件夹的 .ssh下，打开xx.pub,复制全部内容，在github中创建ssh keys
+私钥一般在你的用户文件夹的.ssh下，打开公钥xx.pub,复制全部内容，
+在github中创建ssh keys
 
 
 
@@ -559,6 +566,8 @@ The key's randomart image is:
 |   o=o. .        |
 |  .+*+.          |
 +----[SHA256]-----+
+```
+
 ```
 Git global setup
 git config --global user.name "flack.chen"
