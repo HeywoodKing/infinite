@@ -4,8 +4,8 @@
 ### git常用命令
 命令行里git的命令列表以及解释 
 ```
-克隆项目
-git clone <address> 复制代码库到本地
+克隆项目(复制代码库到本地)
+git clone <address> 
 git clone https://github.com/512439130/512439130.github.io.git
 git clone git@xxx.com:model/xxx.git
 git clone git@github.com:512439130/512439130.github.io.git
