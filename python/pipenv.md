@@ -85,7 +85,7 @@ click是Flask作者 Armin Ronacher 写的命令行库，现在Flask已经集成�
 值填写 存放位置
 ```
 WORKON_HOME
-D:\workspace\virtualbox_env
+D:\workspace\virtualenvs
 
 以后所有的虚拟环境都会放在这个目录里
 要想把虚拟环境放入项目文件夹

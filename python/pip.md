@@ -60,6 +60,10 @@ pip freeze or pip list
 pip list -o
 ```
 
+
+
+
+
 内存检测工具
 
 对于python代码的内存占用问题，对于代码进行内存监控十分必要。这里笔者这里推荐两个小工具来检测python代码的内存占用
